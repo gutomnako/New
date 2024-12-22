@@ -1,0 +1,394 @@
+/* Global reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; /* To avoid overflow issues */
+}
+
+/* Navbar styling */
+.navbar {
+  margin: auto;
+  background-color: white;
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.logo img {
+  height: 50px;
+  width: auto; 
+}
+
+nav ul {
+  list-style: none;
+  display: flex; 
+  justify-content: space-between; 
+}
+
+nav li {
+  margin: 0 10px;
+}
+
+nav a {
+  text-decoration: none;
+  color: #333;
+  font-size: 14px;
+  font-weight: bold;
+  font-family: Arial;
+  padding: 5px 10px;
+}
+
+nav a:hover {
+  background-color: #e0e0e0;
+  color: #000;
+}
+
+.navbar .right a {
+  background: transparent;
+  border: 1px solid blue;
+  padding: 10px 50px;
+  margin: 0; /* Reset margin */
+  border-radius: 40px;
+  transition: background-color 0.3s ease;
+  text-decoration: none;
+  font-family: Arial;
+  font-weight: bold;
+}
+
+.navbar .right a:hover {
+  background-color: rgb(61, 97, 228);
+  color: black;
+}
+
+/* Main section */
+.main {
+  width: 100%;
+  height: 100vh;
+  background-image: url('/static/images/mnbv.jfif');
+  background-position: center;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Content section */
+.content {
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  padding: 60px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;  /* Increase max-width for better responsiveness */
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.content h1 {
+  font-family: 'Times New Roman', serif;
+  font-size: 36px;
+  color: black;
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.content .cn {
+  display: inline-block;
+  padding: 10px 20px;
+  background: blue;
+  color: white;
+  font-family: Arial, sans-serif;
+  font-weight: bold;
+  font-size: 15px;
+  margin-top: 20px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-decoration: none;
+}
+
+.content .cn:hover {
+  background-color: darkblue;
+}
+
+.content .cn a {
+  color: white;
+  text-decoration: none;
+}
+
+/* Welcome section */
+.welcome-section {
+  width: 100%;
+  margin: 0;
+  padding: 20px;
+  background-color: lightblue;
+  display: flex;
+  flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  color: #333;
+}
+
+.welcome-section h2 {
+  font-family: 'Times New Roman', serif;
+  font-size: 36px;
+  color: black;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+}
+
+.custom-line {
+  border: none;
+  border-top: 3px solid black;
+  width: 600px;
+  margin: 10px auto 20px;
+}
+
+.welcome-section p {
+  font-size: 18px;
+  line-height: 1.6;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.welcome-section .text-content {
+  flex: 1;
+  max-width: 600px;
+}
+
+.image-gallery {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  position: relative;
+  padding: 70px; 
+}
+
+
+.image-gallery img {
+  border: 3px solid grey;
+  width: 220px; /* Pare-parehong lapad */
+  height: 150px; /* Pare-parehong taas */
+  object-fit: cover; /* Para sakto sa frame */
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+
+.image-gallery img:nth-child(odd) {
+  transform: translateX(-10px); /* Bahagyang kaliwa */
+}
+
+.image-gallery img:nth-child(even) {
+  transform: translateX(10px); /* Bahagyang kanan */
+}
+
+.image-gallery img:hover {
+  transform: scale(1.05) translateX(0); /* Zoom lang kapag hover */
+  z-index: 1; /* Iangat ang imahe kapag naka-hover */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Top-rated section */
+.top-rated {
+  padding: 20px;
+  background-color: #f9f9f9;
+  background-image: url('/static/images/paradise.jpg');
+  background-size: cover;
+  background-position: center;
+  text-align: center;
+}
+
+.top-rated h2 {
+  color: black;
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.card-container{
+    flex: 1;
+    padding: 1em;
+    width: 100%;
+    height: 100vh;
+    background-image: url('/static/images/paradise.jpg');
+    background-position: center;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Increased min width for a better visual */
+  gap: 1.5em; /* Slightly larger gap for better spacing */
+  padding: 1em;
+}
+
+/* Individual card styling */
+.card {
+  background-color: #f4bf99;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1em;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Even spacing for content */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease; /* Add subtle scaling effect */
+}
+
+.card:hover {
+  transform: scale(1.02); /* Slightly enlarges on hover for emphasis */
+}
+
+/* Image styling */
+.card img {
+  width: 100%;
+  height: 150px; /* Fixed height for consistent appearance */
+  border-radius: 8px;
+  object-fit: cover; /* Ensures image covers area without distortion */
+  margin-bottom: 10px;
+}
+
+/* Title styling */
+.card h3 {
+  color: #004080;
+  font-size: 1.1em;
+  margin: 0.5em 0;
+}
+
+/* Description and text */
+.card p {
+  font-size: 0.9em;
+  color: #333;
+  margin: 0.5em 0;
+}
+
+/* Button styling */
+.card button {
+  background-color: #004080;
+  color: #fff;
+  border: none;
+  padding: 0.5em 1em;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.card button a {
+  text-decoration: none;
+  color: white;
+}
+
+.card button:hover {
+  background-color: #002f4f;
+  transform: scale(1.05);
+}
+
+.card button:active {
+  background-color: #004085;
+}
+
+
+.see-more-btn {
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  display: block;
+  margin: 20px auto;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  font-size: 16px;
+  border-radius: 50px;
+  cursor: pointer;
+}
+
+.see-more-btn:hover {
+  background-color: #0056b3;
+}
+
+.discover-section {
+  background-color: #ade0ff;
+  text-align: center;
+}
+
+.discover-section h2 {
+  font-size: 2em;
+  color: #004080;
+  margin-bottom: 1em;
+}
+
+.discover-cards {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+
+.discover-card {
+  border: 3px solid burlywood;
+  border-radius: 10px;
+  width: 150px;
+  text-align: center;
+  margin: 0.5em;
+}
+
+.discover-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.discover-card p {
+  font-size: 1.2em;
+  color: #004080;
+  margin-top: 0.5em;
+}
+
+.about-section {
+  background-color: #00bfff;
+  padding: 2em;
+  text-align: center;
+  color: #fff;
+  margin-top: 2em;
+}
+
+.about-section h2 {
+  font-size: 2em;
+  margin-bottom: 0.5em;
+}
+
+.about-section p {
+  font-size: 1em;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+  color: #004080;
+}
+
+.social-media {
+  margin-top: 1em;
+}
+
+.social-media a {
+  margin: 0 10px;
+  display: inline-block;
+}
+
+.social-media img {
+  width: 30px;
+  height: 30px;
+  filter: invert(1);
+}

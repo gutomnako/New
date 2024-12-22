@@ -1,0 +1,41 @@
+<aside class="sidebar">
+
+    <div class="filter-section price-range-box">
+      <h3>Price Range</h3>
+      <label for="min-price">Minimum Budget</label>
+      <input type="number" id="min-price" placeholder="₱ Min">
+      
+      <label for="max-price">Maximum Budget</label>
+      <input type="number" id="max-price" placeholder="₱ Max">
+      
+      <button type="button">Apply</button>
+  </div>
+  
+  <div class="filter-section">
+    <form action="{% url 'filter_beaches' %}" method="GET" id="filter-form">
+          <h3>AMENITIES</h3>
+          <a href="{% url 'create-resort' %}">Add Resort</a>
+          <h4>{{resorts.count}} resorts available</h4>
+          {% for amenity in amenities %}
+          <label>
+              <input type="checkbox" name="amenities" value="{{ amenity.id }}"
+                  {% if amenity.id|stringformat:"s" in selected_amenities %}checked{% endif %}
+                  onchange="document.getElementById('filter-form').submit()">
+              {{ amenity.name }}  
+          </label>
+      {% endfor %}
+      <hr>
+      <h3>LOCATIONS</h3>
+          {% for location in locations %}
+          <label>
+              <input type="checkbox" name="location" value="{{ location.id }}"
+                  {% if location.id|stringformat:"s" in selected_location %}checked{% endif %}
+                  onchange="document.getElementById('filter-form').submit()">
+              {{ location.name }}  
+          </label>
+      {% endfor %}
+      </form>
+  </div>
+
+  
+</aside>

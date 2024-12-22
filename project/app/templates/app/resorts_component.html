@@ -1,0 +1,23 @@
+{% load static %}
+<main class="main-content">
+    <div class="card-grid">      
+      {% for resort in resorts %}
+      <div class="card" data-location="San Sebastian" data-amenities="Pool, Restaurant, Parking">
+        <img src="{% static 'images/paradise.jpg' %}" alt=""> 
+        {% if request.user == resort.host %}
+        <a href="{% url 'update-resort' resort.id %}">Edit</a>
+        <a href="{% url 'delete-resort' resort.id %}">Delete</a>
+        {% endif %}
+          <h5>{{resort.name}}</a></h5> 
+                  
+          <p>{{resort.description}}</p>
+          <p>Entrance Kids:{{resort.entrance_kids}} | Entrance Adluts:{{resort.entrance_adults}}</p>
+          <p>Cottage:{{resort.price}}</p>
+          <button type="button">
+             <a href="{% url 'resort' resort.id %}">Details</a>
+            </button>
+      </div>
+      {% endfor %}
+
+    </div>
+  </main>

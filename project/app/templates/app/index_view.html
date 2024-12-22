@@ -1,0 +1,147 @@
+{% extends 'main.html' %}
+
+{% load static %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beach and Resort</title>
+  <link rel="stylesheet" href="{% static 'styles/index.css' %}">
+</head>
+<body>  
+ {% csrf_token %}
+  <div class="navbar">
+    <div class="logo">
+      <a href="#home">
+        <img src="{% static 'images/icon.png' %}" alt="Logo">
+      </a>
+    </div>
+    
+    <nav>
+      <ul>
+        <li><a href="{% url 'home' %}">Beaches & Resorts</a></li>
+        <li><a href="map.html">Map</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </nav>
+
+    <div class="right">
+      {% if request.user.is_authenticated %}
+      <a href="{% url 'logout' %}">Logout</a>
+      {% else %}
+      <a href="{% url 'login' %}">Login</a>
+      {% endif %}
+    </div>
+  </div>
+
+  
+  <div class="main">
+    <div class="content">
+      {% if request.user.is_authenticated %}
+      <h2><strong>Hello {{request.user}}!</strong></h2>
+      {% endif %}
+      <hr>
+      <br>
+      <br>
+      <h1>Discover the Best<br><span>Beaches & Resorts</span><br>in Santa Magdalena, Sorsogon!</h1>
+      <button class="cn"><a href="beachesling.html">Explore Now!</a></button>
+    </div>
+  </div>
+
+ 
+  <div class="welcome-section">
+    <div class="text-content">
+      <h2>Welcome to Santa Magdalena’s Beach and Resort Getaways!</h2>
+      <hr class="custom-line">
+      <p>
+        Your ultimate guide to exploring the most stunning beaches and luxurious resorts in Santa Magdalena, Sorsogon. Discover hidden gems, plan your next adventure, and stay updated with local events as you embark on a journey through Santa Magdalena’s breathtaking coastal landscapes.
+        <br><br>
+        Santa Magdalena, Sorsogon is a coastal paradise waiting to be discovered. With its pristine beaches, clear turquoise waters, and captivating scenery, this hidden gem offers a unique blend of relaxation and adventure. Far from crowded tourist spots, Santa Magdalena is the perfect destination for travelers seeking an authentic beach experience.
+        <br><br>
+        The town’s resorts provide a warm and welcoming atmosphere, where guests can enjoy the simple pleasures of beach life. Whether you're basking in the sun, exploring vibrant coral reefs, or savoring fresh seafood, each beach in Santa Magdalena has its own charm. From secluded coves perfect for quiet reflection to lively shorelines ideal for family fun, Santa Magdalena, Sorsogon, offers something for everyone. Come and experience the natural beauty and laid-back lifestyle that make this destination truly special.
+      </p>
+    </div>
+    
+    <div class="image-gallery">
+      <img src="{% static 'images/delhamor.jfif' %}" alt="Beach 1">
+      <img src="{% static 'images/fmb.jfif' %}" alt="Beach 2">
+      <img src="{% static 'images/olango img.jpeg' %}" alt="Beach 3">
+      <img src="{% static 'images/bueta.jfif' %}" alt="Beach 4">
+      <img src="{% static 'images/baetacottage3.jfif' %}" alt="Beach 5">
+    </div>
+  </div>
+
+
+  <div class="top-rated">
+    <h2>TOP RATED</h2>
+    <div class="card-container">
+      <div class="card-grid">
+        {% for resort in resorts %}
+        <div class="card">
+          <img src="{%static 'images/beata img.jfif' %}" alt="Beata Beach Sanctuary">
+          <br>
+          <h4>{{resort.name}}</h4>
+              <p>{{resort.description}}</p>
+              <p>Entrance Kids:{{resort.entrance_kids}} | Entrance Adults:{{resort.entrance_adults}}</p>
+              <p>Cottage:{{resort.price}}</p>
+              <button type="button">
+                 <a href="{% url 'resort' resort.id %}">Details</a>
+                </button>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <br>
+
+    <button id="see-more-btn" class="see-more-btn">See More!</button>
+  </div>
+  <div class="discover-section">
+    <div class="discover-cards">
+      <div class="discover-card">
+        <p>UNWIND</p>
+        <img src="{% static 'images/beach1.jfif' %}" alt="Unwind">
+      </div>
+      <div class="discover-card">
+        <img src="{% static 'images/beach2.jfif' %}" alt="Enjoy">
+        <p>ENJOY</p>
+      </div>
+      <div class="discover-card">
+        <p>RELAX</p>
+        <img src="{% static 'images/beach3.jpg' %}" alt="Relax"> {% static '' %}
+      </div>
+      <div class="discover-card">
+        <img src="{% static 'images/beach4.jfif' %}" alt="Swim">
+        <p>SWIM</p>
+      </div>
+      <div class="discover-card">
+        <p>REST</p>
+        <img src="{% static 'images/beach5.jfif' %}" alt="Rest">
+      </div>
+      <div class="discover-card">
+        <img src="{% static 'images/beach6.jpg' %}" alt="Explore">
+        <p>EXPLORE</p>
+      </div>
+    </div>
+  </div>
+  <div class="about-section">
+    <h2>About Us</h2>
+    <p>
+      A hidden gem along the coast of Santa Magdalena, Sorsogon, Where waves meet the shore in a symphony of peace and tranquility. Once untouched, it now welcomes families, friends, and travelers Seeking an escape into nature’s embrace.  Beneath clear skies and swaying palms, Guests find both adventure and relaxation— A place far from the bustling world, yet close enough For those who crave a quick retreat into paradise.  Sta. Magdalena Beach and Resort, where nature’s beauty awaits.
+    </p>
+    
+    <div class="social-media">
+      <a href="#"><img src="{% static 'images/facebook.png' %}" alt="Facebook"></a>
+      <a href="#"><img src="{% static 'images/twitter.png' %}" alt="Twitter"></a>
+      <a href="#"><img src="{% static 'images/instagram.png' %}" alt="Instagram"></a>
+      <a href="#"><img src="{% static 'images/gmail.png' %}" alt="Email"></a>
+    </div>
+  </div>
+  
+  
+
+</body>
+</html>
+{% endblock content %}

@@ -1,0 +1,61 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+{% if page == 'login' %}
+<link rel="stylesheet" href="{% static 'styles/login.css' %}">
+<body>
+    <div>
+      {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-warning" role="alert">
+            {{message}}
+          </div>
+        {% endfor %} 
+      {% endif %}
+    
+      <div class="login-container">
+        <h1>STA MAGDALENA BEACH AND RESORT</h1>
+        <h4>RECOMMENDATION SYSTEM</h4>
+        <form method="POST" action="">
+          {% csrf_token %}
+          <label>Username:</label>
+          <input type="text" name="username" placeholder="Enter Username">
+
+          <label>Password:</label>
+          <input type="password" name="password" placeholder="Enter Password">
+
+          <button 
+            type="submit" value="Login"> Login
+          </button>
+      </form>
+
+      <p>haven't sign up yet?</p>
+      <a href="{% url 'register' %}">Sign up</a>
+      </div>
+
+    {% else %}
+
+    <link rel="stylesheet" href="{% static 'styles/signup.css' %}">
+      <div class="signup-container1">
+        <h1>Sign Up for STA MAGDALENA BEACH AND RESORT</h1>
+        <h4>RECOMMENDATION SYSTEM</h4>
+        <form method="POST" action="">
+          {% csrf_token %}
+          {% for field in form %}
+          <label>{{field.label}}</label>
+          {{field}}
+          {% endfor %}
+          <button 
+            type="submit" value="Login"> Register
+          </button>
+      </form>
+
+      <p>Already signed up?</p>
+      <a href="{% url 'login' %}">Login</a>
+      </div>
+  </div>
+</body>
+{% endif %}
+</html>
+{% endblock content %}

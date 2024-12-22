@@ -1,0 +1,75 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+<style>
+    .home-container {
+        display: grid;
+        grid-template-columns: 1fr 3fr;
+    }
+</style>
+<h1>home</h1>
+
+<div class="home-container">
+    <div>
+       
+        <form action="{% url 'filter_beaches' %}" method="GET" id="filter-form">
+            <h3>AMENITIES</h3>
+            <a href="{% url 'create-resort' %}">Add Resort</a>
+
+            <div>
+                <a href="{% url 'home' %}">All</a>
+            </div>
+            {% for amenity in amenities %}
+            <label>
+                <input type="checkbox" name="amenities" value="{{ amenity.id }}"
+                    {% if amenity.id|stringformat:"s" in selected_amenities %}checked{% endif %}
+                    onchange="document.getElementById('filter-form').submit()">
+                {{ amenity.name }}  
+            </label>
+            <br>
+        {% endfor %}
+        <hr>
+        <h3>LOCATIONS</h3>
+            {% for location in locations %}
+            <label>
+                <input type="checkbox" name="location" value="{{ location.id }}"
+                    {% if location.id|stringformat:"s" in selected_location %}checked{% endif %}
+                    onchange="document.getElementById('filter-form').submit()">
+                {{ location.name }}  
+            </label>
+            <br>
+        {% endfor %}
+        </form>
+        <hr>
+    </div>
+       
+    <div>
+        <h5>{{resorts.count}} resorts available</h5>
+        <a href="{% url 'create-resort' %}">Add Resort</a>
+
+        <div>
+            
+            {% for resort in resorts %}
+                <div>
+                    <a href="{% url 'update-resort' resort.id %}">Edit</a>
+                    <a href="{% url 'delete-resort' resort.id %}">Delete</a>
+                    <span>@{{resort.host.username}}</span>
+                    <h5>{{resort.id}} -- <a href="{% url 'resort' resort.id %}">{{resort.name}}</a></h5> 
+                    
+                     <p>{{resort.description}}</p>
+                     <p>Entrance Kids:{{resort.entrance_kids}} | Entrance Adluts:{{resort.entrance_adults}}</p>
+                     <p>Cottage:{{resort.price}}</p>
+                    
+                </div>
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+   
+
+</div>
+
+{% endblock content %}

@@ -1,0 +1,40 @@
+{% extends 'main.html' %}
+
+{% load static %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beaches & Resorts</title>
+  <link rel="stylesheet" href="{% static 'styles/beach.css' %}">
+</head>
+<body>
+  <header class="header">
+    <div class="logo">
+      <h1>BEACHES & RESORT</h1>
+    </div>
+    <nav class="nav">
+      <a href="{% url 'index-view' %}">Home</a>
+      <a href="map.html">Map</a>
+      <a href="#">Contact</a>
+    </nav>
+    <div class="search-bar">
+      <form method="GET" action="{% url 'home' %}">
+        <input type="text" name="q" placeholder="Search Resort...">
+      </form>
+    </div>
+  </header>
+    <div class="container">
+      <div class="container">
+      {% include 'app/checkbox_component.html' %}
+    </div>
+        {% include 'app/resorts_component.html' %}
+    </div>
+
+</body>
+</html>
+
+{% endblock content %}
