@@ -8,8 +8,8 @@ from .forms import ResortForm
 from django.contrib import messages
 from django.http import HttpResponse
 from django.contrib.auth.forms import UserCreationForm
-from .decorators import unauthenticated_user, allowed_users
-# from django.contrib.auth.models import Group
+from .decorators import unauthenticated_user, allowed_users, admin_only
+from django.contrib.auth.models import Group
 
 #resorts = [
 #    {'id':1, 'name':'Del hamor'},
@@ -18,23 +18,35 @@ from .decorators import unauthenticated_user, allowed_users
 #]
 
 
+@admin_only
+def adminDashboard(request):
+      resorts = Resort.objects.all()
+      return render(request, 'app/adminDashboard.html', {'resorts': resorts})
+
 @unauthenticated_user 
 def loginPage(request):
       page = 'login'
+      if request.user.is_authenticated:
+        return redirect('index-view')
+    
       if request.method == 'POST':
             username = request.POST.get('username').lower()
             password = request.POST.get('password')
 
-            if request.user.is_authenticated:
-                  return redirect('index-view')
-
             user = authenticate(request, username=username, password=password)
-
+            
             if user is not None:
                   login(request, user)
+
+                  # Redirect Pinakaadmin users to the dashboard
+                  if user.groups.filter(name='pinakaadmin').exists():
+                   return redirect('admin-dashboard')
+                  
+                  # Redirect other users to the index view
                   return redirect('index-view')
-            else: 
-                  messages.error(request, 'User does not exist OR password does not exist')
+            else:
+                  messages.error(request, 'User does not exist OR password is incorrect')
+      
       context = {'page': page}
       return render(request, 'app/login_register.html', context)
 
@@ -54,6 +66,8 @@ def registerPage(request):
                   user.save()
                   login(request, user)
 
+                  group = Group.objects.get(name='users')
+                  user.groups.add(group)
 
                   return redirect('index-view')
             else: 
@@ -64,6 +78,7 @@ def registerPage(request):
 def index_view(request):
     resorts = Resort.objects.all()
     return render(request, 'app/index_view.html', {'resorts': resorts})
+
 
 def home(request):
     q = request.GET.get('q') if request.GET.get('q') != None else ''
@@ -86,7 +101,7 @@ def home(request):
 
 def resort(request, pk):
         resort = Resort.objects.get(id=pk)
-
+        amenities = Amenity.objects.all()
         resort_messages = resort.messages.all().order_by('-created_at')
 
         if request.method == 'POST':
@@ -97,7 +112,7 @@ def resort(request, pk):
             )
             return redirect('resort', pk=resort.id)
 
-        context = {'resort': resort, 'resort_messages': resort_messages,}
+        context = {'resort': resort, 'resort_messages': resort_messages, 'amenities': amenities}
         return render(request, 'app/resort.html', context)
 
 def contact_number(request):
@@ -222,3 +237,4 @@ def deleteMessage(request, pk):
 @login_required(login_url='login')
 def updateUser(request):
       return render(request, 'app/updtae-user.html')
+

@@ -2,13 +2,19 @@
 <main class="main-content">
     <div class="card-grid">      
       {% for resort in resorts %}
-      <div class="card" data-location="San Sebastian" data-amenities="Pool, Restaurant, Parking">
+      <div class="card">
         <img src="{% static 'images/paradise.jpg' %}" alt=""> 
         {% if request.user == resort.host %}
-        <a href="{% url 'update-resort' resort.id %}">Edit</a>
-        <a href="{% url 'delete-resort' resort.id %}">Delete</a>
+        <div class="btn">
+          <button>
+            <a href="{% url 'update-resort' resort.id %}">Edit</a>
+          </button>
+          <button>
+            <a href="{% url 'delete-resort' resort.id %}">Delete</a>
+          </button>
+        </div>
         {% endif %}
-          <h5>{{resort.name}}</a></h5> 
+          <h5>{{resort.name}}</h5> 
                   
           <p>{{resort.description}}</p>
           <p>Entrance Kids:{{resort.entrance_kids}} | Entrance Adluts:{{resort.entrance_adults}}</p>

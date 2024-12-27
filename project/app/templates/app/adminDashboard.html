@@ -1,0 +1,75 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beach Management System</title>
+    <link rel="stylesheet" href="{% static 'styles/styles.css' %}">
+    <script src="{% static 'scripts/scripts.js' %}" defer></script>
+</head>
+<body>
+    {% csrf_token %}
+    <header>
+        <nav class="nav">
+            <a href="{% url 'index-view' %}">Home</a>
+          </nav>
+    </header>
+
+    <main>
+        <section id="dashboard" class="grid-section">
+            <div class="card">
+                <h2>Most Visited Beach</h2>
+                <p id="most-visited-beach-name">Loading...</p>
+            </div>
+            <div class="card">
+                <h2>Monthly User Logins</h2>
+                <canvas id="loginChart"></canvas>
+            </div>
+        </section>
+
+        <section id="manage-resorts" class="grid-section">
+            <div class="card">
+                <h2>Add Resort</h2>
+                <form id="add-resort-form">
+                    <label for="resort-name">Resort Name:</label>
+                    <input type="text" id="resort-name" required>
+                    <button type="submit">Add Resort</button>
+                </form>
+            </div>
+            <div class="card">
+             <h2>Resort List</h2>
+                {% if resorts %}
+                    <ul>
+                        {% for resort in resorts %}
+                            <li>{{ resort.name }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No resorts available.</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <section id="user-reviews" class="grid-section">
+            <div class="card">
+                <h2>Add Review</h2>
+                <textarea id="review-text" placeholder="Write your review here..."></textarea>
+                <button id="submit-review">Submit Review</button>
+            </div>
+            <div class="card">
+                <h2>User Reviews</h2>
+                <ul id="reviews-list">
+                    <!-- User reviews will be dynamically added here -->
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Beach Management System</p>
+    </footer>
+</body>
+</html>
+{% endblock content %}

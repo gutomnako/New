@@ -6,8 +6,8 @@ urlpatterns = [
     path('logout/', views.logoutUser, name='logout'),
     path('register/', views.registerPage, name='register'),
 
-    path('index-view/', views.index_view, name='index-view'),
-    path('', views.home, name='home'),
+    path('home/', views.home, name='home'),
+    path('', views.index_view, name='index-view'),
     path('resort/<str:pk>/', views.resort, name='resort'),
     path('profile/<str:pk>/', views.userProfile, name='user-profile'),
 
@@ -19,5 +19,6 @@ urlpatterns = [
     path('contact-number/', views.contact_number, name='contact-number'),
 
     path('update-user/', views.updateUser, name='update-user'),
+    path('admin-Dashboard/', views.adminDashboard, name='admin-dashboard'),
     
 ]

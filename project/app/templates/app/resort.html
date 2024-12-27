@@ -7,7 +7,9 @@
 
 <p>{{resort.description}}</p>
 
-<p>{{resort.amenities.name}}</p>
+{% for amenity in amenities %}
+    <li>{{ amenity.name }}</li>
+{% endfor %}
 
 <div class="comment-wrapper">
     <h3>Comments</h3>

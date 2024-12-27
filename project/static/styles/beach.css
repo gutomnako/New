@@ -1,6 +1,6 @@
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: "Quicksand", serif;
     margin: 0;
     padding: 0;
     background-color: #f3f3f3;
@@ -13,7 +13,7 @@ body {
     padding: 1em 2em;
     background-color: #3daed7;
     color: black;
-    font-family: 'Times New Roman', Times, serif;
+    font-family: "Quicksand", serif;
   }
   
   .header .logo h1 {
@@ -182,6 +182,34 @@ body {
   background-repeat: no-repeat;
 }
 
+.btn {
+  font-family: 'Arial', sans-serif;
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.edit-button {
+  background-color: #4CAF50; /* Green */
+  color: white;
+}
+
+.edit-button:hover {
+  background-color: #45a049; /* Darker green */
+}
+
+/* Delete Button */
+.delete-button {
+  background-color: #f44336; /* Red */
+  color: white;
+}
+
+.delete-button:hover {
+  background-color: #e53935; /* Darker red */
+}
 
   /* Container for grid layout */
 .card-grid {
@@ -193,7 +221,7 @@ body {
 
 /* Individual card styling */
 .card {
-  background-color: #f4bf99;
+  background-color: #eeeded;
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 1em;
@@ -265,5 +293,3 @@ body {
 #apply-filters:hover {
   background-color: #004080;
 }
-
-  
