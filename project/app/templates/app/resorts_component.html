@@ -5,10 +5,14 @@
       <div class="card">
         <img src="{% static 'images/paradise.jpg' %}" alt=""> 
         {% if request.user == resort.host %}
+          <div class="btn">
+            <button>
+              <a href="{% url 'update-resort' resort.id %}">Edit</a>
+            </button>
+            </div>
+          {% endif %}
+          {% if request.user.groups.all.0.name == "Pinakaadmin" %}
         <div class="btn">
-          <button>
-            <a href="{% url 'update-resort' resort.id %}">Edit</a>
-          </button>
           <button>
             <a href="{% url 'delete-resort' resort.id %}">Delete</a>
           </button>

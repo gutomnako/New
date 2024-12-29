@@ -1,14 +1,71 @@
 {% extends 'main.html' %}
 
+{% load static %}
+
 {% block content %}
+<link rel="stylesheet" href="{% static 'styles/update.css' %}">
+<link rel="stylesheet" href="{% static 'styles/cancel_button.css' %}"> <!-- Link the cancel button CSS -->
+<body>
+  <div class="container">
+      <header>Santa Magdalena Beach Resort Admin</header>
 
-<div>
-    <form method="POST" action="">
+      <form action="" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
-        {{form}}
-        <input type="submit" name="submit">
-    </form>
-</div>
+          <div class="form first">
+              <div class="details personal">
+                  <span class="title">Create Resort</span>
+                  <div class="fields">
+                      <div class="input-fields">
+                          <label for="host">Host</label>
+                          {{ form.host }}
+                      </div>
 
+                      <div class="input-fields">
+                          <label for="name">Name</label>
+                          {{ form.name }}
+                      </div>
+                      
+                      <div class="input-fields">
+                          <label for="location">Location</label>
+                          {{ form.location }}
+                      </div>
 
+                      <div class="input-fields">
+                          <label for="description">Description</label>
+                          {{ form.description }}
+                      </div>
+                      
+                      <div class="input-fields">
+                          <label for="amenities">Amenities</label>
+                          {{ form.amenities }}
+                      </div>
+
+                      <div class="input-fields">
+                          <label for="price_per_night">Price per Night</label>
+                          {{ form.price_per_night }}
+                      </div>
+
+                      <div class="input-fields">
+                          <label for="entrance_kids">Entrance Kids</label>
+                          {{ form.entrance_kids }}
+                      </div>
+
+                      <div class="input-fields">
+                          <label for="entrance_adults">Entrance Adults</label>
+                          {{ form.entrance_adults }}
+                      </div>
+
+                      <div class="input-fields">
+                          <label for="contact_number">Contact Number</label>
+                          {{ form.contact_number }}
+                      </div>
+
+                      <button type="submit">Create</button>
+                      <a href="{% url 'home' %}" class="cancel">Cancel</a>
+                  </div>
+              </div>
+          </div>
+      </form>
+  </div>
+</body>
 {% endblock content %}

@@ -14,7 +14,7 @@
   <div class="filter-section">
     <form action="{% url 'filter_beaches' %}" method="GET" id="filter-form">
           <h3>AMENITIES</h3>
-          {% if request.user == resort.host %}
+          {% if request.user.groups.all.0.name == "Pinakaadmin" %}
           <a href="{% url 'create-resort' %}">Add Resort</a>
           {% endif %}
           <h4>{{resorts.count}} resorts available</h4>
