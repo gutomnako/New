@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 from django.contrib.messages import constants as messages   
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -40,6 +41,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'app.apps.AppConfig',
 ]
+
+
+AUTH_USER_MODEL = 'app.User'
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -80,7 +85,7 @@ WSGI_APPLICATION = 'project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'test',
+        'NAME': 'your_database_name',
         'USER': 'root',
         'PASSWORD': 'akingtiti',
         'HOST': '127.0.0.1',
@@ -124,6 +129,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+MEDIA_URL = '/images/'
 
 STATICFILES_DIRS =[
     BASE_DIR / 'static'
@@ -132,6 +138,12 @@ STATICFILES_DIRS =[
 MESSAGE_TAGS = {
     messages.ERROR: 'danger'
 }
+
+
+MEDIA_ROOT = BASE_DIR / 'static/images'
+
+
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

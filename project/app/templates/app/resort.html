@@ -1,5 +1,7 @@
 {% extends 'main.html' %}
+{% load static %}
 {% block content %}
+<link rel="stylesheet" href="{% static 'styles/resortdetails.css' %}">
 
 <a href="{% url 'home' %}">Home</a>
 
@@ -18,9 +20,12 @@
     {% for message in resort_messages %}
     <div>
         {% if request.user == message.user %}
+        <div>
+            <img src="{{ resort.host.avatar.url}}" class="avatar">
+        </div>
         <a href="{% url 'delete-message' message.id %}">Delete</a>
         {% endif %}
-        <a href="{% url 'user-profile' message.user.id %}">@{{message.user}}</a> <small>{{message.created_at|timesince}} ago </small>
+        <a href="{% url 'user-profile' message.user.id %}">@{{message.user.name}}</a> <small>{{message.created_at|timesince}} ago </small>
         <p>{{ message.comment }}</p>
         <hr>
     </div>

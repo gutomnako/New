@@ -1,21 +1,31 @@
 from django.shortcuts import render, redirect
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from .models import Resort, Amenity, Location, Message
+from .models import Resort, Amenity, Location, Message, User
 from django.contrib.auth import authenticate, login, logout
-from .forms import ResortForm
+from .forms import ResortForm, MyUserCreationForm
 from django.contrib import messages
 from django.http import HttpResponse
-from django.contrib.auth.forms import UserCreationForm
 from .decorators import unauthenticated_user, allowed_users, admin_only
 from django.contrib.auth.models import Group
+
 
 #resorts = [
 #    {'id':1, 'name':'Del hamor'},
 ##    {'id':1, 'name':"Zeah's Beach Place"},
 #    {'id':1, 'name':'FMB Beach Resort'},
 #]
+#def index(request):
+#      if request.method == "POST":
+#          form=ImageForm(data=request.POST,files=request.FILES)
+#          if form.is_valid():
+#               form.save()
+#               obj=form.instance
+#               return render (request, "home.html", {"obj": obj})
+#      else:
+#           form=ImageForm()
+#      img=Image.objects.all()
+#      return render(request, 'app/home.html', {'img':img,'form':form})
 
 
 @admin_only
@@ -56,10 +66,10 @@ def logoutUser(request):
 
 @unauthenticated_user 
 def registerPage(request):
-      form = UserCreationForm()
+      form = MyUserCreationForm()
 
       if request.method == 'POST':
-            form = UserCreationForm(request.POST)
+            form = MyUserCreationForm(request.POST)
             if form.is_valid():
                   user = form.save(commit=False)
                   user.username = user.username.lower()
@@ -130,8 +140,9 @@ def userProfile(request, pk):
 @allowed_users(allowed_roles=['Pinakaadmin'])
 def createResort(request):
       form = ResortForm()
+      
       if request.method == 'POST':
-            form = ResortForm(request.POST)
+            form = ResortForm(request.POST, request.FILES)
             if form.is_valid():
                 form.save()
                 return redirect ('home')
@@ -148,10 +159,12 @@ def updateResort(request, pk):
             return HttpResponse('You are not allowed here!')
 
       if request.method =="POST":
-            form = ResortForm(request.POST, instance=resort)
+            form = ResortForm(request.POST, request.FILES, instance=resort)
             if form.is_valid():
                   form.save()
                   return redirect('home')
+      else:
+        form = ResortForm(instance=resort)
             
       context = {'form': form}
       return render(request, 'app/resort_form.html', context)

@@ -4,7 +4,7 @@
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'styles/update.css' %}">
-<link rel="stylesheet" href="{% static 'styles/cancel_button.css' %}"> <!-- Link the cancel button CSS -->
+<link rel="stylesheet" href="{% static 'styles/cancel_button.css' %}"> 
 <body>
   <div class="container">
       <header>Santa Magdalena Beach Resort Admin</header>
@@ -60,8 +60,20 @@
                           {{ form.contact_number }}
                       </div>
 
+                      <div class="input-fields">
+                        <label for="name">Cottage</label>
+                        {{ form.price }}
+                    </div>
+
+                      <div class="input-fields">
+                        <label for="image">Upload Image</label>
+                        <input type="file" name="image" id="id_image">
+                    </div>
+
+                    <div class="input-fields">
                       <button type="submit">Create</button>
                       <a href="{% url 'home' %}" class="cancel">Cancel</a>
+                    </div>
                   </div>
               </div>
           </div>

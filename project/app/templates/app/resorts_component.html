@@ -4,6 +4,17 @@
       {% for resort in resorts %}
       <div class="card">
         <img src="{% static 'images/paradise.jpg' %}" alt=""> 
+       <!--<form action="" method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="btn btn-lg btn-success">Upload</button>
+        </form>
+        {% if obj %}
+        <img src="{{ obj.image.url }}" alt="image" class="img-thumbnail">
+        {% endif %}
+        {% for x in img %}
+        <img src="{{x.image.url}}" alt="">
+        {% endfor %}-->
         {% if request.user == resort.host %}
           <div class="btn">
             <button>
