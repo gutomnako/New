@@ -3,26 +3,18 @@
 {% block content %}
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Beach Management System</title>
-    <link rel="stylesheet" href="{% static 'styles/adminstyle.css' %}">
-    	<!-- My CSS -->
-    <script src="{% static 'scripts/script1.js' %}" defer></script>
-</head>
-<!DOCTYPE html>
-<html lang="en">
-<head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 	<!-- Boxicons -->
 	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+	<!-- My CSS -->
+	<link rel="stylesheet" href="{% static 'styles/adminstyle.css' %}">
 
 	<title>AdminHub</title>
 </head>
 <body>
-{% csrf_token %}
+
 
 	<!-- SIDEBAR -->
 	<section id="sidebar">
@@ -31,14 +23,14 @@
 			<span class="text">AdminHub</span>
 		</a>
 		<ul class="side-menu top">
-			<li class="active">
+			<li>
 				<a href="{% url 'admin-dashboard' %}">
 					<i class='bx bxs-dashboard' ></i>
 					<span class="text">Dashboard</span>
 				</a>
 			</li>
-			<li>
-				<a href="{% url 'admin-beach' %}">
+			<li class="active">
+				<a href="beachandresorts.html">
 					<i class='bx bx-swim'></i>
 					<span class="text">Beaches and Resorts</span>
 				</a>
@@ -91,7 +83,7 @@
 		<main>
 			<div class="head-title">
 				<div class="left">
-					<h1>Dashboard</h1>
+					<h1>Beaches and Resorts</h1>
 					<ul class="breadcrumb">
 						<li>
 							<a href="#">Dashboard</a>
@@ -108,91 +100,25 @@
 				</a>
 			</div>
 
-			<ul class="box-info">
-				<li>
-					<i class='bx bxs-calendar-check' ></i>
-					<span class="text">
-						<h3>1020</h3>
-						<p>New Users</p>
-					</span>
-				</li>
-				<li>
-					<i class='bx bxs-group' ></i>
-					<span class="text">
-						<h3>2834</h3>
-						<p>Users</p>
-					</span>
-				</li>
-			</ul>
-
-
 			<div class="table-data">
-				<div class="order">
-					<div class="head">
-						<h3>Recent Logins</h3>
-						<i class='bx bx-search' ></i>
-						<i class='bx bx-filter' ></i>
-					</div>
-					<table>
-						<thead>
-							<tr>
-								<th>User</th>
-								<th>Date Order</th>
-								<th>Status</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>
-									<img src="{% static 'images/people.png' %}">
-									<p>John Doe</p>
-								</td>
-								<td>01-10-2021</td>
-								<td><span class="status completed">Completed</span></td>
-							</tr>
-							<tr>
-								<td>
-									<img src="img/people.png">
-									<p>John Doe</p>
-								</td>
-								<td>01-10-2021</td>
-								<td><span class="status pending">Pending</span></td>
-							</tr>
-							<tr>
-								<td>
-									<img src="img/people.png">
-									<p>John Doe</p>
-								</td>
-								<td>01-10-2021</td>
-								<td><span class="status process">Process</span></td>
-							</tr>
-							<tr>
-								<td>
-									<img src="img/people.png">
-									<p>John Doe</p>
-								</td>
-								<td>01-10-2021</td>
-								<td><span class="status pending">Pending</span></td>
-							</tr>
-							<tr>
-								<td>
-									<img src="img/people.png">
-									<p>John Doe</p>
-								</td>
-								<td>01-10-2021</td>
-								<td><span class="status completed">Completed</span></td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
 				<div class="todo">
 					<div class="head">
-						<h3>User Reviews</h3>
-						<i class='bx bx-plus' ></i>
+						<h3>List of Beaches and Resorts</h3>
+						{% if request.user.groups.all.0.name == "Pinakaadmin" %}
+						<a href="{% url 'create-resort' %}" class='bx bx-plus'></a>
+						{% endif %}
 						<i class='bx bx-filter' ></i>
 					</div>
 					<ul class="todo-list">
-						
+						{% if resorts %}
+						<ul>
+							{% for resort in resorts %}
+								<li>{{ resort.name }}</li>
+							{% endfor %}
+						</ul>
+					{% else %}
+						<p>No resorts available.</p>
+					{% endif %}
 					</ul>
 				</div>
 			</div>
@@ -201,7 +127,8 @@
 	</section>
 	<!-- CONTENT -->
 	
+
+	<script src="{% static 'scripts/script1.js' %}"></script>
 </body>
 </html>
-
 {% endblock content %}

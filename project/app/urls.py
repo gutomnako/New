@@ -20,6 +20,9 @@ urlpatterns = [
     path('contact-number/', views.contact_number, name='contact-number'),
 
     path('update-user/', views.updateUser, name='update-user'),
+
     path('admin-Dashboard/', views.adminDashboard, name='admin-dashboard'),
+    path('adminbeachandresort/', views.adminresorts, name='admin-beach'),
+    path('adminviews/', views.adminmonitors, name='admin-monitor')
     
 ]

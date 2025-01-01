@@ -2,8 +2,10 @@
 <main class="main-content">
     <div class="card-grid">      
       {% for resort in resorts %}
-      <div class="card">
-        <img src="{% static 'images/paradise.jpg' %}" alt=""> 
+           <div class="card"> 
+            {% if resort.resort_image %}
+        <img src="{{ resort.resort_image.url }}" alt="">
+        {% endif %}
        <!--<form action="" method="POST" enctype="multipart/form-data">
           {% csrf_token %}
           {{ form.as_p }}

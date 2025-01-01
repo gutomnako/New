@@ -26,12 +26,31 @@ from django.contrib.auth.models import Group
 #           form=ImageForm()
 #      img=Image.objects.all()
 #      return render(request, 'app/home.html', {'img':img,'form':form})
+@login_required
+def some_view(request):
+    # Default redirect URL
+    cancel_url = 'home'
 
+    # Check user groups and set the URL accordingly
+    if request.user.groups.filter(name='Pinakaadmin').exists():
+        cancel_url = 'admin-dashboard'
+
+    return render(request, 'app/adminDashboard.html', {'cancel_url': cancel_url})
 
 @admin_only
 def adminDashboard(request):
       resorts = Resort.objects.all()
       return render(request, 'app/adminDashboard.html', {'resorts': resorts})
+
+@admin_only
+def adminresorts(request):
+      resorts = Resort.objects.all()
+      return render(request, 'app/beachandresorts.html', {'resorts': resorts})
+
+@admin_only
+def adminmonitors(request):
+      resorts = Resort.objects.all()
+      return render(request, 'app/recent-logins.html', {'resorts': resorts})
 
 @unauthenticated_user 
 def loginPage(request):
@@ -100,6 +119,7 @@ def home(request):
         Q(description__icontains=q) |
         Q(location__name__icontains=q)
         ).distinct()
+    
     
     amenities = Amenity.objects.all()
     locations = Location.objects.all()

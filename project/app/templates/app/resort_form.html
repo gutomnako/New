@@ -72,7 +72,11 @@
 
                     <div class="input-fields">
                       <button type="submit">Create</button>
+                      {% if request.user.groups.all.0.name == "Pinakaadmin" %}
+                            <a href="{% url 'admin-dashboard' %}" class="cancel">Cancel</a>
+                        {% else %}
                       <a href="{% url 'home' %}" class="cancel">Cancel</a>
+                      {% endif %}
                     </div>
                   </div>
               </div>
