@@ -19,12 +19,12 @@
     
     {% for message in resort_messages %}
     <div>
-        {% if request.user == message.user %}
         {% if resort %}
         <div>
             <img src="{{ resort.host.avatar.url }}" class="avatar">
         </div>
         {% endif %} 
+        {% if request.user == message.user %}
         <a href="{% url 'delete-message' message.id %}">Delete</a>
         {% endif %}
         <a href="{% url 'user-profile' message.user.id %}">@{{message.user.name}}</a> <small>{{message.created_at|timesince}} ago </small>

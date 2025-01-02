@@ -82,7 +82,9 @@
       <div class="card-grid">
         {% for resort in resorts %}
         <div class="card">
-          <img src="{%static 'images/beata img.jfif' %}" alt="Beata Beach Sanctuary">
+          {% if resort.resort_image %}
+         <img src="{{ resort.resort_image.url }}" alt="">
+          {% endif %}
           <br>
           <h4>{{resort.name}}</h4>
               <p>{{resort.description}}</p>

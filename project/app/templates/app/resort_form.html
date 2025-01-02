@@ -67,11 +67,15 @@
 
                       <div class="input-fields">
                         <label for="image">Upload Image</label>
-                        <input type="file" name="image" id="id_image">
+                        <input type="file" name="resort_image" id="id_image">
                     </div>
 
                     <div class="input-fields">
+                        {% if request.user.groups.all.0.name == "Pinakaadmin" %}
                       <button type="submit">Create</button>
+                      {% else %}
+                      <button type="submit">Update</button>
+                      {% endif %}
                       {% if request.user.groups.all.0.name == "Pinakaadmin" %}
                             <a href="{% url 'admin-dashboard' %}" class="cancel">Cancel</a>
                         {% else %}

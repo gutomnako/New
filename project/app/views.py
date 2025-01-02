@@ -28,10 +28,9 @@ from django.contrib.auth.models import Group
 #      return render(request, 'app/home.html', {'img':img,'form':form})
 @login_required
 def some_view(request):
-    # Default redirect URL
+    
     cancel_url = 'home'
 
-    # Check user groups and set the URL accordingly
     if request.user.groups.filter(name='Pinakaadmin').exists():
         cancel_url = 'admin-dashboard'
 
@@ -67,11 +66,9 @@ def loginPage(request):
             if user is not None:
                   login(request, user)
 
-                  # Redirect Pinakaadmin users to the dashboard
                   if user.groups.filter(name='pinakaadmin').exists():
                    return redirect('admin-dashboard')
                   
-                  # Redirect other users to the index view
                   return redirect('index-view')
             else:
                   messages.error(request, 'User does not exist OR password is incorrect')
@@ -198,50 +195,18 @@ def deleteResort(request, pk):
             return redirect('home')
       return render(request, 'app/delete.html', {'obj': resort})
 
-#def filter_beaches(request):
-      selected_amenities = request.GET.getlist('amenities')  # Get selected amenities from the request
-      selected_location = request.GET.getlist('location')
-
-      #     selected_amenities = [amenity for amenity in selected_amenities if amenity.strip().isdigit()]
-      if selected_amenities:
-            resorts = Resort.objects.filter(amenities__id__in=selected_amenities).distinct()  # Ensure no duplicates
-      else:
-            resorts = Resort.objects.all()
-
-      if selected_location:
-            location = Resort.objects.filter(location__id__in=selected_location).distinct()
-      else:
-            location = Resort.objects.all()
-
-      amenities = Amenity.objects.all()  # For rendering checkboxes
-      locations = Location.objects.all()   
-
-      context = {
-            'amenities': amenities,
-            'selected_amenities': selected_amenities,
-            'resorts': resorts,
-            'selected_location': selected_location,
-            'location': location,
-            'locations': locations}
-      
-      return render(request, 'app/home.html', context)
-
 def filter_beaches(request):
-    selected_amenities = request.GET.getlist('amenities')  # Get selected amenities
-    selected_location = request.GET.getlist('location')   # Get selected locations
-
-    # Start with all resorts
+    selected_amenities = request.GET.getlist('amenities')  
+    selected_location = request.GET.getlist('location')   
+    
     resorts = Resort.objects.all()
 
-    # Filter by selected amenities
     if selected_amenities:
         resorts = resorts.filter(amenities__id__in=selected_amenities).distinct()
 
-    # Filter by selected locations
     if selected_location:
         resorts = resorts.filter(location__id__in=selected_location).distinct()
 
-    # Fetch all amenities and locations for rendering
     amenities = Amenity.objects.all()
     locations = Location.objects.all()
 

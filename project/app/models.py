@@ -46,15 +46,9 @@ class Resort(models.Model):
      cottage = models.CharField(max_length=100, default="Default Cottage Name")  # Example field
      price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
      contact_number = models.CharField(max_length=20, help_text="Contact phone number")
-     resort_image = models.ImageField(upload_to='resorts/', default='resorts/paradise.jpg', blank=True, help_text="Image of the resort")
+     resort_image = models.ImageField(upload_to='resorts/', default='paradise.jpg', blank=True, help_text="Image of the resort")
      created_at = models.DateTimeField(auto_now_add=True, help_text="Date and time the resort was added")
      updated_at = models.DateTimeField(auto_now=True, help_text="Date and time the resort was last updated")
-
-     def admin_photo(self):
-          return mark_safe('<img src="{}"/>'.format(self.image.url))
-     admin_photo.short_description = 'image'
-     admin_photo.allow_tags = True
-
      class Meta:
          ordering =['-updated_at', '-created_at']
     
