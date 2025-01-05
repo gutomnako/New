@@ -40,16 +40,30 @@
       <div class="signup-container1">
         <h1>Sign Up for STA MAGDALENA BEACH AND RESORT</h1>
         <h4>RECOMMENDATION SYSTEM</h4>
-        <form method="POST" action="">
-            {% csrf_token %}
-          {% for field in form %}
-          <label>{{field.label}}</label>
-          {{field}}
-          {% endfor %}
-          <button 
-            type="submit" value="Login"> Register
-          </button>
+        <form method="POST">
+          {% csrf_token %}
+          {{ form.as_p }}
+          
+          {% if form.errors %}
+              <div class="alert alert-danger">
+                  {% for field in form %}
+                      {% for error in field.errors %}
+                          <p>{{ error }}</p>
+                      {% endfor %}
+                  {% endfor %}
+              </div>
+          {% endif %}
+          
+          <button type="submit">Register</button>
       </form>
+      
+      {% if messages %}
+          <div class="alert alert-danger">
+              {% for message in messages %}
+                  <p>{{ message }}</p>
+              {% endfor %}
+          </div>
+      {% endif %}
 
       <p>Already signed up?</p>
       <a href="{% url 'login' %}">Login</a>

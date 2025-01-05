@@ -1,14 +1,32 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import AbstractUser
-from django.utils.safestring import mark_safe
+from django.conf import settings
+from django.utils.timezone import now
+from django.contrib.auth.models import User
 
+class LoginActivity(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    action = models.CharField(max_length=10, choices=[('login', 'Login'), ('logout', 'Logout')])
+    timestamp = models.DateTimeField(default=now)
 
+    def __str__(self):
+        return f"{self.user.username} - {self.action} at {self.timestamp}"
+
+# Model to track aggregated login statistics
+class LoginHistory(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    total_logins = models.PositiveIntegerField(default=0)
+    total_logouts = models.PositiveIntegerField(default=0)
+    last_login = models.DateTimeField(null=True, blank=True)
+    last_logout = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.user.username} - Total Logins: {self.total_logins}, Last Login: {self.last_login}, Last Logout: {self.last_logout}"
 class User(AbstractUser):
      name = models.CharField(max_length=200, null=True)
-     email = models.EmailField(unique=True, null=True)
+     email = models.EmailField(unique=True, null=True, blank=False)
      bio = models.TextField(null=True)
-
      avatar = models.ImageField(null=True, default="avatar-default.svg")
 
      USERNAME_FIELD = 'username'

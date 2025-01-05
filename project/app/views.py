@@ -8,24 +8,13 @@ from django.contrib import messages
 from django.http import HttpResponse
 from .decorators import unauthenticated_user, allowed_users, admin_only
 from django.contrib.auth.models import Group
+from .models import LoginActivity, LoginHistory
 
 
-#resorts = [
-#    {'id':1, 'name':'Del hamor'},
-##    {'id':1, 'name':"Zeah's Beach Place"},
-#    {'id':1, 'name':'FMB Beach Resort'},
-#]
-#def index(request):
-#      if request.method == "POST":
-#          form=ImageForm(data=request.POST,files=request.FILES)
-#          if form.is_valid():
-#               form.save()
-#               obj=form.instance
-#               return render (request, "home.html", {"obj": obj})
-#      else:
-#           form=ImageForm()
-#      img=Image.objects.all()
-#      return render(request, 'app/home.html', {'img':img,'form':form})
+
+
+
+
 @login_required
 def some_view(request):
     
@@ -39,17 +28,49 @@ def some_view(request):
 @admin_only
 def adminDashboard(request):
       resorts = Resort.objects.all()
-      return render(request, 'app/adminDashboard.html', {'resorts': resorts})
+      login_history = LoginHistory.objects.all()
+
+      unique_users_count = login_history.values('user').distinct().count()
+
+      if login_history.exists():  # Check if there is any login history
+        login_activities = LoginActivity.objects.filter(user=request.user).order_by('-timestamp')
+        return render(request, 'app/adminDashboard.html', {
+            'resorts': resorts,
+            'login_history': login_history,
+            'login_activities': login_activities,
+            'unique_users_count': unique_users_count,  # Pass the count to the template
+        })
+      else:
+        return render(request, 'app/adminDashboard.html', {
+            'error': 'No login history found.',
+            'resorts': resorts,
+            'login_history': login_history,
+            'unique_users_count': unique_users_count,  # Pass the count even if no history
+      })
 
 @admin_only
 def adminresorts(request):
       resorts = Resort.objects.all()
+     
       return render(request, 'app/beachandresorts.html', {'resorts': resorts})
 
 @admin_only
 def adminmonitors(request):
       resorts = Resort.objects.all()
-      return render(request, 'app/recent-logins.html', {'resorts': resorts})
+      login_history = LoginHistory.objects.all()
+
+      unique_users_count = login_history.values('user').distinct().count()
+
+      if not login_history:
+        return render(request, 'app/recent-logins.html',
+            {'error': 'No login history found.',
+            'resorts': resorts,
+            'login_history': login_history,
+            'unique_users_count': unique_users_count, })
+
+      login_activities = LoginActivity.objects.filter(user=request.user).order_by('-timestamp')
+      return render(request, 'app/recent-logins.html', {'resorts': resorts, 'login_history': login_history,
+            'login_activities': login_activities})
 
 @unauthenticated_user 
 def loginPage(request):
@@ -80,26 +101,34 @@ def logoutUser(request):
       logout(request)
       return redirect('index-view')
 
-@unauthenticated_user 
+@unauthenticated_user
 def registerPage(request):
-      form = MyUserCreationForm()
+    form = MyUserCreationForm()
 
-      if request.method == 'POST':
-            form = MyUserCreationForm(request.POST)
-            if form.is_valid():
-                  user = form.save(commit=False)
-                  user.username = user.username.lower()
-                  user.save()
-                  login(request, user)
+    if request.method == 'POST':
+        form = MyUserCreationForm(request.POST)
+        
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.username = user.username.lower()
+            user.save()
+            login(request, user)
 
-                  group = Group.objects.get(name='users')
-                  user.groups.add(group)
+            # Assign user to the default group 'users'
+            group = Group.objects.get(name='users')
+            user.groups.add(group)
 
-                  return redirect('index-view')
-            else: 
-                  messages.error(request, 'An error occured during registration')
-            
-      return render(request, 'app/login_register.html', {'form': form})
+            return redirect('index-view')
+        else:
+            # Customize error messages based on specific form errors
+            if 'email' in form.errors:
+                messages.error(request, f"Email Error: {form.errors['email'][0]}")
+            elif 'username' in form.errors:
+                messages.error(request, f"Username Error: {form.errors['username'][0]}")
+            else:
+                messages.error(request, 'An error occurred during registration')
+
+    return render(request, 'app/login_register.html', {'form': form})
 
 def index_view(request):
     resorts = Resort.objects.all()

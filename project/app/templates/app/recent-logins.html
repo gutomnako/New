@@ -112,57 +112,28 @@
 						<i class='bx bx-search' ></i>
 						<i class='bx bx-filter' ></i>
 					</div>
-					<table>
-						<thead>
-							<tr>
-								<th>User</th>
-								<th>Date Order</th>
-								<th>Status</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>
-									<img src="{% static 'images/people.png' %}">
-									<p>John Doe</p>
-								</td>
-								<td>01-10-2021</td>
-								<td><span class="status completed">Completed</span></td>
-							</tr>
-							<tr>
-								<td>
-									<img src="img/people.png">
-									<p>John Doe</p>
-								</td>
-								<td>01-10-2021</td>
-								<td><span class="status pending">Pending</span></td>
-							</tr>
-							<tr>
-								<td>
-									<img src="img/people.png">
-									<p>John Doe</p>
-								</td>
-								<td>01-10-2021</td>
-								<td><span class="status process">Process</span></td>
-							</tr>
-							<tr>
-								<td>
-									<img src="img/people.png">
-									<p>John Doe</p>
-								</td>
-								<td>01-10-2021</td>
-								<td><span class="status pending">Pending</span></td>
-							</tr>
-							<tr>
-								<td>
-									<img src="img/people.png">
-									<p>John Doe</p>
-								</td>
-								<td>01-10-2021</td>
-								<td><span class="status completed">Completed</span></td>
-							</tr>
-						</tbody>
-					</table>
+						<table>
+							<thead>
+								<tr>
+									<th>User</th>
+									<th>Last Login</th>
+									<th>Last Logout</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for login in login_history %}
+								<tr>
+									<td>{{ login.user.username }}</td>
+									<td>{{ login.last_login|date:"Y-m-d H:i" }}</td>
+									<td>{{ login.last_logout|date:"Y-m-d H:i" }}</td>
+								</tr>
+								{% empty %}
+								<tr>
+									<td colspan="3">No login history available.</td>
+								</tr>
+								{% endfor %}
+							</tbody>
+						</table>			
 				</div>
 			</div>
 		</main>
