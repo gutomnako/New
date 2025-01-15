@@ -73,7 +73,14 @@ class Resort(models.Model):
      def __str__(self):
          return self.name
 
+class Rating(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    resort = models.ForeignKey(Resort, on_delete=models.CASCADE)
+    rating = models.IntegerField(choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')])
 
+    def __str__(self):
+        return f"{self.user} rated {self.resort} - {self.rating}"
+    
 class Message(models.Model):
      user = models.ForeignKey(User, on_delete=models.CASCADE)
      resort = models.ForeignKey(Resort, on_delete=models.CASCADE, related_name="messages", help_text="Resort this message is related to")

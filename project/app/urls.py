@@ -7,6 +7,8 @@ urlpatterns = [
     path('register/', views.registerPage, name='register'),
     #path('home/', views.index, name='home'),
 
+    path('rate_resort/<int:resort_id>/', views.rate_resort, name='rate_resort'),
+
     path('home/', views.home, name='home'),
     path('', views.index_view, name='index-view'),
     path('resort/<str:pk>/', views.resort, name='resort'),

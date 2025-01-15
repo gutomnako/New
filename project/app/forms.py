@@ -1,11 +1,21 @@
 from django.forms import ModelForm
-from .models import Resort, User
+from .models import Resort, User, Rating
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from django import forms
 from django.core.validators import RegexValidator
 
+class RatingForm(forms.ModelForm):
+    class Meta:
+        model = Rating
+        fields = ['rating']  # Only the rating field is needed, as the resort and user are already linked
 
+    rating = forms.IntegerField(
+        min_value=1, 
+        max_value=5, 
+        widget=forms.NumberInput(attrs={'type': 'number', 'step': '1', 'min': '1', 'max': '5'})
+    )
+ 
 class MyUserCreationForm(UserCreationForm):
     class Meta:
         model = User

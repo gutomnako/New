@@ -1,20 +1,26 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required
-from .models import Resort, Amenity, Location, Message, User
+from .models import Resort, Amenity, Location, Message, User, Rating
 from django.contrib.auth import authenticate, login, logout
-from .forms import ResortForm, MyUserCreationForm
+from .forms import ResortForm, MyUserCreationForm, RatingForm
 from django.contrib import messages
 from django.http import HttpResponse
 from .decorators import unauthenticated_user, allowed_users, admin_only
 from django.contrib.auth.models import Group
 from .models import LoginActivity, LoginHistory
+import pandas as pd
+from sklearn.metrics.pairwise import cosine_similarity
+from django.db.models import Avg
+from django.http import JsonResponse
 
+#dashboard
+#login
+#resorts
+#edit resort
+#comments
 
-
-
-
-
+#dashboard
 @login_required
 def some_view(request):
     
@@ -28,7 +34,7 @@ def some_view(request):
 @admin_only
 def adminDashboard(request):
       resorts = Resort.objects.all()
-      login_history = LoginHistory.objects.all()
+      login_history = LoginHistory.objects.all().order_by('-last_login')
 
       unique_users_count = login_history.values('user').distinct().count()
 
@@ -50,14 +56,14 @@ def adminDashboard(request):
 
 @admin_only
 def adminresorts(request):
-      resorts = Resort.objects.all()
+      resorts = Resort.objects.all().order_by('-created_at')
      
       return render(request, 'app/beachandresorts.html', {'resorts': resorts})
 
 @admin_only
 def adminmonitors(request):
       resorts = Resort.objects.all()
-      login_history = LoginHistory.objects.all()
+      login_history = LoginHistory.objects.all().order_by('-last_login')
 
       unique_users_count = login_history.values('user').distinct().count()
 
@@ -71,7 +77,9 @@ def adminmonitors(request):
       login_activities = LoginActivity.objects.filter(user=request.user).order_by('-timestamp')
       return render(request, 'app/recent-logins.html', {'resorts': resorts, 'login_history': login_history,
             'login_activities': login_activities})
+#end dashboard
 
+#login
 @unauthenticated_user 
 def loginPage(request):
       page = 'login'
@@ -129,10 +137,91 @@ def registerPage(request):
                 messages.error(request, 'An error occurred during registration')
 
     return render(request, 'app/login_register.html', {'form': form})
+#end login
 
+#resorts
 def index_view(request):
+    # Fetch all resorts
     resorts = Resort.objects.all()
-    return render(request, 'app/index_view.html', {'resorts': resorts})
+
+    # Calculate the average rating for each resort
+    rated_resorts = (
+        Resort.objects.annotate(average_rating=Avg('rating__rating'))
+        .order_by('-average_rating')  # Sort by the highest average rating
+    )
+
+    # Collaborative filtering for recommendations
+    ratings = Rating.objects.all().select_related('user', 'resort')
+    data = [{'user': r.user.id, 'resort': r.resort.id, 'rating': r.rating} for r in ratings]
+
+    recommended_resorts = []
+
+    if request.user.is_authenticated and len(data) >= 2:
+        # Code for collaborative filtering
+        df = pd.DataFrame(data)
+        
+        # Reset the index to avoid alignment issues
+        df = df.reset_index(drop=True)  # Reset index of df
+
+        pivot_table = df.pivot_table(index='user', columns='resort', values='rating').fillna(0)
+        similarity_matrix = cosine_similarity(pivot_table)
+        
+        # Reset index of similarity matrix dataframe
+        user_sim_df = pd.DataFrame(similarity_matrix, index=pivot_table.index, columns=pivot_table.index)
+        user_sim_df = user_sim_df.reset_index(drop=True)  # Reset index of user_sim_df
+
+        user_id = request.user.id
+        if user_id in user_sim_df.index:
+            similar_users = user_sim_df[user_id].sort_values(ascending=False).index[1:]  # Exclude self
+            similar_users_ratings = df[df['user'].isin(similar_users)]
+            unseen_resorts = ~df[df['user'] == user_id]['resort'].isin(similar_users_ratings['resort'])
+            recommended = (
+                similar_users_ratings[unseen_resorts]
+                .groupby('resort')['rating']
+                .mean()
+                .sort_values(ascending=False)
+                .reset_index()
+            )
+            recommended_resorts = Resort.objects.filter(id__in=recommended['resort'].tolist())
+
+    # Debugging: Print out the recommended resorts
+    print("Recommended Resorts:", recommended_resorts)
+
+    return render(request, 'app/index_view.html', {
+        'resorts': resorts,
+        'rated_resorts': rated_resorts,  # This will contain resorts sorted by the highest average rating
+        'recommended_resorts': recommended_resorts,  # Collaborative filtering recommendations
+    })
+
+@login_required
+def rate_resort(request, resort_id):
+    if request.method == 'POST':
+        resort = get_object_or_404(Resort, id=resort_id)
+        rating_value = request.POST.get('rating')
+
+        # Check if the rating is missing
+        if not rating_value:
+            return HttpResponse("Rating value is required.", status=400)
+
+        # Validate the rating value
+        try:
+            rating_value = int(rating_value)
+            if rating_value < 1 or rating_value > 5:
+                return HttpResponse("Rating must be between 1 and 5.", status=400)
+        except ValueError:
+            return HttpResponse("Invalid rating value.", status=400)
+
+        # Handle rating (create or update)
+        existing_rating = Rating.objects.filter(user=request.user, resort=resort).first()
+        if existing_rating:
+            existing_rating.rating = rating_value
+            existing_rating.save()
+        else:
+            Rating.objects.create(user=request.user, resort=resort, rating=rating_value)
+
+        return redirect('home')  # Redirect after rating
+
+    return render(request, 'app/resort_component.html')
 
 
 def home(request):
@@ -182,6 +271,34 @@ def userProfile(request, pk):
       context = {'user': user}
       return render(request, 'app/profile.html', context) 
 
+
+def filter_beaches(request):
+    selected_amenities = request.GET.getlist('amenities')  
+    selected_location = request.GET.getlist('location')   
+    
+    resorts = Resort.objects.all()
+
+    if selected_amenities:
+        resorts = resorts.filter(amenities__id__in=selected_amenities).distinct()
+
+    if selected_location:
+        resorts = resorts.filter(location__id__in=selected_location).distinct()
+
+    amenities = Amenity.objects.all()
+    locations = Location.objects.all()
+
+    context = {
+        'amenities': amenities,
+        'selected_amenities': selected_amenities,
+        'locations': locations,
+        'selected_location': selected_location,
+        'resorts': resorts,
+    }
+
+    return render(request, 'app/home.html', context)
+#end resorts
+
+#edit resort
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['Pinakaadmin'])
 def createResort(request):
@@ -223,32 +340,9 @@ def deleteResort(request, pk):
             resort.delete()
             return redirect('home')
       return render(request, 'app/delete.html', {'obj': resort})
+#end edit
 
-def filter_beaches(request):
-    selected_amenities = request.GET.getlist('amenities')  
-    selected_location = request.GET.getlist('location')   
-    
-    resorts = Resort.objects.all()
-
-    if selected_amenities:
-        resorts = resorts.filter(amenities__id__in=selected_amenities).distinct()
-
-    if selected_location:
-        resorts = resorts.filter(location__id__in=selected_location).distinct()
-
-    amenities = Amenity.objects.all()
-    locations = Location.objects.all()
-
-    context = {
-        'amenities': amenities,
-        'selected_amenities': selected_amenities,
-        'locations': locations,
-        'selected_location': selected_location,
-        'resorts': resorts,
-    }
-
-    return render(request, 'app/home.html', context)
-
+#comments
 @login_required(login_url='login')
 def deleteMessage(request, pk):
       message = Message.objects.get(id=pk)
@@ -264,4 +358,4 @@ def deleteMessage(request, pk):
 @login_required(login_url='login')
 def updateUser(request):
       return render(request, 'app/updtae-user.html')
-
+#end comments

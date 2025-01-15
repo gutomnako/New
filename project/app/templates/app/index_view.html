@@ -76,27 +76,30 @@
 
 
   <div class="top-rated">
-    <h2>TOP RATED</h2>
+    <h2>RECOMMENDED FOR YOU</h2>
     <br>
     <div class="card-container">
       <div class="card-grid">
-        {% for resort in resorts %}
+        {% for resort in rated_resorts %}
         <div class="card">
           {% if resort.resort_image %}
-         <img src="{{ resort.resort_image.url }}" alt="">
+            <img src="{{ resort.resort_image.url }}" alt="">
           {% endif %}
           <br>
-          <h4>{{resort.name}}</h4>
-              <p>{{resort.description}}</p>
-              <p>Entrance Kids:{{resort.entrance_kids}} | Entrance Adults:{{resort.entrance_adults}}</p>
-              <p>Cottage:{{resort.price}}</p>
-              <button type="button">
-                 <a href="{% url 'resort' resort.id %}">Details</a>
-                </button>
+          <h4>{{ resort.name }}</h4>
+          <p>{{ resort.description }}</p>
+          <p>Entrance Kids: {{ resort.entrance_kids }} | Entrance Adults: {{ resort.entrance_adults }}</p>
+          <p>Cottage: {{ resort.price }}</p>
+          <p>Average Rating: {{ resort.average_rating|floatformat:1 }}</p> <!-- Display average rating -->
+
+          <button type="button">
+            <a href="{% url 'resort' resort.id %}">Details</a>
+          </button>
         </div>
         {% endfor %}
       </div>
     </div>
+</div>
     <br>
 
     <button id="see-more-btn" class="see-more-btn">See More!</button>

@@ -293,3 +293,30 @@ body {
 #apply-filters:hover {
   background-color: #004080;
 }
+
+/* Basic star styling */
+.stars {
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center;    /* Center vertically */
+  gap: 5px;               /* Add space between stars */
+  margin-top: 10px;       /* Optional: Add spacing above */
+}
+
+.star {
+  font-size: 24px;        /* Adjust size of the stars */
+  cursor: pointer;        /* Make them clickable */
+  color: #ccc;            /* Default star color (inactive) */
+  transition: color 0.2s ease-in-out; /* Smooth color change */
+}
+
+.star.active {
+  color: #f39c12;         /* Highlight color for active stars */
+}
+
+.star:hover {
+  color: #f1c40f;         /* Optional: Highlight color on hover */
+}
+
+ 
+
