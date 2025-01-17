@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.contrib.auth.decorators import login_required
-from .models import Resort, Amenity, Location, Message, User, Rating
+from .models import Resort, Amenity, Location, Message, User, Favorite, Rating
 from django.contrib.auth import authenticate, login, logout
 from .forms import ResortForm, MyUserCreationForm, RatingForm
 from django.contrib import messages
@@ -13,6 +13,8 @@ import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 from django.db.models import Avg
 from django.http import JsonResponse
+import json
+from .recommendations import get_recommendations
 
 #dashboard
 #login
@@ -195,15 +197,15 @@ def index_view(request):
 
 @login_required
 def rate_resort(request, resort_id):
+    resort = get_object_or_404(Resort, id=resort_id)
+    
     if request.method == 'POST':
-        resort = get_object_or_404(Resort, id=resort_id)
         rating_value = request.POST.get('rating')
 
         # Check if the rating is missing
         if not rating_value:
             return HttpResponse("Rating value is required.", status=400)
 
-        # Validate the rating value
         try:
             rating_value = int(rating_value)
             if rating_value < 1 or rating_value > 5:
@@ -211,7 +213,7 @@ def rate_resort(request, resort_id):
         except ValueError:
             return HttpResponse("Invalid rating value.", status=400)
 
-        # Handle rating (create or update)
+        # Check if user has already rated this resort
         existing_rating = Rating.objects.filter(user=request.user, resort=resort).first()
         if existing_rating:
             existing_rating.rating = rating_value
@@ -219,28 +221,62 @@ def rate_resort(request, resort_id):
         else:
             Rating.objects.create(user=request.user, resort=resort, rating=rating_value)
 
-        return redirect('home')  # Redirect after rating
+        return redirect('home')
 
-    return render(request, 'app/resort_component.html')
+    return render(request, 'app/resort_component.html', {'resort': resort})
 
+@login_required
+def toggle_favorite(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        resort_id = data['resort_id']
+        is_favorite = data['is_favorite']
+
+        resort = Resort.objects.get(id=resort_id)
+        user = request.user
+
+        if is_favorite:
+            # Add to favorites
+            Favorite.objects.get_or_create(user=user, resort=resort)
+        else:
+            # Remove from favorites
+            Favorite.objects.filter(user=user, resort=resort).delete()
+
+        # Get updated favorite count 
+        updated_favorite_count = Resort.objects.annotate(favorite_count=Count('favorite_resorts')).get(id=resort_id).favorite_count
+
+        return JsonResponse({'status': 'success', 'favorite_count': updated_favorite_count})
+    
+    return JsonResponse({'status': 'failed'}, status=400)
 
 def home(request):
     q = request.GET.get('q') if request.GET.get('q') != None else ''
 
-
+    # Existing resorts filtering logic
     resorts = Resort.objects.filter(
         Q(amenities__name__icontains=q) |
         Q(name__icontains=q) |
         Q(description__icontains=q) |
         Q(location__name__icontains=q)
-        ).distinct()
-    
+    ).annotate(
+        favorite_count=Count('favorite_resorts', distinct=True)
+    )
     
     amenities = Amenity.objects.all()
     locations = Location.objects.all()
     resort_count = resorts.count()
 
-    context = {'resorts': resorts, 'amenities': amenities, 'resort_count': resort_count, 'locations': locations}
+    # Get recommendations for the logged-in user
+    recommendations = get_recommendations(request.user.id)
+
+    context = {
+        'resorts': resorts,
+        'amenities': amenities,
+        'resort_count': resort_count,
+        'locations': locations,
+        'recommendations': recommendations,  # Include recommended resorts
+    }
+
     return render(request, 'app/home.html', context)
 
 
@@ -283,6 +319,13 @@ def filter_beaches(request):
 
     if selected_location:
         resorts = resorts.filter(location__id__in=selected_location).distinct()
+
+    resorts = resorts.annotate(
+        favorite_count=Count('favorite_resorts', distinct=True)  # Count distinct favorites
+    )
+
+    # Order the resorts by favorite_count in descending order (most favorites first)
+    resorts = resorts.order_by('-favorite_count')
 
     amenities = Amenity.objects.all()
     locations = Location.objects.all()
@@ -359,3 +402,15 @@ def deleteMessage(request, pk):
 def updateUser(request):
       return render(request, 'app/updtae-user.html')
 #end comments
+
+# def recommended_resorts(request):
+#     user_id = request.user.id
+#     recommended_resorts = get_recommendations(user_id)
+    
+#     # Debugging: Check if recommended resorts are being passed
+#     print(f"Recommended resorts for user {user_id}: {recommended_resorts}")
+
+#     context = {
+#         'recommended_resorts': recommended_resorts
+#     }
+#     return render(request, 'app/recommended_resorts.html', context)

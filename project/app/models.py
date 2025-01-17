@@ -50,7 +50,7 @@ class Amenity(models.Model):
 
      def __str__(self):
          return self.name
-    
+     
 class Resort(models.Model):
      host = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
      name = models.CharField(max_length=255, help_text="Name of the resort")
@@ -58,6 +58,7 @@ class Resort(models.Model):
      location = models.ManyToManyField(Location, blank=True, related_name="resorts", help_text="Location of the resort")
      description = models.TextField(help_text="Brief description of the resort", blank=True, null=True)
      amenities = models.ManyToManyField(Amenity, blank=True, related_name="resorts", help_text="Amenities available at the resort")
+     favorites = models.ManyToManyField(User, through='Favorite', related_name='favorite_resorts')
      price_per_night = models.DecimalField(max_digits=10, decimal_places=2)
      entrance_kids = models.DecimalField(max_digits=10, decimal_places=2, validators=[validate_non_negative], default=0.00)
      entrance_adults = models.DecimalField(max_digits=10, decimal_places=2, validators=[validate_non_negative], default=0.00)
@@ -78,6 +79,9 @@ class Rating(models.Model):
     resort = models.ForeignKey(Resort, on_delete=models.CASCADE)
     rating = models.IntegerField(choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')])
 
+    class Meta:
+        unique_together = ['user', 'resort'] 
+
     def __str__(self):
         return f"{self.user} rated {self.resort} - {self.rating}"
     
@@ -91,4 +95,10 @@ class Message(models.Model):
      def __str__(self):
          return f"Message from {self.user} on {self.created_at}"
 
+class Favorite(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    resort = models.ForeignKey(Resort, related_name='favorite_resorts', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user.username} likes {self.resort.name}"
 

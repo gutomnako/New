@@ -5,9 +5,12 @@ urlpatterns = [
     path('login/', views.loginPage, name='login'),
     path('logout/', views.logoutUser, name='logout'),
     path('register/', views.registerPage, name='register'),
-    #path('home/', views.index, name='home'),
 
+    # path('recommended/', views.recommended_resorts, name='recommended_resorts'),
+
+    #path('resorts/', views.resort_list, name='resort_list'),
     path('rate_resort/<int:resort_id>/', views.rate_resort, name='rate_resort'),
+    path('toggle_favorite/', views.toggle_favorite, name='toggle_favorite'),
 
     path('home/', views.home, name='home'),
     path('', views.index_view, name='index-view'),
