@@ -119,71 +119,72 @@
     const leftArrowAllResorts = document.querySelector('.all-resorts-section .arrow-btn.left');
     const rightArrowAllResorts = document.querySelector('.all-resorts-section .arrow-btn.right');
     
-    
     const recommendedSlider = document.querySelector('.recommended-section .card-slider');
     const allResortsSlider = document.querySelector('.all-resorts-section .card-slider');
     
-    
-    const visibleCardsCount = 4; 
-    
-
+    const visibleCardsCount = 2; // Number of cards visible at a time
     const cardWidth = 260;
     const cardGap = 16;
-    const scrollAmount = (cardWidth + cardGap) * visibleCardsCount; 
-    
-    
-    function scrollRight(slider) {
-        const firstCard = slider.querySelector('.card');
-        
-        
-        for (let i = 0; i < visibleCardsCount; i++) {
-            const card = slider.querySelector('.card');
-            slider.appendChild(card);
-        }
+    const scrollAmount = (cardWidth + cardGap) * visibleCardsCount;
 
-       
-        slider.style.transform = `translateX(-${scrollAmount}px)`; 
-        
-       
-        setTimeout(() => {
-            slider.style.transition = 'transform 0.3s ease';
-            slider.style.transform = `translateX(0)`;
-        }, 10);
-    }
-
-    
+    // Function to scroll cards to the left (reveal previous cards)
     function scrollLeft(slider) {
-        const lastCard = slider.querySelector('.card:last-child');
-        
-        
-        for (let i = 0; i < visibleCardsCount; i++) {
-            const card = slider.querySelector('.card:last-child');
-            slider.insertBefore(card, slider.firstChild);
-        }
+        // Smoothly move the slider right
+        slider.style.transition = 'transform 0.5s ease';
+        slider.style.transform = `translateX(${scrollAmount}px)`;
 
-        
-        slider.style.transform = `translateX(${scrollAmount}px)`; 
-        
-        
-        setTimeout(() => {
-            slider.style.transition = 'transform 0.3s ease';
-            slider.style.transform = `translateX(0)`;
-        }, 10);
+        // After the animation, prepend the last `visibleCardsCount` cards to the start
+        slider.addEventListener(
+            'transitionend',
+            () => {
+                for (let i = 0; i < visibleCardsCount; i++) {
+                    const lastCard = slider.querySelector('.card:last-child');
+                    slider.insertBefore(lastCard, slider.firstChild);
+                }
+
+                // Reset the transform position without animation
+                slider.style.transition = 'none';
+                slider.style.transform = `translateX(0)`;
+            },
+            { once: true }
+        );
     }
 
-    
+    // Function to scroll cards to the right (reveal next cards)
+    function scrollRight(slider) {
+        // Smoothly move the slider left
+        slider.style.transition = 'transform 0.5s ease';
+        slider.style.transform = `translateX(-${scrollAmount}px)`;
+
+        // After the animation, append the first `visibleCardsCount` cards to the end
+        slider.addEventListener(
+            'transitionend',
+            () => {
+                for (let i = 0; i < visibleCardsCount; i++) {
+                    const firstCard = slider.querySelector('.card');
+                    slider.appendChild(firstCard);
+                }
+
+                // Reset the transform position without animation
+                slider.style.transition = 'none';
+                slider.style.transform = `translateX(0)`;
+            },
+            { once: true }
+        );
+    }
+
+    // Add event listeners for the recommended slider
     if (recommendedSlider) {
-        leftArrowRecommended.addEventListener('click', () => scrollLeft(recommendedSlider));
         rightArrowRecommended.addEventListener('click', () => scrollRight(recommendedSlider));
+        leftArrowRecommended.addEventListener('click', () => scrollLeft(recommendedSlider));
     }
 
-
+    // Add event listeners for the all resorts slider
     if (allResortsSlider) {
-        leftArrowAllResorts.addEventListener('click', () => scrollLeft(allResortsSlider));
         rightArrowAllResorts.addEventListener('click', () => scrollRight(allResortsSlider));
+        leftArrowAllResorts.addEventListener('click', () => scrollLeft(allResortsSlider));
     }
 
-   
     document.querySelectorAll('.stars').forEach(starsContainer => {
             const stars = starsContainer.querySelectorAll('.star');
             stars.forEach(star => {
