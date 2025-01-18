@@ -1,121 +1,144 @@
-
+/* Global Styles */
 body {
-    font-family: "Quicksand", serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f3f3f3;
-  }
+  font-family: "Quicksand", serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f3f3f3;
+  padding-top: 80px;  /* Adds space below the fixed navbar */
+}
 
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1em 2em;
-    background-color: #3daed7;
-    color: black;
-    font-family: "Quicksand", serif;
-  }
-  
-  .header .logo h1 {
-    font-size: 1.8em;
-    margin: 0;
-  }
-  
-  .nav {
-    display: flex;
-    gap: 1.5em;
-  }
-  
-  .nav a {
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: bold;
-    padding: 0.5em 0.8em;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-  }
-  
-  .nav a:hover {
-    background-color: #0066cc;
-  }
-  
-  .search-bar {
-    display: flex;
-    align-items: center;
-    gap: 0.5em;
-  }
-  
-  .search-bar input[type="text"] {
-    padding: 0.5em;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    width: 200px;
-  }
-  
-  .search-bar button {
-    background-color: #ffccaa;
-    color: #004080;
-    border: none;
-    padding: 0.5em 1em;
-    cursor: pointer;
-    border-radius: 5px;
-  }
-  
-  .search-bar button:hover {
-    background-color: #ffa070;
-  }
-  
-  .container {
-    display: flex;
-  }
-  
-  .sidebar {
-    width: 250px;
-    padding: 1em;
-    background-color: #ffffff;
-    border-right: 2px solid #ddd;
-    border-radius: 5px;
-    border-width: 2cap;
-  }
-  
-  .sidebar h2 {
-    color: #004080;
-  }
-  
-  .filter-section {
-    margin-bottom: 1em;
+/* Header / Navbar */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1em 2em;
+  background-color: #3daed7;
+  color: black;
+  font-family: "Quicksand", serif;
+  position: fixed;  /* Keeps the navbar fixed at the top */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;  /* Makes sure it stays above other content */
+  width: 100%;  /* Ensures it takes the full width of the screen */
+  box-sizing: border-box;  /* Prevents padding from causing layout issues */
+}
+
+.header .logo h1 {
+  font-size: 1.8em;
+  margin: 0;
+}
+
+.nav {
+  display: flex;
+  gap: 1.5em;
+}
+
+.nav a {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 0.5em 0.8em;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.nav a:hover {
+  background-color: #0066cc;
+}
+
+/* Search Bar */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding-left: 20px; /* Ensures the search bar is not too close to the edge */
+}
+
+.search-bar input[type="text"] {
+  padding: 0.5em;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 200px;
+  width: 250px; /* Increased width to make it more comfortable */
+}
+
+.search-bar button {
+  background-color: #ffccaa;
+  color: #004080;
+  border: none;
+  padding: 0.5em 1em;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-left: 10px; /* Adds a little space between the input and the button */
+}
+
+.search-bar button:hover {
+  background-color: #ffa070;
+}
+
+/* Layout */
+.container {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 20px; /* Add space between sidebar and main content */
+  padding: 20px;
+  background-color: #ddd;
+  border-radius: 1%;
+}
+
+.sidebar {
+  width: 250px;
+  padding: 1em;
+  background-color: #ffffff;
+  border-right: 2px solid #ddd;
+  border-radius: 5px;
+  height: fit-content;
+  position: sticky;
+  top: 0;
+}
+
+.sidebar h2 {
+  color: #004080;
+}
+
+/* Filter Section */
+.filter-section {
+  margin-bottom: 1em;
 }
 
 .filter-section label {
-    display: block;
-    margin-bottom: 0.5em;
-    color: #333;
-    font-weight: bold;
+  display: block;
+  margin-bottom: 0.5em;
+  color: #333;
+  font-weight: bold;
 }
 
 .filter-section input[type="number"] {
-    width: calc(100% - 2em);
-    margin-bottom: 0.5em;
-    padding: 0.5em;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 1em;
+  width: calc(100% - 2em);
+  margin-bottom: 0.5em;
+  padding: 0.5em;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1em;
 }
 
 .filter-section button {
-    background-color: #004080;
-    color: #fff;
-    border: none;
-    padding: 0.5em 1em;
-    cursor: pointer;
-    border-radius: 5px;
-    font-size: 1em;
+  background-color: #004080;
+  color: #fff;
+  border: none;
+  padding: 0.5em 1em;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 1em;
 }
 
 .filter-section button:hover {
-    background-color: #002f4f;
+  background-color: #002f4f;
 }
 
+/* Price Range Box */
 .price-range-box {
   background-color: #f9f9f9;
   border: 1px solid #ddd;
@@ -165,18 +188,13 @@ body {
   background-color: #002f4f;
 }
 
-.container {
-  background-clip: border-box;
-  background-color: #ddd;
-  border-radius: 1%;
-}
-
-/* Overall Card Grid */
+/* Card Grid */
 .card-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
   justify-content: center;
+  margin-top: 20px;
 }
 
 .card {
@@ -205,10 +223,12 @@ body {
 /* Slider for Recommended and All Resorts */
 .card-slider {
   display: flex;
-  overflow-x: auto;
+  overflow-x: scroll;
   gap: 20px;
   padding: 10px 0;
   margin-top: 20px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 .card-slider::-webkit-scrollbar {
@@ -217,6 +237,7 @@ body {
 
 .card-slider .card {
   flex: 0 0 auto;
+  width: 260px; /* Fix width of cards to prevent them from breaking out */
 }
 
 /* Section Titles */
@@ -224,12 +245,14 @@ body {
 .all-resorts-section h2 {
   font-size: 26px;
   margin-bottom: 20px;
-  text-align: center;
+  text-align: left;
   font-weight: 600;
   color: #333;
+  margin-top: 30px;
+  padding-left: 20px;
 }
 
-/* Favorite button styles */
+/* Favorite Button Styles */
 .favorite-btn i {
   font-size: 28px;
   color: #ccc;
@@ -260,6 +283,10 @@ body {
   color: #f39c12;
 }
 
+.star.active {
+  color: gold; 
+}
+
 /* Buttons */
 button {
   background-color: #3498db;
@@ -282,27 +309,64 @@ button a {
   text-decoration: none;
 }
 
-/* Scrollbar Customization */
+/* Slider container styling */
+.card-slider-container {
+  position: relative;
+  width: 100%; /* Full width of the container */
+  overflow: hidden; /* Hide the overflowing content */
+}
+
+/* Arrow buttons fixed to the left and right */
+.arrow-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.arrow-btn.left {
+  left: 10px;
+}
+
+.arrow-btn.right {
+  right: 10px;
+}
+
+/* Smooth transition for arrows */
+.arrow-btn {
+  transition: opacity 0.3s ease;
+}
+
+/* Card slider styling */
 .card-slider {
-  scrollbar-width: thin;
-  scrollbar-color: #ccc #f1f1f1;
+  display: flex;
+  transition: transform 0.3s ease;
+  width: fit-content; /* Set the total width based on the cards */
 }
 
-.card-slider::-webkit-scrollbar {
-  width: 10px;
+/* Card styling: each card is 260px wide, with a margin between them */
+.card-slider .card {
+  flex: 0 0 auto;
+  width: 260px; /* Adjust width of individual cards */
+  margin-right: 16px; /* Gap between cards */
 }
 
-.card-slider::-webkit-scrollbar-thumb {
-  background-color: #ccc;
-  border-radius: 10px;
-}
-
-.card-slider::-webkit-scrollbar-track {
-  background-color: #f1f1f1;
+/* Adjust the visible width of the slider container */
+.card-slider-container {
+  max-width: 1500px; /* Limit the width to fit 4 cards (4 * 260px + gap) */
 }
 
 
 
 
- 
+
+
+
+
+
 

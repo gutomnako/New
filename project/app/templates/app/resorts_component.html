@@ -1,163 +1,240 @@
 {% load static %}
 
 <main class="main-content">
-    <!-- Recommended For You Section -->
+
     <div class="recommended-section">
         <h2>Recommended For You</h2>
-        <div class="card-slider">
-            {% for resort in recommendations %}
-                <div class="card">
-                    {% if resort.resort_image %}
-                        <img src="{{ resort.resort_image.url }}" alt="">
-                    {% endif %}
+        <div class="card-slider-container recommended-slider">
+    
+            <button class="arrow-btn left">&#10094;</button>
 
-                    <!-- Favorite Button -->
-                    <a class="favorite-btn" data-resort-id="{{ resort.id }}">
-                        <i class="fa fa-heart {% if resort.favorite_count > 0 %} active {% endif %}" aria-hidden="true"></i>
-                    </a>
 
-                    <!-- Rating Form -->
-                    <form method="POST" action="{% url 'rate_resort' resort.id %}">
-                        {% csrf_token %}
-                        <div class="stars">
-                            <span class="star" data-value="1">&#9734;</span>
-                            <span class="star" data-value="2">&#9734;</span>
-                            <span class="star" data-value="3">&#9734;</span>
-                            <span class="star" data-value="4">&#9734;</span>
-                            <span class="star" data-value="5">&#9734;</span>
-                        </div>
-                        <input type="hidden" name="rating" value="0">
-                        <button type="submit">Submit Rating</button>
-                    </form>
+            <div class="card-slider recommended-cards">
+                {% for resort in recommendations %}
+                    <div class="card">
+                        {% if resort.resort_image %}
+                            <img src="{{ resort.resort_image.url }}" alt="">
+                        {% endif %}
 
-                    <h5>{{ resort.name }}</h5>
-                    <p>{{ resort.description }}</p>
-                    <p>Entrance Kids: {{ resort.entrance_kids }} | Entrance Adults: {{ resort.entrance_adults }}</p>
-                    <p>Cottage: {{ resort.price }}</p>
-                    <button type="button">
-                        <a href="{% url 'resort' resort.id %}">Details</a>
-                    </button>
+        
+                        <a class="favorite-btn" data-resort-id="{{ resort.id }}">
+                            <i class="fa fa-heart {% if resort.favorite_count > 0 %} active {% endif %}" aria-hidden="true"></i>
+                        </a>
 
-                    <!-- Display Number of Favorites -->
-                    <p class="favorite-count">Favorites: {{ resort.favorite_count }}</p>
-                </div>
-            {% endfor %}
+                
+                        <form method="POST" action="{% url 'rate_resort' resort.id %}">
+                            {% csrf_token %}
+                            <div class="stars">
+                                <span class="star" data-value="1">&#9734;</span>
+                                <span class="star" data-value="2">&#9734;</span>
+                                <span class="star" data-value="3">&#9734;</span>
+                                <span class="star" data-value="4">&#9734;</span>
+                                <span class="star" data-value="5">&#9734;</span>
+                            </div>
+                            <input type="hidden" name="rating" value="0">
+                            <button type="submit">Submit Rating</button>
+                        </form>
+
+                        <h5>{{ resort.name }}</h5>
+                        <p>{{ resort.description }}</p>
+                        <p>Entrance Kids: {{ resort.entrance_kids }} | Entrance Adults: {{ resort.entrance_adults }}</p>
+                        <p>Cottage: {{ resort.price }}</p>
+                        <button type="button">
+                            <a href="{% url 'resort' resort.id %}">Details</a>
+                        </button>
+
+                        
+                        <p class="favorite-count">Favorites: {{ resort.favorite_count }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+          
+            <button class="arrow-btn right">&#10095;</button>
         </div>
     </div>
 
-    <!-- All Resorts Section -->
+   
     <div class="all-resorts-section">
         <h2>All Resorts</h2>
-        <div class="card-slider">
-            {% for resort in resorts %}
-                <div class="card">
-                    {% if resort.resort_image %}
-                        <img src="{{ resort.resort_image.url }}" alt="">
-                    {% endif %}
+        <div class="card-slider-container all-resorts-slider">
+        
+            <button class="arrow-btn left">&#10094;</button>
 
-                    <!-- Favorite Button -->
-                    <a class="favorite-btn" data-resort-id="{{ resort.id }}">
-                        <i class="fa fa-heart {% if resort.favorite_count > 0 %} active {% endif %}" aria-hidden="true"></i>
-                    </a>
+          
+            <div class="card-slider all-resorts-cards">
+                {% for resort in resorts %}
+                    <div class="card">
+                        {% if resort.resort_image %}
+                            <img src="{{ resort.resort_image.url }}" alt="">
+                        {% endif %}
 
-                    <!-- Rating Form -->
-                    <form method="POST" action="{% url 'rate_resort' resort.id %}">
-                        {% csrf_token %}
-                        <div class="stars">
-                            <span class="star" data-value="1">&#9734;</span>
-                            <span class="star" data-value="2">&#9734;</span>
-                            <span class="star" data-value="3">&#9734;</span>
-                            <span class="star" data-value="4">&#9734;</span>
-                            <span class="star" data-value="5">&#9734;</span>
-                        </div>
-                        <input type="hidden" name="rating" value="0">
-                        <button type="submit">Submit Rating</button>
-                    </form>
+                        
+                        <a class="favorite-btn" data-resort-id="{{ resort.id }}">
+                            <i class="fa fa-heart {% if resort.favorite_count > 0 %} active {% endif %}" aria-hidden="true"></i>
+                        </a>
 
-                    <h5>{{ resort.name }}</h5>
-                    <p>{{ resort.description }}</p>
-                    <p>Entrance Kids: {{ resort.entrance_kids }} | Entrance Adults: {{ resort.entrance_adults }}</p>
-                    <p>Cottage: {{ resort.price }}</p>
-                    <button type="button">
-                        <a href="{% url 'resort' resort.id %}">Details</a>
-                    </button>
+                       
+                        <form method="POST" action="{% url 'rate_resort' resort.id %}">
+                            {% csrf_token %}
+                            <div class="stars">
+                                <span class="star" data-value="1">&#9734;</span>
+                                <span class="star" data-value="2">&#9734;</span>
+                                <span class="star" data-value="3">&#9734;</span>
+                                <span class="star" data-value="4">&#9734;</span>
+                                <span class="star" data-value="5">&#9734;</span>
+                            </div>
+                            <input type="hidden" name="rating" value="0">
+                            <button type="submit">Submit Rating</button>
+                        </form>
 
-                    <!-- Display Number of Favorites -->
-                    <p class="favorite-count">Favorites: {{ resort.favorite_count }}</p>
-                </div>
-            {% endfor %}
+                        <h5>{{ resort.name }}</h5>
+                        <p>{{ resort.description }}</p>
+                        <p>Entrance Kids: {{ resort.entrance_kids }} | Entrance Adults: {{ resort.entrance_adults }}</p>
+                        <p>Cottage: {{ resort.price }}</p>
+                        <button type="button">
+                            <a href="{% url 'resort' resort.id %}">Details</a>
+                        </button>
+
+                       
+                        <p class="favorite-count">Favorites: {{ resort.favorite_count }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+            
+            <button class="arrow-btn right">&#10095;</button>
         </div>
     </div>
 </main>
 
 
+
+<!-- Add your scripts here -->
 <script>
-// Wait for the DOM to fully load
-document.addEventListener('DOMContentLoaded', function () {
-    const starContainers = document.querySelectorAll('.stars');
+   document.addEventListener('DOMContentLoaded', function () {
+    const leftArrowRecommended = document.querySelector('.recommended-section .arrow-btn.left');
+    const rightArrowRecommended = document.querySelector('.recommended-section .arrow-btn.right');
+    
+    const leftArrowAllResorts = document.querySelector('.all-resorts-section .arrow-btn.left');
+    const rightArrowAllResorts = document.querySelector('.all-resorts-section .arrow-btn.right');
+    
+    
+    const recommendedSlider = document.querySelector('.recommended-section .card-slider');
+    const allResortsSlider = document.querySelector('.all-resorts-section .card-slider');
+    
+    
+    const visibleCardsCount = 4; 
+    
 
-    starContainers.forEach(starsContainer => {
-        const stars = starsContainer.querySelectorAll('.star');
+    const cardWidth = 260;
+    const cardGap = 16;
+    const scrollAmount = (cardWidth + cardGap) * visibleCardsCount; 
+    
+    
+    function scrollRight(slider) {
+        const firstCard = slider.querySelector('.card');
+        
+        
+        for (let i = 0; i < visibleCardsCount; i++) {
+            const card = slider.querySelector('.card');
+            slider.appendChild(card);
+        }
 
-        stars.forEach(star => {
-            star.addEventListener('click', function () {
-                const rating = this.getAttribute('data-value'); // Get the rating value
-                const ratingInput = starsContainer.closest('form').querySelector('input[name="rating"]'); // Find the hidden input
+       
+        slider.style.transform = `translateX(-${scrollAmount}px)`; 
+        
+       
+        setTimeout(() => {
+            slider.style.transition = 'transform 0.3s ease';
+            slider.style.transform = `translateX(0)`;
+        }, 10);
+    }
 
-                // Set the value of the hidden input to the selected rating
-                ratingInput.value = rating;
+    
+    function scrollLeft(slider) {
+        const lastCard = slider.querySelector('.card:last-child');
+        
+        
+        for (let i = 0; i < visibleCardsCount; i++) {
+            const card = slider.querySelector('.card:last-child');
+            slider.insertBefore(card, slider.firstChild);
+        }
 
-                // Update the star UI (add 'active' class to the selected stars)
-                stars.forEach(s => s.classList.remove('active')); // Remove active class from all stars
-                for (let i = 0; i < rating; i++) {
-                    stars[i].classList.add('active'); // Add active class to selected stars
-                }
+        
+        slider.style.transform = `translateX(${scrollAmount}px)`; 
+        
+        
+        setTimeout(() => {
+            slider.style.transition = 'transform 0.3s ease';
+            slider.style.transform = `translateX(0)`;
+        }, 10);
+    }
+
+    
+    if (recommendedSlider) {
+        leftArrowRecommended.addEventListener('click', () => scrollLeft(recommendedSlider));
+        rightArrowRecommended.addEventListener('click', () => scrollRight(recommendedSlider));
+    }
+
+
+    if (allResortsSlider) {
+        leftArrowAllResorts.addEventListener('click', () => scrollLeft(allResortsSlider));
+        rightArrowAllResorts.addEventListener('click', () => scrollRight(allResortsSlider));
+    }
+
+   
+    document.querySelectorAll('.stars').forEach(starsContainer => {
+            const stars = starsContainer.querySelectorAll('.star');
+            stars.forEach(star => {
+                star.addEventListener('click', function () {
+                    const rating = this.getAttribute('data-value');
+                    const ratingInput = starsContainer.closest('form').querySelector('input[name="rating"]');
+                    ratingInput.value = rating;
+
+                    
+                    stars.forEach(s => s.classList.remove('active'));
+                    for (let i = 0; i < rating; i++) {
+                        stars[i].classList.add('active');
+                    }
+                });
+            });
+        });
+
+ 
+        document.querySelectorAll('.favorite-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const resortId = this.getAttribute('data-resort-id');
+                const isFavorite = this.querySelector('i').classList.contains('active');
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                this.querySelector('i').classList.toggle('active');
+
+                fetch('/toggle_favorite/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        resort_id: resortId,
+                        is_favorite: !isFavorite,
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        this.closest('.card').querySelector('.favorite-count').innerText = `Favorites: ${data.favorite_count}`;
+                    } else {
+                        console.error('Error updating favorite status:', data.message);
+                        this.querySelector('i').classList.toggle('active');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    this.querySelector('i').classList.toggle('active');
+                });
             });
         });
     });
-});
-
-
-
- // Handle the favorite button click
-document.querySelectorAll('.favorite-btn').forEach(button => {
-    button.addEventListener('click', function () {
-        const resortId = this.getAttribute('data-resort-id');
-        const isFavorite = this.querySelector('i').classList.contains('active');
-        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
-        // Toggle the heart icon color (on click)
-        this.querySelector('i').classList.toggle('active');
-
-        // Send the favorite status to the server
-        fetch('/toggle_favorite/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken,
-            },
-            body: JSON.stringify({
-                resort_id: resortId,
-                is_favorite: !isFavorite,  // Send the opposite of current state
-            }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                // Update favorite count on the UI
-                this.closest('.card').querySelector('.favorite-count').innerText = `Favorites: ${data.favorite_count}`;
-            } else {
-                console.error('Error updating favorite status:', data.message);
-                // Optionally revert the heart icon color if error occurs
-                this.querySelector('i').classList.toggle('active');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            // Optionally revert the heart icon color if error occurs
-            this.querySelector('i').classList.toggle('active');
-        });
-    });
-});
-
 </script>

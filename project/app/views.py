@@ -308,25 +308,55 @@ def userProfile(request, pk):
       return render(request, 'app/profile.html', context) 
 
 
+from django.http import JsonResponse
+from django.db.models import Count
+from django.shortcuts import render
+
 def filter_beaches(request):
     selected_amenities = request.GET.getlist('amenities')  
     selected_location = request.GET.getlist('location')   
+    min_price = request.GET.get('min_price')  # Retrieve minimum price filter
+    max_price = request.GET.get('max_price')  # Retrieve maximum price filter
     
     resorts = Resort.objects.all()
 
+    # Filter by selected amenities
     if selected_amenities:
         resorts = resorts.filter(amenities__id__in=selected_amenities).distinct()
 
+    # Filter by selected location
     if selected_location:
         resorts = resorts.filter(location__id__in=selected_location).distinct()
 
+    # Filter by price range
+    if min_price:
+        resorts = resorts.filter(price__gte=min_price)
+    if max_price:
+        resorts = resorts.filter(price__lte=max_price)
+
+    # Annotate resorts with favorite count
     resorts = resorts.annotate(
-        favorite_count=Count('favorite_resorts', distinct=True)  # Count distinct favorites
+        favorite_count=Count('favorite_resorts', distinct=True)
     )
 
-    # Order the resorts by favorite_count in descending order (most favorites first)
+    # Order resorts by favorite count
     resorts = resorts.order_by('-favorite_count')
+    
+    # Handle AJAX requests
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        resorts_data = list(resorts.values(
+            'id', 'name', 'description', 'entrance_kids', 'entrance_adults', 'price', 'resort_image'
+        ))
 
+        # Include image URL
+        for resort in resorts_data:
+            if resort['resort_image']:
+                resort['resort_image'] = f"/media/{resort['resort_image']}"  # Adjust path as needed
+
+        return JsonResponse({'resorts': resorts_data})
+
+    # For non-AJAX requests, render the full page
+    recommendations = get_recommendations(request.user.id)
     amenities = Amenity.objects.all()
     locations = Location.objects.all()
 
@@ -336,9 +366,11 @@ def filter_beaches(request):
         'locations': locations,
         'selected_location': selected_location,
         'resorts': resorts,
+        'recommendations': recommendations,
     }
 
     return render(request, 'app/home.html', context)
+
 #end resorts
 
 #edit resort

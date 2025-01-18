@@ -12,31 +12,80 @@
   </div>
   
   <div class="filter-section">
-    <form action="{% url 'filter_beaches' %}" method="GET" id="filter-form">
-          <h3>AMENITIES</h3>
-          {% if request.user.groups.all.0.name == "Pinakaadmin" %}
-          {% endif %}
-          <h4>{{resorts.count}} resorts available</h4>
-          {% for amenity in amenities %}
-          <label>
-              <input type="checkbox" name="amenities" value="{{ amenity.id }}"
-                  {% if amenity.id|stringformat:"s" in selected_amenities %}checked{% endif %}
-                  onchange="document.getElementById('filter-form').submit()">
-              {{ amenity.name }}  
-          </label>
-      {% endfor %}
-      <hr>
-      <h3>LOCATIONS</h3>
-          {% for location in locations %}
-          <label>
-              <input type="checkbox" name="location" value="{{ location.id }}"
-                  {% if location.id|stringformat:"s" in selected_location %}checked{% endif %}
-                  onchange="document.getElementById('filter-form').submit()">
-              {{ location.name }}  
-          </label>
-      {% endfor %}
-      </form>
-  </div>
+    <form id="filter-form" action="{% url 'filter_beaches' %}" method="GET">
+        <h3>AMENITIES</h3>
+        <h4>{{ resorts.count }} resorts available</h4>
+        {% for amenity in amenities %}
+        <label>
+            <input type="checkbox" name="amenities" value="{{ amenity.id }}"
+                {% if amenity.id|stringformat:"s" in selected_amenities %}checked{% endif %}>
+            {{ amenity.name }}
+        </label>
+        {% endfor %}
+        <hr>
+        <h3>LOCATIONS</h3>
+        {% for location in locations %}
+        <label>
+            <input type="checkbox" name="location" value="{{ location.id }}"
+                {% if location.id|stringformat:"s" in selected_location %}checked{% endif %}>
+            {{ location.name }}
+        </label>
+        {% endfor %}
+    </form>
+</div>
+
 
   
 </aside>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function () {
+    const filterForm = document.getElementById('filter-form');
+
+    // Handle checkbox changes
+    filterForm.addEventListener('change', function (event) {
+        event.preventDefault(); // Prevent the form from reloading the page
+
+        // Collect form data
+        const formData = new FormData(filterForm);
+        const params = new URLSearchParams(formData).toString();
+
+        // Send AJAX request
+        fetch(`${filterForm.action}?${params}`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            updateResortList(data.resorts); // Update the UI with the filtered resorts
+        })
+        .catch(error => console.error('Error fetching filtered resorts:', error));
+    });
+
+    // Function to update the resort list dynamically
+    function updateResortList(resorts) {
+        const resortsContainer = document.querySelector('.all-resorts-cards'); // Adjust selector as needed
+        resortsContainer.innerHTML = ''; // Clear the current resorts
+
+        resorts.forEach(resort => {
+            // Create a card element for each resort
+            const card = document.createElement('div');
+            card.classList.add('card');
+            card.innerHTML = `
+                ${resort.resort_image ? `<img src="${resort.resort_image}" alt="">` : ''}
+                <h5>${resort.name}</h5>
+                <p>${resort.description}</p>
+                <p>Entrance Kids: ${resort.entrance_kids} | Entrance Adults: ${resort.entrance_adults}</p>
+                <p>Cottage: ${resort.price}</p>
+                <p>Favorites: ${resort.favorite_count}</p>
+            `;
+            resortsContainer.appendChild(card);
+        });
+    }
+});
+</script>
+
+
