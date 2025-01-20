@@ -159,42 +159,49 @@ def index_view(request):
     recommended_resorts = []
 
     if request.user.is_authenticated and len(data) >= 2:
-        # Code for collaborative filtering
+        # Convert the ratings data into a DataFrame
         df = pd.DataFrame(data)
-        
-        # Reset the index to avoid alignment issues
-        df = df.reset_index(drop=True)  # Reset index of df
 
+        # Pivot the DataFrame to create a user-resort rating matrix
         pivot_table = df.pivot_table(index='user', columns='resort', values='rating').fillna(0)
-        similarity_matrix = cosine_similarity(pivot_table)
-        
-        # Reset index of similarity matrix dataframe
-        user_sim_df = pd.DataFrame(similarity_matrix, index=pivot_table.index, columns=pivot_table.index)
-        user_sim_df = user_sim_df.reset_index(drop=True)  # Reset index of user_sim_df
 
+        # Calculate the cosine similarity between users
+        similarity_matrix = cosine_similarity(pivot_table)
+
+        # Convert similarity_matrix into a DataFrame for easier manipulation
+        user_sim_df = pd.DataFrame(similarity_matrix, index=pivot_table.index, columns=pivot_table.index)
+
+        # Get the current user's ID
         user_id = request.user.id
+
         if user_id in user_sim_df.index:
-            similar_users = user_sim_df[user_id].sort_values(ascending=False).index[1:]  # Exclude self
+            # Find similar users, excluding the current user
+            similar_users = user_sim_df[user_id].sort_values(ascending=False).index[1:]
+
+            # Get ratings from similar users
             similar_users_ratings = df[df['user'].isin(similar_users)]
-            unseen_resorts = ~df[df['user'] == user_id]['resort'].isin(similar_users_ratings['resort'])
+
+            # Find resorts that the current user hasn't rated
+            user_rated_resorts = df[df['user'] == user_id]['resort'].tolist()
+            unseen_resorts = similar_users_ratings[~similar_users_ratings['resort'].isin(user_rated_resorts)]
+
+            # Group by resort and calculate the mean rating for recommendations
             recommended = (
-                similar_users_ratings[unseen_resorts]
-                .groupby('resort')['rating']
+                unseen_resorts.groupby('resort')['rating']
                 .mean()
                 .sort_values(ascending=False)
                 .reset_index()
             )
+
+            
             recommended_resorts = Resort.objects.filter(id__in=recommended['resort'].tolist())
 
-    # Debugging: Print out the recommended resorts
-    print("Recommended Resorts:", recommended_resorts)
-
+    # Return the context to the template
     return render(request, 'app/index_view.html', {
         'resorts': resorts,
-        'rated_resorts': rated_resorts,  # This will contain resorts sorted by the highest average rating
-        'recommended_resorts': recommended_resorts,  # Collaborative filtering recommendations
+        'rated_resorts': rated_resorts, 
+        'recommended_resorts': recommended_resorts,  
     })
-
 @login_required
 def rate_resort(request, resort_id):
     resort = get_object_or_404(Resort, id=resort_id)

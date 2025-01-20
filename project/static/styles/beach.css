@@ -361,12 +361,14 @@ button a {
   max-width: 1500px; /* Limit the width to fit 4 cards (4 * 260px + gap) */
 }
 
-
-
-
-
-
-
-
-
-
+@media screen and (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    margin-bottom: 10px;
+  }
+}
