@@ -124,13 +124,12 @@ def registerPage(request):
             user.save()
             login(request, user)
 
-            # Assign user to the default group 'users'
             group = Group.objects.get(name='users')
             user.groups.add(group)
 
             return redirect('index-view')
         else:
-            # Customize error messages based on specific form errors
+        
             if 'email' in form.errors:
                 messages.error(request, f"Email Error: {form.errors['email'][0]}")
             elif 'username' in form.errors:
@@ -143,49 +142,34 @@ def registerPage(request):
 
 #resorts
 def index_view(request):
-    # Fetch all resorts
+  
     resorts = Resort.objects.all()
 
-    # Calculate the average rating for each resort
     rated_resorts = (
         Resort.objects.annotate(average_rating=Avg('rating__rating'))
-        .order_by('-average_rating')  # Sort by the highest average rating
+        .order_by('-average_rating') 
     )
 
-    # Collaborative filtering for recommendations
+   
     ratings = Rating.objects.all().select_related('user', 'resort')
     data = [{'user': r.user.id, 'resort': r.resort.id, 'rating': r.rating} for r in ratings]
 
     recommended_resorts = []
 
     if request.user.is_authenticated and len(data) >= 2:
-        # Convert the ratings data into a DataFrame
+       
         df = pd.DataFrame(data)
-
-        # Pivot the DataFrame to create a user-resort rating matrix
         pivot_table = df.pivot_table(index='user', columns='resort', values='rating').fillna(0)
-
-        # Calculate the cosine similarity between users
         similarity_matrix = cosine_similarity(pivot_table)
-
-        # Convert similarity_matrix into a DataFrame for easier manipulation
         user_sim_df = pd.DataFrame(similarity_matrix, index=pivot_table.index, columns=pivot_table.index)
-
-        # Get the current user's ID
         user_id = request.user.id
 
         if user_id in user_sim_df.index:
-            # Find similar users, excluding the current user
+            
             similar_users = user_sim_df[user_id].sort_values(ascending=False).index[1:]
-
-            # Get ratings from similar users
             similar_users_ratings = df[df['user'].isin(similar_users)]
-
-            # Find resorts that the current user hasn't rated
             user_rated_resorts = df[df['user'] == user_id]['resort'].tolist()
             unseen_resorts = similar_users_ratings[~similar_users_ratings['resort'].isin(user_rated_resorts)]
-
-            # Group by resort and calculate the mean rating for recommendations
             recommended = (
                 unseen_resorts.groupby('resort')['rating']
                 .mean()
@@ -196,7 +180,6 @@ def index_view(request):
             
             recommended_resorts = Resort.objects.filter(id__in=recommended['resort'].tolist())
 
-    # Return the context to the template
     return render(request, 'app/index_view.html', {
         'resorts': resorts,
         'rated_resorts': rated_resorts, 
@@ -209,7 +192,6 @@ def rate_resort(request, resort_id):
     if request.method == 'POST':
         rating_value = request.POST.get('rating')
 
-        # Check if the rating is missing
         if not rating_value:
             return HttpResponse("Rating value is required.", status=400)
 
@@ -220,7 +202,6 @@ def rate_resort(request, resort_id):
         except ValueError:
             return HttpResponse("Invalid rating value.", status=400)
 
-        # Check if user has already rated this resort
         existing_rating = Rating.objects.filter(user=request.user, resort=resort).first()
         if existing_rating:
             existing_rating.rating = rating_value
@@ -243,45 +224,74 @@ def toggle_favorite(request):
         user = request.user
 
         if is_favorite:
-            # Add to favorites
             Favorite.objects.get_or_create(user=user, resort=resort)
         else:
-            # Remove from favorites
             Favorite.objects.filter(user=user, resort=resort).delete()
 
-        # Get updated favorite count 
         updated_favorite_count = Resort.objects.annotate(favorite_count=Count('favorite_resorts')).get(id=resort_id).favorite_count
 
         return JsonResponse({'status': 'success', 'favorite_count': updated_favorite_count})
     
     return JsonResponse({'status': 'failed'}, status=400)
 
-def home(request):
-    q = request.GET.get('q') if request.GET.get('q') != None else ''
+from django.db.models import Count, Q
 
-    # Existing resorts filtering logic
-    resorts = Resort.objects.filter(
-        Q(amenities__name__icontains=q) |
-        Q(name__icontains=q) |
-        Q(description__icontains=q) |
-        Q(location__name__icontains=q)
-    ).annotate(
-        favorite_count=Count('favorite_resorts', distinct=True)
-    )
-    
+@login_required
+def home(request):
+    q = request.GET.get('q') if request.GET.get('q') is not None else ''
+
+    # Get filters from the request
+    selected_amenities = request.GET.getlist('amenities')
+    selected_location = request.GET.getlist('location')
+    min_price = request.GET.get('min_price')
+    max_price = request.GET.get('max_price')
+
+    # Filtering for all resorts
+    resorts = Resort.objects.all()
+
+    if selected_amenities:
+        resorts = resorts.filter(amenities__id__in=selected_amenities).distinct()
+    if selected_location:
+        resorts = resorts.filter(location__id__in=selected_location).distinct()
+    if min_price:
+        resorts = resorts.filter(price__gte=min_price)
+    if max_price:
+        resorts = resorts.filter(price__lte=max_price)
+
+    # Annotate resorts with favorite count
+    resorts = resorts.annotate(favorite_count=Count('favorite_resorts', distinct=True))
+
+    # Filtering for recommended resorts (you can apply specific logic to recommend resorts)
+    recommendations = Resort.objects.all()
+
+    if selected_amenities:
+        recommendations = recommendations.filter(amenities__id__in=selected_amenities).distinct()
+    if selected_location:
+        recommendations = recommendations.filter(location__id__in=selected_location).distinct()
+    if min_price:
+        recommendations = recommendations.filter(price__gte=min_price)
+    if max_price:
+        recommendations = recommendations.filter(price__lte=max_price)
+
+    # Add `is_favorite` and `favorite_count` to each resort in both sections
+    user = request.user
+    for resort in resorts:
+        resort.is_favorite = Favorite.objects.filter(user=user, resort=resort).exists()
+
+    for resort in recommendations:
+        resort.is_favorite = Favorite.objects.filter(user=user, resort=resort).exists()
+
     amenities = Amenity.objects.all()
     locations = Location.objects.all()
     resort_count = resorts.count()
 
-    # Get recommendations for the logged-in user
-    recommendations = get_recommendations(request.user.id)
-
+    # Your recommendation logic goes here
     context = {
         'resorts': resorts,
+        'recommendations': recommendations,
         'amenities': amenities,
         'resort_count': resort_count,
         'locations': locations,
-        'recommendations': recommendations,  # Include recommended resorts
     }
 
     return render(request, 'app/home.html', context)
@@ -304,10 +314,11 @@ def resort(request, pk):
         return render(request, 'app/resort.html', context)
 
 def contact_number(request):
-      resort = Resort.objects.first()  # Adjust this to filter for the specific entry
+      resort = Resort.objects.first()
       contact = resort.contact_number if resort else "No contact number available"
       context = {'contact_number': contact}
       return render(request, 'app/contact_number.html', context)
+
 
 def userProfile(request, pk):
       user = User.objects.get(id=pk)
@@ -315,51 +326,45 @@ def userProfile(request, pk):
       return render(request, 'app/profile.html', context) 
 
 
-from django.http import JsonResponse
-from django.db.models import Count
-from django.shortcuts import render
-
+@login_required
 def filter_beaches(request):
     selected_amenities = request.GET.getlist('amenities')  
     selected_location = request.GET.getlist('location')   
-    min_price = request.GET.get('min_price')  # Retrieve minimum price filter
-    max_price = request.GET.get('max_price')  # Retrieve maximum price filter
+    min_price = request.GET.get('min_price') 
+    max_price = request.GET.get('max_price')  
     
     resorts = Resort.objects.all()
 
-    # Filter by selected amenities
+    # Apply filters
     if selected_amenities:
         resorts = resorts.filter(amenities__id__in=selected_amenities).distinct()
 
-    # Filter by selected location
     if selected_location:
         resorts = resorts.filter(location__id__in=selected_location).distinct()
 
-    # Filter by price range
     if min_price:
         resorts = resorts.filter(price__gte=min_price)
     if max_price:
         resorts = resorts.filter(price__lte=max_price)
 
-    # Annotate resorts with favorite count
-    resorts = resorts.annotate(
-        favorite_count=Count('favorite_resorts', distinct=True)
-    )
-
-    # Order resorts by favorite count
-    resorts = resorts.order_by('-favorite_count')
-    
-    # Handle AJAX requests
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        user = request.user  # Get the current logged-in user
         resorts_data = list(resorts.values(
             'id', 'name', 'description', 'entrance_kids', 'entrance_adults', 'price', 'resort_image'
         ))
 
-        # Include image URL
+        # Add the favorite status and update the image URL
         for resort in resorts_data:
             if resort['resort_image']:
                 resort['resort_image'] = f"/media/{resort['resort_image']}"  # Adjust path as needed
 
+            # Check if the current user has marked this resort as a favorite
+            resort['is_favorite'] = Favorite.objects.filter(user=user, resort_id=resort['id']).exists()
+
+            # Get the favorite count for the resort
+            resort['favorite_count'] = Favorite.objects.filter(resort_id=resort['id']).count()
+
+        # Return the filtered resorts data with is_favorite and favorite_count
         return JsonResponse({'resorts': resorts_data})
 
     # For non-AJAX requests, render the full page
@@ -377,6 +382,7 @@ def filter_beaches(request):
     }
 
     return render(request, 'app/home.html', context)
+
 
 #end resorts
 

@@ -17,8 +17,8 @@
                         {% endif %}
 
         
-                        <a class="favorite-btn" data-resort-id="{{ resort.id }}">
-                            <i class="fa fa-heart {% if resort.favorite_count > 0 %} active {% endif %}" aria-hidden="true"></i>
+                        <a href="#" class="favorite-btn" data-resort-id="{{ resort.id }}">
+                            <i class="fa fa-heart {% if resort.is_favorite %}active{% endif %}" aria-hidden="true"></i>
                         </a>
 
                 
@@ -70,10 +70,9 @@
                         {% endif %}
 
                         
-                        <a class="favorite-btn" data-resort-id="{{ resort.id }}">
-                            <i class="fa fa-heart {% if resort.favorite_count > 0 %} active {% endif %}" aria-hidden="true"></i>
+                        <a href="#" class="favorite-btn" data-resort-id="{{ resort.id }}">
+                            <i class="fa fa-heart {% if resort.is_favorite %}active{% endif %}" aria-hidden="true"></i>
                         </a>
-
                        
                         <form method="POST" action="{% url 'rate_resort' resort.id %}">
                             {% csrf_token %}
