@@ -39,6 +39,7 @@ def adminDashboard(request):
       login_history = LoginHistory.objects.all().order_by('-last_login')
 
       unique_users_count = login_history.values('user').distinct().count()
+      
 
       if login_history.exists():  # Check if there is any login history
         login_activities = LoginActivity.objects.filter(user=request.user).order_by('-timestamp')
@@ -236,7 +237,9 @@ def toggle_favorite(request):
 
 from django.db.models import Count, Q
 
-@login_required
+
+from .recommendations import get_recommendations
+
 def home(request):
     q = request.GET.get('q') if request.GET.get('q') is not None else ''
 
@@ -261,31 +264,37 @@ def home(request):
     # Annotate resorts with favorite count
     resorts = resorts.annotate(favorite_count=Count('favorite_resorts', distinct=True))
 
-    # Filtering for recommended resorts (you can apply specific logic to recommend resorts)
-    recommendations = Resort.objects.all()
-
-    if selected_amenities:
-        recommendations = recommendations.filter(amenities__id__in=selected_amenities).distinct()
-    if selected_location:
-        recommendations = recommendations.filter(location__id__in=selected_location).distinct()
-    if min_price:
-        recommendations = recommendations.filter(price__gte=min_price)
-    if max_price:
-        recommendations = recommendations.filter(price__lte=max_price)
-
-    # Add `is_favorite` and `favorite_count` to each resort in both sections
+    # Get the current user
     user = request.user
-    for resort in resorts:
-        resort.is_favorite = Favorite.objects.filter(user=user, resort=resort).exists()
+    recommendations = []
 
-    for resort in recommendations:
-        resort.is_favorite = Favorite.objects.filter(user=user, resort=resort).exists()
+    # If the user is authenticated, fetch personalized recommendations
+    if user.is_authenticated:
+        recommendations = get_recommendations(user.id, n_recommendations=5)
+
+        # Add `favorite_count` to each recommended resort
+        recommendation_ids = [resort.id for resort in recommendations]
+        annotated_recommendations = (
+            Resort.objects.filter(id__in=recommendation_ids)
+            .annotate(favorite_count=Count('favorite_resorts', distinct=True))
+        )
+
+        # Map favorite count back to the original recommendations list
+        for resort in recommendations:
+            annotated_resort = next((ar for ar in annotated_recommendations if ar.id == resort.id), None)
+            if annotated_resort:
+                resort.favorite_count = annotated_resort.favorite_count
+                resort.is_favorite = Favorite.objects.filter(user=user, resort=resort).exists()
+
+    # Add `is_favorite` to all resorts
+    for resort in resorts:
+        resort.is_favorite = user.is_authenticated and Favorite.objects.filter(user=user, resort=resort).exists()
 
     amenities = Amenity.objects.all()
     locations = Location.objects.all()
     resort_count = resorts.count()
 
-    # Your recommendation logic goes here
+    # Prepare the context
     context = {
         'resorts': resorts,
         'recommendations': recommendations,
@@ -295,6 +304,8 @@ def home(request):
     }
 
     return render(request, 'app/home.html', context)
+
+
 
 
 def resort(request, pk):
@@ -326,7 +337,7 @@ def userProfile(request, pk):
       return render(request, 'app/profile.html', context) 
 
 
-@login_required
+
 def filter_beaches(request):
     selected_amenities = request.GET.getlist('amenities')  
     selected_location = request.GET.getlist('location')   
@@ -445,7 +456,7 @@ def deleteMessage(request, pk):
 
 @login_required(login_url='login')
 def updateUser(request):
-      return render(request, 'app/updtae-user.html')
+      return render(request, 'app/update-user.html')
 #end comments
 
 # def recommended_resorts(request):

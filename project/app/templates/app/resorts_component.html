@@ -1,14 +1,14 @@
 {% load static %}
 
 <main class="main-content">
-
+    {% if user.is_authenticated %}
     <div class="recommended-section">
         <h2>Recommended For You</h2>
         <div class="card-slider-container recommended-slider">
     
             <button class="arrow-btn left">&#10094;</button>
 
-
+            
             <div class="card-slider recommended-cards">
                 {% for resort in recommendations %}
                     <div class="card">
@@ -48,12 +48,13 @@
                     </div>
                 {% endfor %}
             </div>
-
+           
           
             <button class="arrow-btn right">&#10095;</button>
         </div>
+        
     </div>
-
+    {% endif %}
    
     <div class="all-resorts-section">
         <h2>All Resorts</h2>
