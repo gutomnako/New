@@ -212,7 +212,7 @@ def rate_resort(request, resort_id):
 
         return redirect('home')
 
-    return render(request, 'app/resort_component.html', {'resort': resort})
+    return render(request, 'app/resort.html', {'resort': resort})
 
 @login_required
 def toggle_favorite(request):
@@ -234,11 +234,6 @@ def toggle_favorite(request):
         return JsonResponse({'status': 'success', 'favorite_count': updated_favorite_count})
     
     return JsonResponse({'status': 'failed'}, status=400)
-
-from django.db.models import Count, Q
-
-
-from .recommendations import get_recommendations
 
 def home(request):
     q = request.GET.get('q') if request.GET.get('q') is not None else ''
@@ -304,8 +299,6 @@ def home(request):
     }
 
     return render(request, 'app/home.html', context)
-
-
 
 
 def resort(request, pk):

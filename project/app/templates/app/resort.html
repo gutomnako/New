@@ -2,46 +2,133 @@
 {% load static %}
 {% block content %}
 <link rel="stylesheet" href="{% static 'styles/resortdetails.css' %}">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<a href="{% url 'home' %}">Home</a>
+<div class="container">
+    <a href="{% url 'home' %}" class="home-link">Home</a>
 
-<h1>{{resort.name}}</h1>
+    <h1>{{ resort.name }}</h1>
+    
+    <img src="{{ resort.resort_image.url }}" alt="{{ resort.name }}" class="image-placeholder">
+    
+    <p><strong>Location:</strong> {{ resort.location }}</p>
+    <p><strong>Rating:</strong> ⭐ {{ resort.rating }}</p>
+    <p><strong>Price Range:</strong> {{ resort.price_range }}</p>
+    
+    <p class="details">{{ resort.description }}</p>
 
-<p>{{resort.description}}</p>
+    <h2>Amenities</h2>
+    <ul class="amenities">
+        {% for amenity in amenities %}
+            <li>{{ amenity.name }}</li>
+        {% endfor %}
+    </ul>
 
-{% for amenity in amenities %}
-    <li>{{ amenity.name }}</li>
-{% endfor %}
+    <h2>Contact Information</h2>
+    <p><strong>Phone:</strong> {{ resort.phone }}</p>
+    <p><strong>Email:</strong> {{ resort.email }}</p>
+</div>
+<!-- Button to trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ratingModal">
+    Rate this Resort
+</button>
+
+<!-- Rating Modal -->
+<div class="modal fade" id="ratingModal" tabindex="-1" aria-labelledby="ratingModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ratingModalLabel">Rate This Resort</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'rate_resort' resort.id %}">
+                    {% csrf_token %}
+                    <div class="stars">
+                        <span class="star" data-value="1">&#9734;</span>
+                        <span class="star" data-value="2">&#9734;</span>
+                        <span class="star" data-value="3">&#9734;</span>
+                        <span class="star" data-value="4">&#9734;</span>
+                        <span class="star" data-value="5">&#9734;</span>
+                    </div>
+                    <input type="hidden" name="rating" value="0">
+                    <div class="text-center mt-3">
+                        <button type="submit">Submit Rating</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="comment-wrapper">
     <h3>Comments</h3>
     <hr>
     
     {% for message in resort_messages %}
-    <div>
-        {% if resort %}
-        <div>
-            <img src="{{ resort.host.avatar.url }}" class="avatar">
+    <div class="comment">
+        <img src="{{ message.user.avatar.url }}" class="avatar">
+
+        <div class="comment-content">
+            <div class="comment-header">
+                <a href="{% url 'user-profile' message.user.id %}">@{{ message.user.username }}</a> 
+                <small>{{ message.created_at|timesince }} ago</small>
+            </div>
+            <p>{{ message.comment }}</p>
+            
+            {% if request.user == message.user %}
+            <a href="{% url 'delete-message' message.id %}" class="delete-btn">Delete</a>
+            {% endif %}
         </div>
-        {% endif %} 
-        {% if request.user == message.user %}
-        <a href="{% url 'delete-message' message.id %}">Delete</a>
-        {% endif %}
-        <a href="{% url 'user-profile' message.user.id %}">@{{message.user.name}}</a> <small>{{message.created_at|timesince}} ago </small>
-        <p>{{ message.comment }}</p>
-        <hr>
     </div>
     {% endfor %}
 </div>
 
 {% if request.user.is_authenticated %}
 <div class="comment-form">
-    <form method="POST" action="">
+    <img src="{{ request.user.avatar.url }}" class="avatar">
+    <form method="POST" action="" style="display: flex; width: 100%;">
         {% csrf_token %}
         <input type="text" name="comment" placeholder="Write your comment here...">
+        <button type="submit">Send</button>
     </form>
-
 </div>
 {% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const stars = document.querySelectorAll('.star');
+    const ratingInput = document.querySelector('input[name="rating"]');
+
+    stars.forEach(star => {
+        star.addEventListener('click', function () {
+            let rating = this.getAttribute('data-value');
+            ratingInput.value = rating;
+
+            stars.forEach(s => {
+                s.classList.remove('selected');
+                if (s.getAttribute('data-value') <= rating) {
+                    s.classList.add('selected');
+                }
+            });
+        });
+
+        star.addEventListener('mouseover', function () {
+            let hoverValue = this.getAttribute('data-value');
+            stars.forEach(s => {
+                s.classList.remove('active');
+                if (s.getAttribute('data-value') <= hoverValue) {
+                    s.classList.add('active');
+                }
+            });
+        });
+
+        star.addEventListener('mouseout', function () {
+            stars.forEach(s => s.classList.remove('active'));
+        });
+    });
+});
+</script>
 
 {% endblock content %}

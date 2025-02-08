@@ -1,5 +1,5 @@
 {% load static %}
-
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 <main class="main-content">
     {% if user.is_authenticated %}
     <div class="recommended-section">
@@ -16,24 +16,11 @@
                             <img src="{{ resort.resort_image.url }}" alt="">
                         {% endif %}
 
-        
-                        <a href="#" class="favorite-btn" data-resort-id="{{ resort.id }}">
+                       
+                        <a class="favorite-btn" data-resort-id="{{ resort.id }}">
                             <i class="fa fa-heart {% if resort.is_favorite %}active{% endif %}" aria-hidden="true"></i>
                         </a>
-
-                
-                        <form method="POST" action="{% url 'rate_resort' resort.id %}">
-                            {% csrf_token %}
-                            <div class="stars">
-                                <span class="star" data-value="1">&#9734;</span>
-                                <span class="star" data-value="2">&#9734;</span>
-                                <span class="star" data-value="3">&#9734;</span>
-                                <span class="star" data-value="4">&#9734;</span>
-                                <span class="star" data-value="5">&#9734;</span>
-                            </div>
-                            <input type="hidden" name="rating" value="0">
-                            <button type="submit">Submit Rating</button>
-                        </form>
+                        
 
                         <h5>{{ resort.name }}</h5>
                         <p>{{ resort.description }}</p>
@@ -71,22 +58,10 @@
                         {% endif %}
 
                         
-                        <a href="#" class="favorite-btn" data-resort-id="{{ resort.id }}">
+                        <a class="favorite-btn" data-resort-id="{{ resort.id }}">
                             <i class="fa fa-heart {% if resort.is_favorite %}active{% endif %}" aria-hidden="true"></i>
                         </a>
                        
-                        <form method="POST" action="{% url 'rate_resort' resort.id %}">
-                            {% csrf_token %}
-                            <div class="stars">
-                                <span class="star" data-value="1">&#9734;</span>
-                                <span class="star" data-value="2">&#9734;</span>
-                                <span class="star" data-value="3">&#9734;</span>
-                                <span class="star" data-value="4">&#9734;</span>
-                                <span class="star" data-value="5">&#9734;</span>
-                            </div>
-                            <input type="hidden" name="rating" value="0">
-                            <button type="submit">Submit Rating</button>
-                        </form>
 
                         <h5>{{ resort.name }}</h5>
                         <p>{{ resort.description }}</p>
@@ -185,57 +160,44 @@
         leftArrowAllResorts.addEventListener('click', () => scrollLeft(allResortsSlider));
     }
 
-    document.querySelectorAll('.stars').forEach(starsContainer => {
-            const stars = starsContainer.querySelectorAll('.star');
-            stars.forEach(star => {
-                star.addEventListener('click', function () {
-                    const rating = this.getAttribute('data-value');
-                    const ratingInput = starsContainer.closest('form').querySelector('input[name="rating"]');
-                    ratingInput.value = rating;
-
-                    
-                    stars.forEach(s => s.classList.remove('active'));
-                    for (let i = 0; i < rating; i++) {
-                        stars[i].classList.add('active');
-                    }
-                });
-            });
-        });
 
  
-        document.querySelectorAll('.favorite-btn').forEach(button => {
-            button.addEventListener('click', function () {
-                const resortId = this.getAttribute('data-resort-id');
-                const isFavorite = this.querySelector('i').classList.contains('active');
-                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            document.querySelectorAll('.favorite-btn').forEach(button => {
+        button.addEventListener('click', function (event) {
+            event.preventDefault(); // Prevents the default anchor behavior
+            event.stopPropagation(); // Prevents event bubbling issues
 
-                this.querySelector('i').classList.toggle('active');
+            const resortId = this.getAttribute('data-resort-id');
+            const isFavorite = this.querySelector('i').classList.contains('active');
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-                fetch('/toggle_favorite/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrfToken,
-                    },
-                    body: JSON.stringify({
-                        resort_id: resortId,
-                        is_favorite: !isFavorite,
-                    }),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        this.closest('.card').querySelector('.favorite-count').innerText = `Favorites: ${data.favorite_count}`;
-                    } else {
-                        console.error('Error updating favorite status:', data.message);
-                        this.querySelector('i').classList.toggle('active');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    this.querySelector('i').classList.toggle('active');
-                });
+            this.querySelector('i').classList.toggle('active'); // Toggle the icon's active class
+
+            fetch('/toggle_favorite/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                },
+                body: JSON.stringify({
+                    resort_id: resortId,
+                    is_favorite: !isFavorite,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    this.closest('.card').querySelector('.favorite-count').innerText = `Favorites: ${data.favorite_count}`;
+                } else {
+                    console.error('Error updating favorite status:', data.message);
+                    this.querySelector('i').classList.toggle('active'); // Revert the toggle if there was an error
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.querySelector('i').classList.toggle('active'); // Revert on error
             });
         });
+    });
     });
 </script>

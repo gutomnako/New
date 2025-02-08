@@ -1,6 +1,241 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f2f2f2;
+  margin: 0;
+  padding: 0;
+}
+.container {
+  width: 80%;
+  margin: 20px auto;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+h1 {
+  color: #007BFF;
+}
+.home-link {
+  text-decoration: none;
+  color: white;
+  background: #007BFF;
+  padding: 10px 15px;
+  border-radius: 5px;
+  display: inline-block;
+}
+.amenities {
+  list-style-type: none;
+  padding: 0;
+}
+.amenities li {
+  background: #dff0d8;
+  padding: 8px;
+  margin: 5px 0;
+  border-radius: 5px;
+}
+.details {
+  margin-top: 20px;
+}
+.image-placeholder {
+  width: 100%;
+  height: 300px;
+  background: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: white;
+  border-radius: 10px;
+}
+
 .avatar {
     vertical-align: middle;
     width: 50px;
     height: 50px;
     border-radius: 50%;
   }
+
+  .comment-wrapper {
+    width: 80vw; /* Adjusts width based on viewport */
+    max-width: 800px; /* Prevents it from getting too wide */
+    margin: 20px auto;
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.comment-wrapper h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.comment-wrapper hr {
+    border: none;
+    height: 1px;
+    background: #ddd;
+    margin-bottom: 15px;
+}
+
+.comment {
+    display: flex;
+    align-items: flex-start;
+    padding: 12px 0;
+    gap: 10px;
+}
+
+.comment .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.comment-content {
+    flex: 1;
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+}
+
+.comment-header a {
+    font-weight: bold;
+    text-decoration: none;
+    color: #007bff;
+}
+
+.comment-header a:hover {
+    text-decoration: underline;
+}
+
+.comment-header small {
+    color: #888;
+}
+
+.comment p {
+    margin-top: 5px;
+    font-size: 14px;
+    color: #444;
+}
+
+.comment a.delete-btn {
+    font-size: 12px;
+    color: #dc3545;
+    text-decoration: none;
+}
+
+.comment a.delete-btn:hover {
+    text-decoration: underline;
+}
+
+.comment-form {
+  width: 80vw;
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Ensures consistent font sizing that does not scale with zoom */
+html {
+  font-size: 16px; /* Keeps text readable without affecting layout */
+}
+
+.comment-form .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.comment-form input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+    transition: border 0.3s ease;
+}
+
+.comment-form input:focus {
+    border-color: #007bff;
+}
+
+.comment-form button {
+    padding: 10px 15px;
+    border: none;
+    background: #007bff;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.comment-form button:hover {
+    background: #0056b3;
+}
+
+
+/* Rating Stars */
+.stars {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin: 10px 0;
+}
+
+.stars span {
+  font-size: 24px;
+  color: #ddd;
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+}
+
+.stars span:hover,
+.stars span.selected {
+  color: #f39c12;
+}
+
+.star.active {
+  color: gold; 
+}
+
+/* Buttons */
+button {
+  background-color: #3498db;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
+
+button a {
+  color: white;
+  text-decoration: none;
+}
+
+
