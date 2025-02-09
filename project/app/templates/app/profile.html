@@ -2,8 +2,29 @@
 
 {% block content %}
 
-<h1>{{ user.username }}</h1>
+<h2>{{ user.username }}'s Profile</h2>
 {% if request.user == user %}
 <a href="{% url 'update-user' %}">Edit profile</a>
 {% endif %}
+<h3>Favorite Resorts:</h3>
+<ul>
+    {% for favorite in favorites %}
+        <li>{{ favorite.resort.name }}</li>
+    {% empty %}
+        <p>No favorite resorts yet.</p>
+    {% endfor %}
+</ul>
+
+<h3>Comments:</h3>
+<ul>
+    {% for message in messages %}
+        <li>
+            <strong>On {{ message.resort.name }}</strong>: {{ message.comment }} 
+            <br>
+        </li>
+    {% empty %}
+        <p>No comments yet.</p>
+    {% endfor %}
+</ul>
+
 {% endblock content %}

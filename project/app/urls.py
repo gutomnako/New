@@ -28,6 +28,7 @@ urlpatterns = [
 
     path('admin-Dashboard/', views.adminDashboard, name='admin-dashboard'),
     path('adminbeachandresort/', views.adminresorts, name='admin-beach'),
-    path('adminviews/', views.adminmonitors, name='admin-monitor')
+    path('adminviews/', views.adminmonitors, name='admin-monitor'),
     
+    path('map/', views.map_view, name='map')
 ]

@@ -238,4 +238,30 @@ button a {
   text-decoration: none;
 }
 
+.star-rating {
+  display: inline-flex;
+  align-items: center;
+}
 
+.star-rating i {
+  font-size: 20px; /* Adjust star size */
+  margin: 2px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.star-rating .filled {
+  color: #fdd835; /* Gold color for filled stars */
+}
+
+.star-rating .half {
+  color: #fdd835; /* Same color for half-stars */
+}
+
+.star-rating .empty {
+  color: #ddd; /* Light gray for empty stars */
+}
+
+/* Hover effect for interactive feel */
+.star-rating i:hover {
+  transform: scale(1.2);
+}

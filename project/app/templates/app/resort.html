@@ -3,6 +3,7 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'styles/resortdetails.css' %}">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <div class="container">
     <a href="{% url 'home' %}" class="home-link">Home</a>
@@ -11,8 +12,17 @@
     
     <img src="{{ resort.resort_image.url }}" alt="{{ resort.name }}" class="image-placeholder">
     
-    <p><strong>Location:</strong> {{ resort.location }}</p>
-    <p><strong>Rating:</strong> ⭐ {{ resort.rating }}</p>
+    {% for loc in resort.location.all %}
+    <p><strong>Location:</strong> 
+        {{ loc.name }}{% if not forloop.last %}, {% endif %}
+    {% empty %}
+        No location available
+    </p>
+    {% endfor %}
+    <p><strong>Rating:</strong> 
+        <span class="star-rating" data-rating="{{ average_rating|default:'0' }}"></span> 
+      </p>
+      
     <p><strong>Price Range:</strong> {{ resort.price_range }}</p>
     
     <p class="details">{{ resort.description }}</p>
@@ -129,6 +139,24 @@
         });
     });
 });
+document.addEventListener("DOMContentLoaded", function () {
+    const starContainers = document.querySelectorAll(".star-rating");
+
+    starContainers.forEach(container => {
+      const rating = parseFloat(container.dataset.rating) || 0; // Get rating
+      const fullStars = Math.floor(rating); // Full stars
+      const halfStar = rating % 1 >= 0.5; // Half star logic
+      const emptyStars = 5 - fullStars - (halfStar ? 1 : 0); // Empty stars
+
+      // Generate star HTML
+      let stars = "";
+      for (let i = 0; i < fullStars; i++) stars += `<i class="fa fa-star filled"></i>`;
+      if (halfStar) stars += `<i class="fa fa-star-half-alt half"></i>`;
+      for (let i = 0; i < emptyStars; i++) stars += `<i class="fa fa-star empty"></i>`;
+
+      container.innerHTML = stars;
+    });
+  });
 </script>
 
 {% endblock content %}

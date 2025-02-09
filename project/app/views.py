@@ -15,6 +15,7 @@ from django.db.models import Avg
 from django.http import JsonResponse
 import json
 from .recommendations import get_recommendations
+from app.scoring import get_ranked_resorts
 
 #dashboard
 #login
@@ -259,6 +260,9 @@ def home(request):
     # Annotate resorts with favorite count
     resorts = resorts.annotate(favorite_count=Count('favorite_resorts', distinct=True))
 
+    # Apply weighted scoring after filtering
+    ranked_resorts = get_ranked_resorts().filter(id__in=resorts.values_list('id', flat=True))
+
     # Get the current user
     user = request.user
     recommendations = []
@@ -282,16 +286,16 @@ def home(request):
                 resort.is_favorite = Favorite.objects.filter(user=user, resort=resort).exists()
 
     # Add `is_favorite` to all resorts
-    for resort in resorts:
+    for resort in ranked_resorts:  # Use ranked resorts instead of original resorts
         resort.is_favorite = user.is_authenticated and Favorite.objects.filter(user=user, resort=resort).exists()
 
     amenities = Amenity.objects.all()
     locations = Location.objects.all()
-    resort_count = resorts.count()
+    resort_count = ranked_resorts.count()  # Count from ranked resorts
 
     # Prepare the context
     context = {
-        'resorts': resorts,
+        'resorts': ranked_resorts,  # Use ranked resorts here
         'recommendations': recommendations,
         'amenities': amenities,
         'resort_count': resort_count,
@@ -306,6 +310,9 @@ def resort(request, pk):
         amenities = Amenity.objects.all()
         resort_messages = resort.messages.all().order_by('-created_at')
 
+
+        average_rating = Rating.objects.filter(resort=resort).aggregate(Avg('rating'))['rating__avg']
+
         if request.method == 'POST':
             message = Message.objects.create(
                   user=request.user,
@@ -314,8 +321,11 @@ def resort(request, pk):
             )
             return redirect('resort', pk=resort.id)
 
-        context = {'resort': resort, 'resort_messages': resort_messages, 'amenities': amenities}
+        context = {'resort': resort, 'resort_messages': resort_messages, 'amenities': amenities, 'average_rating': average_rating,}
         return render(request, 'app/resort.html', context)
+
+def map_view(request):
+    return render(request, 'app/map.html')
 
 def contact_number(request):
       resort = Resort.objects.first()
@@ -325,9 +335,16 @@ def contact_number(request):
 
 
 def userProfile(request, pk):
-      user = User.objects.get(id=pk)
-      context = {'user': user}
-      return render(request, 'app/profile.html', context) 
+    user = get_object_or_404(User, id=pk)  # Get user by ID or return 404
+    favorites = Favorite.objects.filter(user=user)  # Get user's favorite resorts
+    messages = Message.objects.filter(user=user)  # Get user's messages/comments
+
+    context = {
+        'user': user,
+        'favorites': favorites,
+        'messages': messages,
+    }
+    return render(request, 'app/profile.html', context)
 
 
 
@@ -450,6 +467,10 @@ def deleteMessage(request, pk):
 @login_required(login_url='login')
 def updateUser(request):
       return render(request, 'app/update-user.html')
+
+def ranked_resorts_view(request):
+    resorts = Resort.objects.get_ranked_resorts()
+    return render(request, 'resorts/ranked_list.html', {'resorts': resorts})
 #end comments
 
 # def recommended_resorts(request):

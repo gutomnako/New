@@ -1,0 +1,56 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Santa Magdalena Street View</title>
+    
+    <!-- Include Leaflet.js & Mapillary -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    
+    <script src="https://unpkg.com/mapillary-js@4/dist/mapillary.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/mapillary-js@4/dist/mapillary.min.css" />
+
+    <style>
+        #map { height: 400px; }
+        #mly { height: 400px; }
+    </style>
+</head>
+<body>
+
+    <h2>Santa Magdalena, Sorsogon - Interactive Map & Street View</h2>
+    
+    <!-- Map Div -->
+    <div id="map"></div>
+    
+    <!-- Mapillary Street View -->
+    <div id="mly"></div>
+
+    <script>
+        // Set map view to Santa Magdalena, Sorsogon
+        var map = L.map('map').setView([12.6014, 124.1522], 16);
+
+        // Add OpenStreetMap Layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Add a marker
+        var marker = L.marker([12.6014, 124.1522]).addTo(map)
+            .bindPopup("Click here for Street View")
+            .openPopup();
+
+        // On marker click, open Mapillary street view
+        marker.on("click", function() {
+            var viewer = new Mapillary.Viewer(
+                "mly",  // The div ID where Mapillary will load
+                "YOUR_MAPILLARY_CLIENT_ID",  // Replace with your Mapillary API Key
+                "IMAGE_ID_FOR_SANTA_MAGDALENA" // Replace with a Mapillary image ID from this area
+            );
+        });
+    </script>
+
+</body>
+{% endblock content %}

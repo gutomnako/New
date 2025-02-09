@@ -82,17 +82,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 <i class="fa fa-heart ${resort.is_favorite ? 'active' : ''}" aria-hidden="true"></i>
             </a>
 
-            <form method="POST" action="/rate_resort/${resort.id}/">
-                <input type="hidden" name="csrfmiddlewaretoken" value="${resort.csrf_token}">
-                <div class="stars">
-                    ${[1, 2, 3, 4, 5].map(
-                        value => `<span class="star" data-value="${value}">&#9734;</span>`
-                    ).join('')}
-                </div>
-                <input type="hidden" name="rating" value="0">
-                <button type="submit">Submit Rating</button>
-            </form>
-
             <h5>${resort.name}</h5>
             <p>${resort.description}</p>
             <p>Entrance Kids: ${resort.entrance_kids} | Entrance Adults: ${resort.entrance_adults}</p>
