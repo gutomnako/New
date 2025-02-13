@@ -1,9 +1,44 @@
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f2f2f2;
-  margin: 0;
-  padding: 0;
+/* Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+/* Header / Navbar */
+.header {
+    display: flex;
+    justify-content: center; /* Centers the nav */
+    align-items: center;
+    padding: 1em 2em;
+    background-color: #3daed7;
+    color: black;
+    font-family: "Quicksand", serif;
+    position: fixed;  /* Keeps the navbar fixed at the top */
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;  /* Makes sure it stays above other content */
+    width: 100%;  /* Ensures it takes the full width of the screen */
+    box-sizing: border-box;  /* Prevents padding from causing layout issues */
 }
+
+.nav {
+    display: flex;
+    gap: 1.5em;
+    justify-content: center; /* Centers the navigation links */
+}
+
+.nav a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 0.5em 0.8em;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.nav a:hover {
+    background-color: #0066cc;
+}
+
+
 .container {
   width: 80%;
   margin: 20px auto;
@@ -264,4 +299,240 @@ button a {
 /* Hover effect for interactive feel */
 .star-rating i:hover {
   transform: scale(1.2);
+}
+
+
+
+/* General Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: linear-gradient(to bottom, #0099ff, #ffcc66);
+    color: #333;
+    text-align: center;
+}
+
+/* Resort Description */
+.resort-description {
+    padding: 50px 20px;
+    background: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.description-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.description-text {
+    flex: 1;
+    padding-right: 20px;
+}
+
+.description-text h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: #333;
+}
+
+.description-text p {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    color: #555;
+}
+
+.description-image {
+    flex: 1;
+    max-width: 600px;
+}
+
+.description-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Hero Section */
+.hero {
+    background: url('image/fmb.jpg') no-repeat center center/cover;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+    position: relative;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+.cta-button {
+    background: #ffcc66;
+    color: #333;
+    padding: 10px 20px;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.cta-button:hover {
+    background: #ff9900;
+}
+
+/* Amenities Section */
+.amenities {
+    padding: 50px;
+    background: #fff;
+    text-align: center;
+}
+
+.amenities h2 {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.amenities-list {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.amenities-list li {
+    background: #0099ff;
+    color: white;
+    padding: 15px 25px;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.amenities-list li:hover {
+    background: #ff9900;
+    transform: scale(1.1);
+}
+
+/* Facilities */
+.facilities {
+    padding: 50px 20px;
+}
+
+.facilities h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.facilities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 30px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.facility-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.facility-item img {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 10px;
+}
+
+.facility-item p {
+    font-size: 1rem;
+    color: #333;
+}
+
+/* See All Button */
+.see-all-btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: #0099ff;
+    border: 2px solid #0099ff;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.see-all-btn:hover {
+    background: #0099ff;
+    color: white;
+}
+
+.see-all-btn {
+    display: inline-block;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(45deg, #0099ff, #007acc);
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    outline: none;
+}
+
+.see-all-btn:hover {
+    background: linear-gradient(45deg, #007acc, #0055aa);
+    transform: scale(1.05);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.see-all-btn:active {
+    transform: scale(0.98);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.pricing, .contact, footer {
+    text-align: center;
 }
