@@ -30,5 +30,9 @@ urlpatterns = [
     path('adminbeachandresort/', views.adminresorts, name='admin-beach'),
     path('adminviews/', views.adminmonitors, name='admin-monitor'),
     
-    path('map/', views.map_view, name='map')
+    path('map/', views.map_view, name='map'),
+
+    
+    path("update_resort_inline/<int:pk>/", views.update_resort_inline, name="update_resort_inline"),
+    path("update_resort_image/<int:pk>/", views.update_resort_image, name="update_resort_image"),
 ]

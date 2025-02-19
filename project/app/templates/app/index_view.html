@@ -80,10 +80,10 @@
     <br>
     <div class="card-container">
       <div class="card-grid">
-        {% for resort in rated_resorts %}
+        {% for resort in rated_resorts|slice:":4" %}
         <div class="card">
           {% if resort.resort_image %}
-            <img src="{{ resort.resort_image.url }}" alt="">
+          <img src="{{ resort.resort_image.url }}" alt="">
           {% endif %}
           <br>
           <h4>{{ resort.name }}</h4>
@@ -101,11 +101,11 @@
         {% endfor %}
       </div>
     </div>
-</div>
-    <br>
-
-    <button id="see-more-btn" class="see-more-btn">See More!</button>
-  </div>
+    <div>
+      <a href="{% url 'home' %}">
+        <button id="see-more-btn" class="see-more-btn">See More!</button>
+      </a>
+    </div>    
   <div class="discover-section">
     <div class="discover-cards">
       <div class="discover-card">

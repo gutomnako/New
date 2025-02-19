@@ -99,7 +99,7 @@ nav a:hover {
 .content .cn {
   display: inline-block;
   padding: 10px 20px;
-  background: blue;
+  background: #007bff;;
   color: white;
   font-family: "Quicksand", serif;
   font-weight: bold;
@@ -113,7 +113,7 @@ nav a:hover {
 }
 
 .content .cn:hover {
-  background-color: darkblue;
+  background-color: #0056b3;
 }
 
 .content .cn a {
@@ -294,6 +294,7 @@ button a {
   text-decoration: none;
 }
 
+
 /* Rating Styling */
 .card .rating {
   font-size: 16px;
@@ -301,8 +302,6 @@ button a {
   color: #f39c12;
   margin-top: 10px;
 }
-
-
 
 .see-more-btn {
   font-family: "Quicksand", serif;
@@ -316,6 +315,8 @@ button a {
   font-size: 16px;
   border-radius: 50px;
   cursor: pointer;
+  text-decoration: none; /* Removes underline */
+  display: inline-block; /* Ensures proper button styling */
 }
 
 .see-more-btn:hover {

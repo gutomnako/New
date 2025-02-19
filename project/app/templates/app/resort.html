@@ -5,6 +5,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
+
 <!-- <div class="container">
     <a href="{% url 'home' %}" class="home-link">Home</a>
 
@@ -37,20 +38,22 @@
     <h2>Contact Information</h2>
     <p><strong>Phone:</strong> {{ resort.phone }}</p>
     <p><strong>Email:</strong> {{ resort.email }}</p>
-</div>
-<body> -->
+</div>-->
+<body> 
     <!-- Hero Section -->
     <header class="header">
-        <nav class="nav">
-          <a href="{% url 'index-view' %}">Home</a>
-          <a href="{% url 'map' %}">Map</a>
-          <a href="#">Contact</a>
-        </nav>
-      </header>
+            <nav class="nav">
+            <a href="{% url 'index-view' %}">Home</a>
+            <a href="{% url 'map' %}">Map</a>
+            <a href="#">Contact</a>
+            </nav>
+    </header>
     <header class="hero">
         <div class="hero-content">
             <h1>Welcome to {{ resort.name }} Resort</h1>
-            <p>Experience paradise like never before</p>
+            <p contenteditable="true" data-field="description" data-url="{% url 'update_resort_inline' resort.id %}">
+                hesoyam
+            </p>
             <a href="#contact" class="cta-button">Book Now</a>
         </div>
     </header>
@@ -60,136 +63,126 @@
         <div class="description-container">
             <div class="description-text">
                 <h2>About {{ resort.name }} Resort</h2>
-                <p>FMB Resort is a luxurious beachfront getaway that offers a perfect combination of relaxation, adventure, and world-class amenities. Nestled along pristine shores, our resort boasts a range of premium accommodations, a stunning infinity pool with ocean views, fine dining, rejuvenating spa treatments, and a variety of water activities. Whether you're looking to unwind on our private beach, indulge in gourmet meals, or explore the crystal-clear waters, FMB Resort promises an unforgettable experience.</p>
+                <p contenteditable="true" data-field="description" data-url="{% url 'update_resort_inline' resort.id %}">
+                    {{ resort.description }}
+                </p>
             </div>
             <div class="description-image">
-                <img src="image/fmb.jpg" alt="FMB Resort Beach" />
-            </div>
+                <label for="resort-image-upload" class="image-upload-label">
+                    <img id="resortImage" src="{{ resort.image.url }}" alt="Resort Image" />
+                    <div class="edit-icon">
+                        <img src="{% static 'icons/edit-icon.png' %}" alt="Edit" />
+                    </div>
+                </label>
+                <input type="file" id="resort-image-upload" data-url="/update-resort-inline/{{ resort.id }}/" accept="image/*" style="display: none;">
+            </div>            
         </div>
     </section>
 
     <!-- Facilities and Services -->
-    <section class="facilities">
-        <h2>Facilities and Services</h2>
-        <div class="facilities-grid">
-            <div class="facility-item">
-                <img src="image/icon (1).png" alt="Free WiFi">
-                <p>NO SMOKING</p>
+    <section class="facilities-amenities">
+        <h2>Facilities and Amenities</h2>
+        <div class="facilities-container">
+            <!-- Facilities -->
+            <div class="facilities-list">
+                <h3>Facilities & Services</h3>
+                <div class="facility-item">
+                    <img src="image/icon (1).png" alt="No Smoking">
+                    <p>NO SMOKING</p>
+                </div>
+                <div class="facility-item">
+                    <img src="image/icon (2).png" alt="Location">
+                    <p>LOCATION</p>
+                </div>
+                <div class="facility-item">
+                    <img src="image/icon (3).png" alt="Air Conditioning">
+                    <p>AIR CONDITION</p>
+                </div>
+                <div class="facility-item">
+                    <img src="image/icon (4).png" alt="Free WiFi">
+                    <p>FREE WIFI</p>
+                </div>
+                <div class="facility-item">
+                    <img src="image/toiletries.png" alt="Toiletries">
+                    <p>COMPLIMENTARY TOILETRIES</p>
+                </div>
+                <a href="facilities.html"><button class="see-all-btn">See All Facilities</button></a>
             </div>
-            <div class="facility-item">
-                <img src="image/icon (2).png" alt="Air Conditioning">
-                <p>LOCATION</p>
-            </div>
-            <div class="facility-item">
-                <img src="image/icon (3).png" alt="Heart of El Nido">
-                <p>AIR CONDITION</p>
-            </div>
-            <div class="facility-item">
-                <img src="image/icon (4).png" alt="Non-smoking Rooms">
-                <p>FREE WIFI</p>
-            </div>
-            <div class="facility-item">
-                <img src="image/toiletries.png" alt="Non-smoking Rooms">
-                <p>COMPLIMENTARY TOILETRIES</p>
-            </div>
-        </div>
-        <a href="facilities.html"><button class="see-all-btn">See All Facilities</button></a>
-    </section>
-
-    <!-- Amenities Section -->
-    <section class="amenities">
-        <h2>Our Amenities</h2>
-        <ul class="amenities-list">
-        {% for amenity in amenities %}
-            <li>{{ amenity.name }}</li>
-        {% endfor %}
-        </ul>
-    </section>
-
-
-<!-- Button to trigger modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ratingModal">
-    Rate this Resort
-</button>
-
-<!-- Rating Modal -->
-<div class="modal fade" id="ratingModal" tabindex="-1" aria-labelledby="ratingModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="ratingModalLabel">Rate This Resort</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form method="POST" action="{% url 'rate_resort' resort.id %}">
-                    {% csrf_token %}
-                    <div class="stars">
-                        <span class="star" data-value="1">&#9734;</span>
-                        <span class="star" data-value="2">&#9734;</span>
-                        <span class="star" data-value="3">&#9734;</span>
-                        <span class="star" data-value="4">&#9734;</span>
-                        <span class="star" data-value="5">&#9734;</span>
-                    </div>
-                    <input type="hidden" name="rating" value="0">
-                    <div class="text-center mt-3">
-                        <button type="submit">Submit Rating</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="comment-wrapper">
-    <h3>Comments</h3>
-    <hr>
     
-    {% for message in resort_messages %}
-    <div class="comment">
-        <img src="{{ message.user.avatar.url }}" class="avatar">
-
-        <div class="comment-content">
-            <div class="comment-header">
-                <a href="{% url 'user-profile' message.user.id %}">@{{ message.user.username }}</a> 
-                <small>{{ message.created_at|timesince }} ago</small>
+            <!-- Amenities -->
+            <div class="amenities-list">
+                <h3>Our Amenities</h3>
+                <ul>
+                    {% for amenity in amenities %}
+                        <li>{{ amenity.name }}</li>
+                    {% endfor %}
+                </ul>
             </div>
-            <p>{{ message.comment }}</p>
-            
-            {% if request.user == message.user %}
-            <a href="{% url 'delete-message' message.id %}" class="delete-btn">Delete</a>
-            {% endif %}
+        </div>
+    </section>
+    
+
+    <!-- Rating Modal -->
+    <div class="modal fade" id="ratingModal" tabindex="-1" aria-labelledby="ratingModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ratingModalLabel">Rate This Resort</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{% url 'rate_resort' resort.id %}">
+                        {% csrf_token %}
+                        <div class="stars">
+                            <span class="star" data-value="1">&#9734;</span>
+                            <span class="star" data-value="2">&#9734;</span>
+                            <span class="star" data-value="3">&#9734;</span>
+                            <span class="star" data-value="4">&#9734;</span>
+                            <span class="star" data-value="5">&#9734;</span>
+                        </div>
+                        <input type="hidden" name="rating" value="0">
+                        <div class="text-center mt-3">
+                            <button type="submit">Submit Rating</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
-    {% endfor %}
-</div>
 
-{% if request.user.is_authenticated %}
-<div class="comment-form">
-    <img src="{{ request.user.avatar.url }}" class="avatar">
-    <form method="POST" action="" style="display: flex; width: 100%;">
-        {% csrf_token %}
-        <input type="text" name="comment" placeholder="Write your comment here...">
-        <button type="submit">Send</button>
-    </form>
-</div>
-<br>
-{% endif %}
-    <!-- Pricing Section -->
-    <section class="pricing">
-        <h2>Room Rates</h2>
-        <p>Starting from <strong>₱3,000</strong> per night</p>
-    </section>
+    <div class="comment-wrapper">
+        <h3>Comments</h3>
+        <hr>
+        
+        {% for message in resort_messages %}
+        <div class="comment">
+            <img src="{{ message.user.avatar.url }}" class="avatar">
 
-    <!-- Contact Section -->
-    <section id="contact" class="contact">
-        <h2>Contact Us</h2>
-        <p>📞 {{ resort.contact_number }}</p>
-    </section>
+            <div class="comment-content">
+                <div class="comment-header">
+                    <a href="{% url 'user-profile' message.user.id %}">@{{ message.user.username }}</a> 
+                    <small>{{ message.created_at|timesince }} ago</small>
+                </div>
+                <p>{{ message.comment }}</p>
+                
+                {% if request.user == message.user %}
+                <a href="{% url 'delete-message' message.id %}" class="delete-btn">Delete</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2025 FMB Resort. All Rights Reserved.</p>
-    </footer>
+    {% if request.user.is_authenticated %}
+    <div class="comment-form">
+        <img src="{{ request.user.avatar.url }}" class="avatar">
+        <form method="POST" action="" id="commentForm" style="display: flex; width: 100%;">
+            {% csrf_token %}
+            <input type="text" name="comment" placeholder="Write your comment here..." required>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+    {% endif %}
 </body>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
@@ -224,25 +217,103 @@
             stars.forEach(s => s.classList.remove('active'));
         });
     });
-});
-document.addEventListener("DOMContentLoaded", function () {
+
+    // Handle existing star ratings (pre-filled ratings)
     const starContainers = document.querySelectorAll(".star-rating");
-
     starContainers.forEach(container => {
-      const rating = parseFloat(container.dataset.rating) || 0; // Get rating
-      const fullStars = Math.floor(rating); // Full stars
-      const halfStar = rating % 1 >= 0.5; // Half star logic
-      const emptyStars = 5 - fullStars - (halfStar ? 1 : 0); // Empty stars
+        const rating = parseFloat(container.dataset.rating) || 0; 
+        const fullStars = Math.floor(rating);
+        const halfStar = rating % 1 >= 0.5;
+        const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
 
-      // Generate star HTML
-      let stars = "";
-      for (let i = 0; i < fullStars; i++) stars += `<i class="fa fa-star filled"></i>`;
-      if (halfStar) stars += `<i class="fa fa-star-half-alt half"></i>`;
-      for (let i = 0; i < emptyStars; i++) stars += `<i class="fa fa-star empty"></i>`;
+        let stars = "";
+        for (let i = 0; i < fullStars; i++) stars += `<i class="fa fa-star filled"></i>`;
+        if (halfStar) stars += `<i class="fa fa-star-half-alt half"></i>`;
+        for (let i = 0; i < emptyStars; i++) stars += `<i class="fa fa-star empty"></i>`;
 
-      container.innerHTML = stars;
+        container.innerHTML = stars;
     });
+
+    // 🌟 Automatically Open Rating Modal After Comment Submission
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has("rating")) {
+        let ratingModal = new bootstrap.Modal(document.getElementById("ratingModal"));
+        ratingModal.show();
+    }
   });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    // Inline text editing
+    document.querySelectorAll("[contenteditable=true]").forEach(element => {
+        element.addEventListener("blur", function () {
+            let field = this.dataset.field;
+            let url = this.dataset.url;
+            let value = this.innerText.trim();
+
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCSRFToken(),
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ field: field, value: value }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    console.log(`Updated: ${field} -> ${value}`);
+                } else {
+                    console.error("Update failed:", data.error);
+                }
+            });
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+    // 🌟 Image upload
+    document.getElementById("resort-image-upload").addEventListener("change", function () {
+        let file = this.files[0];
+        let url = this.dataset.url;
+        let formData = new FormData();
+        formData.append("resort_image", file);  // ✅ Must match model field name
+        formData.append("csrfmiddlewaretoken", getCSRFToken());  // ✅ Include CSRF token
+
+        fetch(url, {
+            method: "POST",
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                document.getElementById("resortImage").src = data.image_url;  // ✅ Update image preview
+            } else {
+                console.error("Image update failed:", data.error);
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+
+    // 🌟 Clicking on image opens file picker
+    document.getElementById("resortImage").addEventListener("click", function () {
+        document.getElementById("resort-image-upload").click();
+    });
+
+    // 🌟 CSRF Token Helper
+    function getCSRFToken() {
+        return document.querySelector("[name=csrfmiddlewaretoken]").value;
+    }
+});
+
+
+    function getCSRFToken() {
+        return document.querySelector("[name=csrfmiddlewaretoken]").value;
+    }
+});
+
+document.querySelector(".description-image").addEventListener("click", function () {
+    document.getElementById("resort-image-upload").click();
+});
 </script>
+
 
 {% endblock content %}

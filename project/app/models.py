@@ -23,6 +23,7 @@ class LoginHistory(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - Total Logins: {self.total_logins}, Last Login: {self.last_login}, Last Logout: {self.last_logout}"
+    
 class User(AbstractUser):
      name = models.CharField(max_length=200, null=True)
      email = models.EmailField(unique=True, null=True, blank=False)
@@ -102,4 +103,12 @@ class Favorite(models.Model):
 
     def __str__(self):
         return f"{self.user.username} likes {self.resort.name}"
+    
+class Visit(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    resort = models.ForeignKey(Resort, on_delete=models.CASCADE, related_name="visits")
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user} visited {self.resort} on {self.timestamp}"
 

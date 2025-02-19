@@ -9,18 +9,12 @@
     <link rel="stylesheet" href="{% static 'styles/adminstyle.css' %}">
     	<!-- My CSS -->
     <script src="{% static 'scripts/script1.js' %}" defer></script>
-</head>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-	<!-- Boxicons -->
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
 
 	<title>AdminHub</title>
 </head>
+
 <body>
 {% csrf_token %}
 
@@ -114,15 +108,24 @@
 				</a>
 			</div>
 
-			<ul class="box-info">
-				<li>
-					<i class='bx bxs-group' ></i>
-					<span class="text">
-						<h3>{{ unique_users_count }}</h3>
-						<p>Users</p>
-					</span>
-				</li>
-			</ul>
+			<div class="box-info">
+				<ul>
+					<li>
+						<i class="bx bxs-group"></i>
+						<span class="text">
+							<h3>{{ unique_users_count }}</h3>
+							<p>Users</p>
+						</span>
+					</li>
+				</ul>
+				
+				<div class="resort-visit-info">
+					<h3>Resort Visit Data</h3>
+			
+					<!-- Bar Chart (Canvas) -->
+					<canvas id="resortVisitChart"></canvas>
+				</div>
+			</div>
 
 
 			<div class="table-data">
@@ -169,8 +172,72 @@
 		</main>
 		<!-- MAIN -->
 	</section>
-	<!-- CONTENT -->
 	
+	<script id="resortVisitData" type="application/json">
+		{{ resort_visit_data|json_script:"resortVisitData" }}
+	</script>
+
+    <script>
+		// Retrieve the data embedded by json_script and parse it directly
+		var resortVisitData = JSON.parse(document.getElementById('resortVisitData').textContent);
+	
+		// Debugging: Check the data structure in the console
+		console.log(resortVisitData);
+	
+		// Proceed with your chart logic...
+		var resortNames = resortVisitData.map(function(data) { return data.name; });
+		var dailyVisits = resortVisitData.map(function(data) { return data.daily; });
+		var weeklyVisits = resortVisitData.map(function(data) { return data.weekly; });
+		var monthlyVisits = resortVisitData.map(function(data) { return data.monthly; });
+		var yearlyVisits = resortVisitData.map(function(data) { return data.yearly; });
+	
+		// Chart.js setup for the bar chart
+		var ctx = document.getElementById('resortVisitChart').getContext('2d');
+		var resortVisitChart = new Chart(ctx, {
+			type: 'bar',
+			data: {
+				labels: resortNames,
+				datasets: [{
+					label: 'Daily Visits',
+					data: dailyVisits,
+					backgroundColor: '#FF5733',
+					borderColor: '#FF5733',
+					borderWidth: 1
+				}, {
+					label: 'Weekly Visits',
+					data: weeklyVisits,
+					backgroundColor: '#33FF57',
+					borderColor: '#33FF57',
+					borderWidth: 1
+				}, {
+					label: 'Monthly Visits',
+					data: monthlyVisits,
+					backgroundColor: '#3357FF',
+					borderColor: '#3357FF',
+					borderWidth: 1
+				}, {
+					label: 'Yearly Visits',
+					data: yearlyVisits,
+					backgroundColor: '#FF33A1',
+					borderColor: '#FF33A1',
+					borderWidth: 1
+				}]
+			},
+			options: {
+				scales: {
+					y: {
+						beginAtZero: true
+					}
+				},
+				responsive: true,
+				plugins: {
+					legend: {
+						position: 'top',
+					}
+				}
+			}
+		});
+	</script>	
 </body>
 </html>
 

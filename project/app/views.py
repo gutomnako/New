@@ -8,7 +8,8 @@ from django.contrib import messages
 from django.http import HttpResponse
 from .decorators import unauthenticated_user, allowed_users, admin_only
 from django.contrib.auth.models import Group
-from .models import LoginActivity, LoginHistory
+from django.utils.timezone import now, timedelta
+from .models import LoginActivity, LoginHistory, Visit
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 from django.db.models import Avg
@@ -16,6 +17,10 @@ from django.http import JsonResponse
 import json
 from .recommendations import get_recommendations
 from app.scoring import get_ranked_resorts
+from django.core.serializers.json import DjangoJSONEncoder
+from django.core.serializers import serialize
+from decimal import Decimal, InvalidOperation
+from django.views.decorators.csrf import csrf_exempt
 
 #dashboard
 #login
@@ -36,27 +41,42 @@ def some_view(request):
 
 @admin_only
 def adminDashboard(request):
-      resorts = Resort.objects.all()
-      login_history = LoginHistory.objects.all().order_by('-last_login')
+    resorts = Resort.objects.all()
+    login_history = LoginHistory.objects.all().order_by('-last_login')
+    unique_users_count = login_history.values('user').distinct().count()
 
-      unique_users_count = login_history.values('user').distinct().count()
-      
+    today = now().date()
+    week_ago = today - timedelta(days=7)
+    month_ago = today - timedelta(days=30)
+    year_ago = today - timedelta(days=365)
 
-      if login_history.exists():  # Check if there is any login history
-        login_activities = LoginActivity.objects.filter(user=request.user).order_by('-timestamp')
-        return render(request, 'app/adminDashboard.html', {
-            'resorts': resorts,
-            'login_history': login_history,
-            'login_activities': login_activities,
-            'unique_users_count': unique_users_count,  # Pass the count to the template
-        })
-      else:
-        return render(request, 'app/adminDashboard.html', {
-            'error': 'No login history found.',
-            'resorts': resorts,
-            'login_history': login_history,
-            'unique_users_count': unique_users_count,  # Pass the count even if no history
-      })
+    def get_visit_count(resort, start_date):
+        return resort.visits.filter(timestamp__gte=start_date).count()
+
+    resort_visit_data = []
+    for resort in resorts:
+        resort_data = {
+            "name": resort.name,
+            "daily": get_visit_count(resort, today),
+            "weekly": get_visit_count(resort, week_ago),
+            "monthly": get_visit_count(resort, month_ago),
+            "yearly": get_visit_count(resort, year_ago),
+        }
+        resort_visit_data.append(resort_data)
+
+    context = {
+        'resorts': resorts,
+        'login_history': login_history,
+        'unique_users_count': unique_users_count,
+        'resort_visit_data': resort_visit_data,
+    }
+
+    if login_history.exists():
+        context['login_activities'] = LoginActivity.objects.filter(user=request.user).order_by('-timestamp')
+    else:
+        context['error'] = 'No login history found.'
+
+    return render(request, 'app/adminDashboard.html', context)
 
 @admin_only
 def adminresorts(request):
@@ -306,23 +326,34 @@ def home(request):
 
 
 def resort(request, pk):
-        resort = Resort.objects.get(id=pk)
-        amenities = Amenity.objects.all()
-        resort_messages = resort.messages.all().order_by('-created_at')
+    resort = Resort.objects.get(id=pk)
+    amenities = Amenity.objects.all()
+    resort_messages = resort.messages.all().order_by('-created_at')
 
+    # Track the visit when the resort page is accessed (only for authenticated users)
+    if request.user.is_authenticated:
+        Visit.objects.create(resort=resort, user=request.user)
 
-        average_rating = Rating.objects.filter(resort=resort).aggregate(Avg('rating'))['rating__avg']
+    average_rating = Rating.objects.filter(resort=resort).aggregate(Avg('rating'))['rating__avg']
 
-        if request.method == 'POST':
+    if request.method == 'POST':
+        if request.user.is_authenticated:  # Prevent anonymous users from posting messages
             message = Message.objects.create(
-                  user=request.user,
-                  resort=resort,
-                  comment=request.POST.get('comment')
+                user=request.user,
+                resort=resort,
+                comment=request.POST.get('comment')
             )
-            return redirect('resort', pk=resort.id)
+            return redirect(f"{request.path}?rating=1")  # Redirect with ?rating=1
+        else:
+            return redirect('login')  # Redirect to login if not authenticated
 
-        context = {'resort': resort, 'resort_messages': resort_messages, 'amenities': amenities, 'average_rating': average_rating,}
-        return render(request, 'app/resort.html', context)
+    context = {
+        'resort': resort,
+        'resort_messages': resort_messages,
+        'amenities': amenities,
+        'average_rating': average_rating,
+    }
+    return render(request, 'app/resort.html', context)
 
 def map_view(request):
     return render(request, 'app/map.html')
@@ -346,14 +377,12 @@ def userProfile(request, pk):
     }
     return render(request, 'app/profile.html', context)
 
-
-
 def filter_beaches(request):
     selected_amenities = request.GET.getlist('amenities')  
     selected_location = request.GET.getlist('location')   
     min_price = request.GET.get('min_price') 
     max_price = request.GET.get('max_price')  
-    
+   
     resorts = Resort.objects.all()
 
     # Apply filters
@@ -364,12 +393,23 @@ def filter_beaches(request):
         resorts = resorts.filter(location__id__in=selected_location).distinct()
 
     if min_price:
-        resorts = resorts.filter(price__gte=min_price)
+        try:
+            min_price = float(min_price)  # Convert to float since price is a DecimalField
+            resorts = resorts.filter(price__gte=min_price)
+        except ValueError:
+            pass  # Ignore invalid input
+
     if max_price:
-        resorts = resorts.filter(price__lte=max_price)
+        try:
+            max_price = float(max_price)
+            resorts = resorts.filter(price__lte=max_price)
+        except ValueError:
+            pass  # Ignore invalid input
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         user = request.user  # Get the current logged-in user
+        is_authenticated = user.is_authenticated  # Check if user is logged in
+
         resorts_data = list(resorts.values(
             'id', 'name', 'description', 'entrance_kids', 'entrance_adults', 'price', 'resort_image'
         ))
@@ -380,7 +420,10 @@ def filter_beaches(request):
                 resort['resort_image'] = f"/media/{resort['resort_image']}"  # Adjust path as needed
 
             # Check if the current user has marked this resort as a favorite
-            resort['is_favorite'] = Favorite.objects.filter(user=user, resort_id=resort['id']).exists()
+            if is_authenticated:
+                resort['is_favorite'] = Favorite.objects.filter(user=user, resort_id=resort['id']).exists()
+            else:
+                resort['is_favorite'] = False  # Default for non-authenticated users
 
             # Get the favorite count for the resort
             resort['favorite_count'] = Favorite.objects.filter(resort_id=resort['id']).count()
@@ -389,7 +432,7 @@ def filter_beaches(request):
         return JsonResponse({'resorts': resorts_data})
 
     # For non-AJAX requests, render the full page
-    recommendations = get_recommendations(request.user.id)
+    recommendations = get_recommendations(request.user.id) if request.user.is_authenticated else []
     amenities = Amenity.objects.all()
     locations = Location.objects.all()
 
@@ -449,6 +492,57 @@ def deleteResort(request, pk):
             resort.delete()
             return redirect('home')
       return render(request, 'app/delete.html', {'obj': resort})
+
+@login_required(login_url='login')
+@csrf_exempt
+def update_resort_inline(request, pk):
+    resort = Resort.objects.get(id=pk)
+
+    # Check if user is authorized
+    if request.user != resort.host:
+        return JsonResponse({'error': 'You are not allowed to edit this resort'}, status=403)
+
+    if request.method == "POST":
+        if request.FILES.get("resort_image"):
+            # Handle image update
+            resort.resort_image = request.FILES["resort_image"]
+            resort.save()
+            return JsonResponse({"status": "success", "image_url": resort.resort_image.url})
+
+        else:
+            # Handle text updates
+            try:
+                data = json.loads(request.body)
+                field = data.get("field")
+                value = data.get("value")
+
+                if field and hasattr(resort, field):
+                    setattr(resort, field, value)
+                    resort.save()
+                    return JsonResponse({"status": "success", "field": field, "value": value})
+                else:
+                    return JsonResponse({"error": "Invalid field"}, status=400)
+            except json.JSONDecodeError:
+                return JsonResponse({"error": "Invalid JSON data"}, status=400)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+@login_required(login_url='login')
+@csrf_exempt
+def update_resort_image(request, pk):
+    resort = Resort.objects.get(id=pk)
+
+    # Check if user is authorized
+    if request.user != resort.host:
+        return JsonResponse({'error': 'You are not allowed to edit this resort'}, status=403)
+
+    if request.method == "POST" and request.FILES.get("image"):
+        resort.image = request.FILES["image"]
+        resort.save()
+        return JsonResponse({"status": "success", "image_url": resort.image.url})
+
+    return JsonResponse({"error": "No image uploaded"}, status=400)
+
 #end edit
 
 #comments
@@ -473,14 +567,3 @@ def ranked_resorts_view(request):
     return render(request, 'resorts/ranked_list.html', {'resorts': resorts})
 #end comments
 
-# def recommended_resorts(request):
-#     user_id = request.user.id
-#     recommended_resorts = get_recommendations(user_id)
-    
-#     # Debugging: Check if recommended resorts are being passed
-#     print(f"Recommended resorts for user {user_id}: {recommended_resorts}")
-
-#     context = {
-#         'recommended_resorts': recommended_resorts
-#     }
-#     return render(request, 'app/recommended_resorts.html', context)
