@@ -14,4 +14,4 @@ admin.site.register(Favorite)
 class LoginHistoryAdmin(admin.ModelAdmin):
     list_display = ('user', 'total_logins', 'total_logouts', 'last_login', 'last_logout')
     search_fields = ('user__username',)
-    list_filter = ('last_login', 'last_logout')
+    list_filter = ('last_login', 'last_logout')  

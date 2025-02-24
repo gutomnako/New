@@ -137,6 +137,8 @@ STATICFILES_DIRS =[
     BASE_DIR / 'static'
 ]
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 MESSAGE_TAGS = {
     messages.ERROR: 'danger'
 }

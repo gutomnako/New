@@ -518,6 +518,81 @@ body {
 /* MAIN */
 /* CONTENT */
 
+.todo-list {
+    list-style: none;
+    padding: 0;
+}
+
+.comment-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 8px;
+    background: #f8f9fa;
+}
+
+.avatar-wrapper {
+    flex-shrink: 0; /* Prevents avatar from resizing */
+}
+
+.avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.comment-content {
+    flex-grow: 1;
+    max-width: 80%;
+    background: white; /* Ensure the comment area is separate */
+    padding: 8px;
+    border-radius: 5px;
+}
+
+.hidden-comment {
+    display: none !important;
+    visibility: hidden; /* Extra safeguard */
+    height: 0; /* Prevents empty space */
+    overflow: hidden;
+}
+
+
+#seeMoreBtn {
+    background-color: #3C91E6;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    cursor: pointer;
+    margin-top: 10px;
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+
+#seeMoreBtn:hover {
+    background-color: #316bbd;
+}
+
+.star {
+    font-size: 18px;
+    color: #ccc; /* Default empty star color */
+}
+
+.filled {
+    color: gold; /* Filled star color */
+}
+
+.rating-value {
+    font-size: 14px;
+    color: #555;
+    margin-left: 5px;
+}
+
+
+
 
 
 

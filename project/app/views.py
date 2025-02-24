@@ -21,6 +21,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.core.serializers import serialize
 from decimal import Decimal, InvalidOperation
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models import OuterRef, Subquery
 
 #dashboard
 #login
@@ -64,11 +65,22 @@ def adminDashboard(request):
         }
         resort_visit_data.append(resort_data)
 
+    # ✅ Fetch all user messages (Minimal Change)
+    all_messages = Message.objects.select_related('user').order_by('-created_at').annotate(
+    rating=Subquery(
+        Rating.objects.filter(
+            user=OuterRef('user'),
+            resort=OuterRef('resort')
+        ).values('rating')[:1]  # Get the user's rating for the resort
+    )
+)
+
     context = {
         'resorts': resorts,
         'login_history': login_history,
         'unique_users_count': unique_users_count,
         'resort_visit_data': resort_visit_data,
+        'all_messages': all_messages,  # ✅ Just added this
     }
 
     if login_history.exists():
@@ -77,6 +89,7 @@ def adminDashboard(request):
         context['error'] = 'No login history found.'
 
     return render(request, 'app/adminDashboard.html', context)
+
 
 @admin_only
 def adminresorts(request):
@@ -446,7 +459,6 @@ def filter_beaches(request):
     }
 
     return render(request, 'app/home.html', context)
-
 
 #end resorts
 

@@ -121,7 +121,10 @@
 				
 				<div class="resort-visit-info">
 					<h3>Resort Visit Data</h3>
-			
+					
+					<!-- JSON Data Script -->
+    				{{ resort_visit_data|json_script:"resortVisitData" }}
+
 					<!-- Bar Chart (Canvas) -->
 					<canvas id="resortVisitChart"></canvas>
 				</div>
@@ -164,9 +167,43 @@
 						<i class='bx bx-plus' ></i>
 						<i class='bx bx-filter' ></i>
 					</div>
-					<ul class="todo-list">
-						
+					<ul class="todo-list" id="comment-list">
+						{% for message in all_messages %}
+						<li class="comment-item">
+							<!-- Profile Picture -->
+							<div class="avatar-wrapper">
+								<img src="{{ message.user.avatar.url }}" class="avatar" onerror="this.src='/media/avatar-default.svg'">
+							</div>
+							<div class="comment-content">
+								<!-- Username and Rating -->
+								<div class="comment-header">
+									<a href="{% url 'user-profile' message.user.id %}">@{{ message.user.username }}</a> 
+									<small>{{ message.created_at|timesince }} ago</small>
+								</div>
+					
+								<!-- Rating -->
+								{% if message.rating %}
+									<p class="resort-name">
+										Rated <strong>{{ message.resort.name }}</strong>
+									</p>
+									<p>Rating: {{ message.rating }} ⭐</p>
+								{% else %}
+									<p>No rating given</p>
+								{% endif %}
+					
+								<!-- Comment -->
+								<p> commented: {{ message.comment }}</p>
+							</div>
+						</li>
+						{% endfor %}
 					</ul>
+					
+					<!-- See More Button (Hidden if 3 or fewer comments) -->
+					{% if all_messages|length > 3 %}
+					<button id="seeMoreBtn">See More</button>
+					{% endif %}
+					
+					
 				</div>
 			</div>
 		</main>
@@ -237,6 +274,37 @@
 				}
 			}
 		});
+
+		document.addEventListener("DOMContentLoaded", function () {
+        let comments = document.querySelectorAll(".comment-item");
+        let seeMoreBtn = document.getElementById("seeMoreBtn");
+        let visibleCount = 3; // Show first 3 comments initially
+
+        // Hide all comments except the first 3
+        comments.forEach((comment, index) => {
+            if (index >= visibleCount) {
+                comment.style.display = "none";
+            }
+        });
+
+        // Show more comments on button click
+        seeMoreBtn?.addEventListener("click", function () {
+            let hiddenComments = document.querySelectorAll(".comment-item[style='display: none;']");
+            let count = 0;
+
+            hiddenComments.forEach(comment => {
+                if (count < 3) { // Show 3 more comments
+                    comment.style.display = "block";
+                    count++;
+                }
+            });
+
+            // Hide button when all comments are visible
+            if (document.querySelectorAll(".comment-item[style='display: none;']").length === 0) {
+                seeMoreBtn.style.display = "none";
+            }
+        });
+    });
 	</script>	
 </body>
 </html>
