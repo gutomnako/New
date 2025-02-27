@@ -22,10 +22,8 @@
                         </a>
                         
 
-                        <h5>{{ resort.name }}</h5>
+                        <h4>{{ resort.name }}</h4>
                         <p>{{ resort.description }}</p>
-                        <p>Entrance Kids: {{ resort.entrance_kids }} | Entrance Adults: {{ resort.entrance_adults }}</p>
-                        <p>Cottage: {{ resort.price }}</p>
                         <button type="button">
                             <a href="{% url 'resort' resort.id %}">Details</a>
                         </button>
@@ -63,10 +61,8 @@
                         </a>
                        
 
-                        <h5>{{ resort.name }}</h5>
+                        <h4>{{ resort.name }}</h4>
                         <p>{{ resort.description }}</p>
-                        <p>Entrance Kids: {{ resort.entrance_kids }} | Entrance Adults: {{ resort.entrance_adults }}</p>
-                        <p>Cottage: {{ resort.price }}</p>
                         <button type="button">
                             <a href="{% url 'resort' resort.id %}">Details</a>
                         </button>
@@ -82,7 +78,6 @@
         </div>
     </div>
 </main>
-
 
 
 <!-- Add your scripts here -->

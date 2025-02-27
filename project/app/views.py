@@ -65,13 +65,12 @@ def adminDashboard(request):
         }
         resort_visit_data.append(resort_data)
 
-    # ✅ Fetch all user messages (Minimal Change)
     all_messages = Message.objects.select_related('user').order_by('-created_at').annotate(
     rating=Subquery(
         Rating.objects.filter(
             user=OuterRef('user'),
             resort=OuterRef('resort')
-        ).values('rating')[:1]  # Get the user's rating for the resort
+        ).values('rating')[:1]  
     )
 )
 
@@ -80,7 +79,7 @@ def adminDashboard(request):
         'login_history': login_history,
         'unique_users_count': unique_users_count,
         'resort_visit_data': resort_visit_data,
-        'all_messages': all_messages,  # ✅ Just added this
+        'all_messages': all_messages,  
     }
 
     if login_history.exists():
@@ -382,13 +381,16 @@ def userProfile(request, pk):
     user = get_object_or_404(User, id=pk)  # Get user by ID or return 404
     favorites = Favorite.objects.filter(user=user)  # Get user's favorite resorts
     messages = Message.objects.filter(user=user)  # Get user's messages/comments
+    ratings = Rating.objects.filter(user=user)  # Get user's ratings
 
     context = {
         'user': user,
         'favorites': favorites,
         'messages': messages,
+        'ratings': ratings,  
     }
     return render(request, 'app/profile.html', context)
+
 
 def filter_beaches(request):
     selected_amenities = request.GET.getlist('amenities')  

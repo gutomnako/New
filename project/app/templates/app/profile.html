@@ -27,4 +27,17 @@
     {% endfor %}
 </ul>
 
+<h3>User Ratings</h3>
+<ul class="user-ratings">
+    {% for rating in ratings %}
+    <li>
+        <strong>{{ rating.resort.name }}</strong>  
+        - Rated: {{ rating.rating }} ⭐
+    </li>
+    {% empty %}
+    <p>No ratings given yet.</p>
+    {% endfor %}
+</ul>
+
+
 {% endblock content %}
