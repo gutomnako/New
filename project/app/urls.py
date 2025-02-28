@@ -15,7 +15,7 @@ urlpatterns = [
     path('home/', views.home, name='home'),
     path('', views.index_view, name='index-view'),
     path('resort/<str:pk>/', views.resort, name='resort'),
-    path('profile/<str:pk>/', views.userProfile, name='user-profile'),
+    path('profile/<int:pk>/', views.userProfile, name='user-profile'),
 
     path('create-resort/', views.createResort, name='create-resort'),
     path('update-resort/<str:pk>/', views.updateResort, name='update-resort'),

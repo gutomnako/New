@@ -8,33 +8,38 @@
 /* Navbar styling */
 .navbar {
   margin: auto;
-  background-color: #3daed7;
+  background-color: #089cff;
   overflow: hidden;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 8px 20px;
   font-family: "Quicksand", serif;
+  position: relative;
+  z-index: 1000;
 }
 
 .logo img {
   height: 50px;
-  width: auto; 
+  width: auto;
 }
 
 nav ul {
   list-style: none;
-  display: flex; 
-  justify-content: space-between;
+  display: flex;
+  justify-content: center; 
+  align-items: center;
+  padding: 0;
+  margin: 0; 
 }
 
 nav li {
-  margin: 0 10px;
+  margin: 0 15px; 
 }
 
 nav a {
   text-decoration: none;
-  color: #ffffff;;
+  color: #ffffff;
   font-size: 16px;
   font-weight: bold;
   font-family: "Quicksand", serif;
@@ -46,21 +51,55 @@ nav a:hover {
   color: #000;
 }
 
-.navbar .right a {
-  background: transparent;
-  border: 1px solid blue;
-  padding: 10px 50px;
-  margin: 0; /* Reset margin */
-  border-radius: 40px;
-  transition: background-color 0.3s ease;
-  text-decoration: none;
-  font-family: "Quicksand", serif;
-  font-weight: bold;
+/* Dropdown */
+.dropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
-.navbar .right a:hover {
-  background-color: rgb(61, 97, 228);
+/* Dropdown Menu */
+.dropdown-menu {
+  position: absolute !important;
+  z-index: 9999 !important;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  right: 0;
+  left: auto;
+  min-width: 150px;
+  display: none; /* Hide by default */
+}
+
+/* Show dropdown when Bootstrap toggles it */
+.dropdown.show .dropdown-menu {
+  display: block;
+}
+
+.dropdown-toggle {
+  background: none;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+/* Ensures navbar elements stay in place */
+.navbar, .header {
+  position: relative !important;
+  z-index: 100 !important;
+  overflow: visible !important;
+}
+
+/* Dropdown items */
+.dropdown-item {
+  padding: 10px;
+  display: block;
+  text-decoration: none;
   color: black;
+}
+
+.dropdown-item:hover {
+  background-color: #f1f1f1;
 }
 
 /* Main section */

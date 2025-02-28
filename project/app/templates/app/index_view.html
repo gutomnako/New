@@ -3,6 +3,10 @@
 {% load static %}
 
 {% block content %}
+{% block extra_css %}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+{% endblock %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,29 +17,38 @@
 </head>
 <body>  
  {% csrf_token %}
-  <div class="navbar">
-    <div class="logo">
+ <div class="navbar">
+  <div class="logo">
       <a href="#home">
-        <img src="{% static 'images/icon.png' %}" alt="Logo">
+          <img src="{% static 'images/icon.png' %}" alt="Logo">
       </a>
-    </div>
-    
-    <nav>
-      <ul>
-        <li><a href="{% url 'home' %}">Beaches & Resorts</a></li>
-        <li><a href="{% url 'map' %}">Map</a></li>
-        <li><a href="#">Contact</a></li>
-      </ul>
-    </nav>
-
-    <div class="right">
-      {% if request.user.is_authenticated %}
-      <a href="{% url 'logout' %}">Logout</a>
-      {% else %}
-      <a href="{% url 'login' %}">Login</a>
-      {% endif %}
-    </div>
   </div>
+  
+  <nav>
+      <ul>
+          <li><a href="{% url 'home' %}">Beaches & Resorts</a></li>
+          <li><a href="{% url 'map' %}">Map</a></li>
+          <li><a href="#">Contact</a></li>
+      </ul>
+  </nav>
+
+  <div class="dropdown">
+      {% if request.user.is_authenticated %}
+      <!-- Hamburger Button with Bootstrap dropdown -->
+      <button class="btn dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-list"></i> <!-- Bootstrap Icon -->
+      </button>
+    
+      <!-- Dropdown Menu -->
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+          <li><a class="dropdown-item" href="{% url 'user-profile' request.user.pk %}">Settings</a></li>
+          <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+      </ul>
+      {% else %}
+      <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
+      {% endif %}
+  </div>
+</div>
 
   
   <div class="main">
@@ -151,6 +164,7 @@
   
 
 </body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </html>
 <script>
    document.addEventListener("DOMContentLoaded", function () {
@@ -170,6 +184,19 @@
 
       container.innerHTML = stars;
     });
+  });
+
+  document.getElementById("userDropdown").addEventListener("click", function(event) {
+    event.stopPropagation();
+    this.parentElement.classList.toggle("active");
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener("click", function(event) {
+    let dropdown = document.querySelector(".dropdown");
+    if (!dropdown.contains(event.target)) {
+      dropdown.classList.remove("active");
+    }
   });
 </script>
 {% endblock content %}
