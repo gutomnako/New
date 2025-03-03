@@ -80,7 +80,6 @@
 </main>
 
 
-<!-- Add your scripts here -->
 <script>
    document.addEventListener('DOMContentLoaded', function () {
     const leftArrowRecommended = document.querySelector('.recommended-section .arrow-btn.left');
@@ -92,18 +91,16 @@
     const recommendedSlider = document.querySelector('.recommended-section .card-slider');
     const allResortsSlider = document.querySelector('.all-resorts-section .card-slider');
     
-    const visibleCardsCount = 2; // Number of cards visible at a time
+    const visibleCardsCount = 2; 
     const cardWidth = 260;
     const cardGap = 16;
     const scrollAmount = (cardWidth + cardGap) * visibleCardsCount;
 
-    // Function to scroll cards to the left (reveal previous cards)
+    
     function scrollLeft(slider) {
-        // Smoothly move the slider right
         slider.style.transition = 'transform 0.5s ease';
         slider.style.transform = `translateX(${scrollAmount}px)`;
 
-        // After the animation, prepend the last `visibleCardsCount` cards to the start
         slider.addEventListener(
             'transitionend',
             () => {
@@ -112,7 +109,6 @@
                     slider.insertBefore(lastCard, slider.firstChild);
                 }
 
-                // Reset the transform position without animation
                 slider.style.transition = 'none';
                 slider.style.transform = `translateX(0)`;
             },
@@ -120,13 +116,11 @@
         );
     }
 
-    // Function to scroll cards to the right (reveal next cards)
     function scrollRight(slider) {
-        // Smoothly move the slider left
+
         slider.style.transition = 'transform 0.5s ease';
         slider.style.transform = `translateX(-${scrollAmount}px)`;
 
-        // After the animation, append the first `visibleCardsCount` cards to the end
         slider.addEventListener(
             'transitionend',
             () => {
@@ -135,7 +129,6 @@
                     slider.appendChild(firstCard);
                 }
 
-                // Reset the transform position without animation
                 slider.style.transition = 'none';
                 slider.style.transform = `translateX(0)`;
             },
@@ -143,13 +136,11 @@
         );
     }
 
-    // Add event listeners for the recommended slider
     if (recommendedSlider) {
         rightArrowRecommended.addEventListener('click', () => scrollRight(recommendedSlider));
         leftArrowRecommended.addEventListener('click', () => scrollLeft(recommendedSlider));
     }
 
-    // Add event listeners for the all resorts slider
     if (allResortsSlider) {
         rightArrowAllResorts.addEventListener('click', () => scrollRight(allResortsSlider));
         leftArrowAllResorts.addEventListener('click', () => scrollLeft(allResortsSlider));
@@ -159,14 +150,14 @@
  
             document.querySelectorAll('.favorite-btn').forEach(button => {
         button.addEventListener('click', function (event) {
-            event.preventDefault(); // Prevents the default anchor behavior
-            event.stopPropagation(); // Prevents event bubbling issues
+            event.preventDefault(); 
+            event.stopPropagation(); 
 
             const resortId = this.getAttribute('data-resort-id');
             const isFavorite = this.querySelector('i').classList.contains('active');
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-            this.querySelector('i').classList.toggle('active'); // Toggle the icon's active class
+            this.querySelector('i').classList.toggle('active'); 
 
             fetch('/toggle_favorite/', {
                 method: 'POST',
@@ -185,12 +176,12 @@
                     this.closest('.card').querySelector('.favorite-count').innerText = `Favorites: ${data.favorite_count}`;
                 } else {
                     console.error('Error updating favorite status:', data.message);
-                    this.querySelector('i').classList.toggle('active'); // Revert the toggle if there was an error
+                    this.querySelector('i').classList.toggle('active'); 
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                this.querySelector('i').classList.toggle('active'); // Revert on error
+                this.querySelector('i').classList.toggle('active'); 
             });
         });
     });

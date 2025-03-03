@@ -65,7 +65,6 @@ document.addEventListener('DOMContentLoaded', function () {
         .catch(error => console.error('Error fetching filtered resorts:', error));
     });
 
-    
   // Function to update the resort list dynamically
   function updateResortList(resorts) {
     const resortsContainer = document.querySelector('.all-resorts-cards');
@@ -84,10 +83,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             <h5>${resort.name}</h5>
             <p>${resort.description}</p>
-            <p>Entrance Kids: ${resort.entrance_kids} | Entrance Adults: ${resort.entrance_adults}</p>
-            <p>Cottage: ${resort.price}</p>
             <button type="button">
-                <a href="/resort/${resort.id}/">Details</a>
+                <a href="/resort/${resort.id}/">See More Details</a>
             </button>
             <p class="favorite-count">Favorites: ${resort.favorite_count}</p>
         `;
@@ -149,36 +146,6 @@ function attachFavoriteListeners() {
                         favoriteCount.textContent = `Favorites: ${data.favorite_count}`;
                     } else {
                         console.error('Failed to toggle favorite:', data.message);
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-        });
-    });
-}
-
-// Function to attach star rating listeners
-function attachStarRatingListeners() {
-    const stars = document.querySelectorAll('.stars .star');
-
-    stars.forEach(star => {
-        star.addEventListener('click', function () {
-            const resortId = this.closest('form').action.split('/').slice(-2, -1)[0];
-            const rating = this.dataset.value;
-
-            fetch(`/rate_resort/${resortId}/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': getCsrfToken() // Ensure CSRF token is included
-                },
-                body: `rating=${rating}`
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        alert('Rating submitted successfully!');
-                    } else {
-                        console.error('Failed to submit rating:', data.message);
                     }
                 })
                 .catch(error => console.error('Error:', error));

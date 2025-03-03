@@ -295,7 +295,6 @@ def home(request):
     # Apply weighted scoring after filtering
     ranked_resorts = get_ranked_resorts().filter(id__in=resorts.values_list('id', flat=True))
 
-    # Get the current user
     user = request.user
     recommendations = []
 
@@ -318,16 +317,16 @@ def home(request):
                 resort.is_favorite = Favorite.objects.filter(user=user, resort=resort).exists()
 
     # Add `is_favorite` to all resorts
-    for resort in ranked_resorts:  # Use ranked resorts instead of original resorts
+    for resort in ranked_resorts:  
         resort.is_favorite = user.is_authenticated and Favorite.objects.filter(user=user, resort=resort).exists()
 
     amenities = Amenity.objects.all()
     locations = Location.objects.all()
-    resort_count = ranked_resorts.count()  # Count from ranked resorts
+    resort_count = ranked_resorts.count()  
 
-    # Prepare the context
+    
     context = {
-        'resorts': ranked_resorts,  # Use ranked resorts here
+        'resorts': ranked_resorts,  
         'recommendations': recommendations,
         'amenities': amenities,
         'resort_count': resort_count,

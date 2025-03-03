@@ -4,25 +4,25 @@
 /* Header / Navbar */
 .header {
     display: flex;
-    justify-content: center; /* Centers the nav */
+    justify-content: center; 
     align-items: center;
     padding: 1em 2em;
-    background-color: #3daed7;
+    background-color: #089cff;
     color: black;
     font-family: "Quicksand", serif;
-    position: fixed;  /* Keeps the navbar fixed at the top */
+    position: fixed;  
     top: 0;
     left: 0;
     right: 0;
-    z-index: 1000;  /* Makes sure it stays above other content */
-    width: 100%;  /* Ensures it takes the full width of the screen */
-    box-sizing: border-box;  /* Prevents padding from causing layout issues */
+    z-index: 1000;  
+    width: 100%;  
+    box-sizing: border-box;  
 }
 
 .nav {
     display: flex;
     gap: 1.5em;
-    justify-content: center; /* Centers the navigation links */
+    justify-content: center; 
 }
 
 .nav a {
