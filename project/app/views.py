@@ -279,6 +279,10 @@ def home(request):
 
     # Filtering for all resorts
     resorts = Resort.objects.all()
+    rated_resorts = (
+        Resort.objects.annotate(average_rating=Avg('rating__rating'))
+        .order_by('-average_rating') 
+    )
 
     if selected_amenities:
         resorts = resorts.filter(amenities__id__in=selected_amenities).distinct()
@@ -293,7 +297,7 @@ def home(request):
     resorts = resorts.annotate(favorite_count=Count('favorite_resorts', distinct=True))
 
     # Apply weighted scoring after filtering
-    ranked_resorts = get_ranked_resorts().filter(id__in=resorts.values_list('id', flat=True))
+    ranked_resorts = get_ranked_resorts().filter(id__in=resorts.values_list('id', flat=True)).annotate(average_rating=Avg('rating__rating')).order_by('-average_rating') 
 
     user = request.user
     recommendations = []
@@ -331,6 +335,7 @@ def home(request):
         'amenities': amenities,
         'resort_count': resort_count,
         'locations': locations,
+        "rated_resorts": rated_resorts,
     }
 
     return render(request, 'app/home.html', context)

@@ -5,6 +5,8 @@
 {% block content %}
 {% block extra_css %}
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
 {% endblock %}
 
 <!DOCTYPE html>
@@ -60,7 +62,7 @@
       <br>
       <br>
       <h1>Discover the Best<br><span>Beaches & Resorts</span><br>in Santa Magdalena, Sorsogon!</h1>
-      <button class="cn"><a href="beachesling.html">Explore Now!</a></button>
+      <button class="cn"><a href="{% url 'home' %}">Explore Now!</a></button>
     </div>
   </div>
 
@@ -101,8 +103,6 @@
           <br>
           <h4>{{ resort.name }}</h4>
           <p>{{ resort.description }}</p>
-          <p>Entrance Kids: {{ resort.entrance_kids }} | Entrance Adults: {{ resort.entrance_adults }}</p>
-          <p>Cottage: {{ resort.price }}</p>
           <p>
             Average Rating:
             <span class="star-rating" data-rating="{{ resort.average_rating }}"></span>
@@ -115,9 +115,9 @@
       </div>
     </div>
     <div>
-      <a href="{% url 'home' %}">
+      <a href="{% url 'home' %}#most-rated-section">
         <button id="see-more-btn" class="see-more-btn">See More!</button>
-      </a>
+    </a>
     </div>    
   <div class="discover-section">
     <div class="discover-cards">

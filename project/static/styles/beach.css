@@ -378,3 +378,26 @@ button a {
     margin-bottom: 10px;
   }
 }
+
+.star-rating {
+  display: inline-flex;
+  align-items: center;
+  font-size: 20px; /* Adjust size */
+}
+
+.star-rating .fa {
+  margin-right: 2px;
+  transition: color 0.3s;
+}
+
+.star-rating .filled {
+  color: #FFD700; /* Gold for filled stars */
+}
+
+.star-rating .half {
+  color: #FFBF00; /* Slightly lighter gold for half stars */
+}
+
+.star-rating .empty {
+  color: #CCCCCC; /* Gray for empty stars */
+}
