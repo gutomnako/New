@@ -99,11 +99,11 @@
                         
 
                         <h4>{{ resort.name }}</h4>
-                        <p>{{ resort.description }}</p>
                         <p>
                             Average Rating:
                             <span class="star-rating" data-rating="{{ resort.average_rating }}"></span>
-                          </p>
+                        </p>
+                        <p>{{ resort.description }}</p>
                         <button type="button">
                             <a href="{% url 'resort' resort.id %}">See More Details</a>
                         </button>

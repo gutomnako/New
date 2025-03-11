@@ -75,6 +75,11 @@ class Resort(models.Model):
     
      def __str__(self):
          return self.name
+     
+     @property
+     def total_price(self):
+        """Compute the total price including entrance fees and stay price."""
+        return self.price_per_night + self.entrance_kids + self.entrance_adults
 
 class Rating(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

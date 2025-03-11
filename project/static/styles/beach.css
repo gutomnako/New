@@ -237,12 +237,13 @@ body {
 
 .card-slider .card {
   flex: 0 0 auto;
-  width: 260px; /* Fix width of cards to prevent them from breaking out */
+  width: 260px; 
 }
 
 /* Section Titles */
 .recommended-section h2,
-.all-resorts-section h2 {
+.all-resorts-section h2,
+.most-rated-section h2{
   font-size: 26px;
   margin-bottom: 20px;
   text-align: left;

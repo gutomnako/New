@@ -1,165 +1,149 @@
 <aside class="sidebar">
-
-    <div class="filter-section price-range-box">
-      <h3>Price Range</h3>
-      <label for="min-price">Minimum Budget</label>
-      <input type="number" id="min-price" placeholder="₱ Min">
-      
-      <label for="max-price">Maximum Budget</label>
-      <input type="number" id="max-price" placeholder="₱ Max">
-      
-      <button type="button">Apply</button>
-  </div>
-  
-  <div class="filter-section">
     <form id="filter-form" action="{% url 'filter_beaches' %}" method="GET">
-        <h3>AMENITIES</h3>
-        <h4>{{ resorts.count }} resorts available</h4>
-        {% for amenity in amenities %}
-        <label>
-            <input type="checkbox" name="amenities" value="{{ amenity.id }}"
-                {% if amenity.id|stringformat:"s" in selected_amenities %}checked{% endif %}>
-            {{ amenity.name }}
-        </label>
-        {% endfor %}
+        
+        {% csrf_token %}
+
+        <div class="filter-section price-range-box">
+            <h3>Price Range</h3>
+            <label for="min-price">Minimum Budget</label>
+            <input type="number" id="min-price" name="min_price" placeholder="₱ Min" value="{{ request.GET.min_price }}">
+
+            <label for="max-price">Maximum Budget</label>
+            <input type="number" id="max-price" name="max_price" placeholder="₱ Max" value="{{ request.GET.max_price }}">
+
+            <button type="button" id="apply-filters">Apply</button>
+        </div>
+
+        <div class="filter-section">
+            <h3>AMENITIES</h3>
+            <h4>{{ resorts.count }} resorts available</h4>
+            {% for amenity in amenities %}
+            <label>
+                <input type="checkbox" name="amenities" value="{{ amenity.id }}"
+                    {% if amenity.id|stringformat:"s" in selected_amenities %}checked{% endif %}>
+                {{ amenity.name }}
+            </label>
+            {% endfor %}
+        </div>
+
         <hr>
-        <h3>LOCATIONS</h3>
-        {% for location in locations %}
-        <label>
-            <input type="checkbox" name="location" value="{{ location.id }}"
-                {% if location.id|stringformat:"s" in selected_location %}checked{% endif %}>
-            {{ location.name }}
-        </label>
-        {% endfor %}
+
+        <div class="filter-section">
+            <h3>LOCATIONS</h3>
+            {% for location in locations %}
+            <label>
+                <input type="checkbox" name="location" value="{{ location.id }}"
+                    {% if location.id|stringformat:"s" in selected_location %}checked{% endif %}>
+                {{ location.name }}
+            </label>
+            {% endfor %}
+        </div>
+
     </form>
-</div>
-
-
-  
 </aside>
 
+
 <script>
-
-document.addEventListener('DOMContentLoaded', function () {
-    const filterForm = document.getElementById('filter-form');
-
-    // Handle checkbox changes
-    filterForm.addEventListener('change', function (event) {
-        event.preventDefault(); // Prevent the form from reloading the page
-
-        // Collect form data
-        const formData = new FormData(filterForm);
-        const params = new URLSearchParams(formData).toString();
-
-        
-        fetch(`${filterForm.action}?${params}`, {
-            method: 'GET',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-            },
-        })
-        .then(response => response.json())
-        .then(data => {
-            updateResortList(data.resorts); 
-        })
-        .catch(error => console.error('Error fetching filtered resorts:', error));
-    });
-
-  // Function to update the resort list dynamically
-  function updateResortList(resorts) {
-    const resortsContainer = document.querySelector('.all-resorts-cards');
-    resortsContainer.innerHTML = ''; // Clear existing resorts
-
-    resorts.forEach(resort => {
-        const card = document.createElement('div');
-        card.classList.add('card');
-
-        card.innerHTML = `
-            ${resort.resort_image ? `<img src="${resort.resort_image}" alt="">` : ''}
-
-            <a class="favorite-btn" data-resort-id="${resort.id}">
-                <i class="fa fa-heart ${resort.is_favorite ? 'active' : ''}" aria-hidden="true"></i>
-            </a>
-
-            <h5>${resort.name}</h5>
-            <p>${resort.description}</p>
-            <button type="button">
-                <a href="/resort/${resort.id}/">See More Details</a>
-            </button>
-            <p class="favorite-count">Favorites: ${resort.favorite_count}</p>
-        `;
-
-        resortsContainer.appendChild(card);
-    });
-
-    attachFavoriteListeners(); // Reattach event listeners for dynamically added favorite buttons
-    attachStarRatingListeners(); // Reattach event listeners for dynamically added star ratings
-}
-    function updateRecommendedList(recommendations) {
-        const recommendationsContainer = document.querySelector('.recommended-cards');
-        recommendationsContainer.innerHTML = ''; // Clear existing recommendations
-
-        recommendations.forEach(resort => {
-            const card = document.createElement('div');
-            card.classList.add('card');
-
-            card.innerHTML = `
-                <img src="${resort.resort_image}" alt="">
-                <a class="favorite-btn" data-resort-id="${resort.id}">
-                    <i class="fa fa-heart ${resort.is_favorite ? 'active' : ''}" aria-hidden="true"></i>
-                </a>
-                <h5>${resort.name}</h5>
-                <p>${resort.description}</p>
-                <p>Favorites: ${resort.favorite_count}</p>
-            `;
-            recommendationsContainer.appendChild(card);
-        });
-    }
-// Function to attach favorite button listeners
-function attachFavoriteListeners() {
-    const favoriteButtons = document.querySelectorAll('.favorite-btn');
-
-    favoriteButtons.forEach(button => {
-        button.addEventListener('click', function () {
-            const resortId = this.dataset.resortId;
-            const isFavorite = this.querySelector('.fa-heart').classList.contains('active');
-
-            fetch('/toggle_favorite/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCsrfToken() // Ensure CSRF token is included
-                },
-                body: JSON.stringify({
-                    resort_id: resortId,
-                    is_favorite: !isFavorite
-                })
+    document.addEventListener('DOMContentLoaded', function () {
+        const filterForm = document.getElementById('filter-form');
+        const minPriceInput = document.getElementById('min-price');
+        const maxPriceInput = document.getElementById('max-price');
+        const applyButton = document.getElementById('apply-filters');
+    
+        function applyFilters() {
+            event.preventDefault(); // Prevent the form from submitting normally
+    
+            // Collect form data
+            const formData = new FormData(filterForm);
+            const params = new URLSearchParams(formData);
+    
+            // Manually append price inputs if they are filled
+            if (minPriceInput.value) {
+                params.append("min_price", minPriceInput.value);
+            }
+            if (maxPriceInput.value) {
+                params.append("max_price", maxPriceInput.value);
+            }
+    
+            fetch(`${filterForm.action}?${params.toString()}`, {
+                method: 'GET',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        // Toggle the active class
-                        this.querySelector('.fa-heart').classList.toggle('active', !isFavorite);
-
-                        // Update the favorite count
-                        const favoriteCount = this.closest('.card').querySelector('.favorite-count');
-                        favoriteCount.textContent = `Favorites: ${data.favorite_count}`;
-                    } else {
-                        console.error('Failed to toggle favorite:', data.message);
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-        });
+            .then(response => response.json())
+            .then(data => {
+                updateResortList(data.resorts); 
+            })
+            .catch(error => console.error('Error fetching filtered resorts:', error));
+        }
+    
+        // Apply filters when checkboxes change
+        filterForm.addEventListener('change', applyFilters);
+    
+        // Apply filters when "Apply" button is clicked
+        applyButton.addEventListener('click', applyFilters);
+    
+        function updateResortList(resorts) {
+            const resortsContainer = document.querySelector('.all-resorts-cards');
+            resortsContainer.innerHTML = ''; // Clear existing resorts
+    
+            resorts.forEach(resort => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+    
+                card.innerHTML = `
+                    ${resort.resort_image ? `<img src="${resort.resort_image}" alt="">` : ''}
+    
+                    <a class="favorite-btn" data-resort-id="${resort.id}">
+                        <i class="fa fa-heart ${resort.is_favorite ? 'active' : ''}" aria-hidden="true"></i>
+                    </a>
+    
+                    <h5>${resort.name}</h5>
+                    <p>${resort.description}</p>
+                    <button type="button">
+                        <a href="/resort/${resort.id}/">See More Details</a>
+                    </button>
+                    <p class="favorite-count">Favorites: ${resort.favorite_count}</p>
+                `;
+    
+                resortsContainer.appendChild(card);
+            });
+    
+            attachFavoriteListeners();
+        }
+    
+        function attachFavoriteListeners() {
+            document.querySelectorAll('.favorite-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const resortId = this.dataset.resortId;
+                    const isFavorite = this.querySelector('.fa-heart').classList.contains('active');
+    
+                    fetch('/toggle_favorite/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCsrfToken()
+                        },
+                        body: JSON.stringify({
+                            resort_id: resortId,
+                            is_favorite: !isFavorite
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            this.querySelector('.fa-heart').classList.toggle('active', !isFavorite);
+                            this.closest('.card').querySelector('.favorite-count').textContent = `Favorites: ${data.favorite_count}`;
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                });
+            });
+        }
+    
+        function getCsrfToken() {
+            return document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+        }
     });
-}
-
-// Helper function to get the CSRF token
-function getCsrfToken() {
-    return document.querySelector('input[name="csrfmiddlewaretoken"]').value;
-}
-
-
-});
-</script>
-
+    </script>
+    
 

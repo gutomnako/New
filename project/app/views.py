@@ -22,6 +22,7 @@ from django.core.serializers import serialize
 from decimal import Decimal, InvalidOperation
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import OuterRef, Subquery
+from django.db.models import F, Sum
 
 #dashboard
 #login
@@ -413,44 +414,46 @@ def filter_beaches(request):
 
     if min_price:
         try:
-            min_price = float(min_price)  # Convert to float since price is a DecimalField
-            resorts = resorts.filter(price__gte=min_price)
+            min_price = float(min_price)  
+            resorts = resorts.annotate(
+                total_price=F('price_per_night') + F('entrance_kids') + F('entrance_adults')
+            ).filter(total_price__gte=min_price)
         except ValueError:
-            pass  # Ignore invalid input
+            pass  
 
     if max_price:
         try:
             max_price = float(max_price)
-            resorts = resorts.filter(price__lte=max_price)
+            resorts = resorts.annotate(
+                total_price=F('price_per_night') + F('entrance_kids') + F('entrance_adults')
+            ).filter(total_price__lte=max_price)
         except ValueError:
-            pass  # Ignore invalid input
+            pass  
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        user = request.user  # Get the current logged-in user
-        is_authenticated = user.is_authenticated  # Check if user is logged in
+        user = request.user  
+        is_authenticated = user.is_authenticated  
 
         resorts_data = list(resorts.values(
-            'id', 'name', 'description', 'entrance_kids', 'entrance_adults', 'price', 'resort_image'
+            'id', 'name', 'description', 'entrance_kids', 'entrance_adults', 'price_per_night', 'resort_image'
         ))
 
-        # Add the favorite status and update the image URL
         for resort in resorts_data:
             if resort['resort_image']:
-                resort['resort_image'] = f"/media/{resort['resort_image']}"  # Adjust path as needed
+                resort['resort_image'] = f"/media/{resort['resort_image']}"  
 
-            # Check if the current user has marked this resort as a favorite
             if is_authenticated:
                 resort['is_favorite'] = Favorite.objects.filter(user=user, resort_id=resort['id']).exists()
             else:
-                resort['is_favorite'] = False  # Default for non-authenticated users
+                resort['is_favorite'] = False  
 
-            # Get the favorite count for the resort
             resort['favorite_count'] = Favorite.objects.filter(resort_id=resort['id']).count()
 
-        # Return the filtered resorts data with is_favorite and favorite_count
+            # Compute total price dynamically
+            resort['total_price'] = float(resort['price_per_night']) + float(resort['entrance_kids']) + float(resort['entrance_adults'])
+
         return JsonResponse({'resorts': resorts_data})
 
-    # For non-AJAX requests, render the full page
     recommendations = get_recommendations(request.user.id) if request.user.is_authenticated else []
     amenities = Amenity.objects.all()
     locations = Location.objects.all()
@@ -465,7 +468,6 @@ def filter_beaches(request):
     }
 
     return render(request, 'app/home.html', context)
-
 #end resorts
 
 #edit resort
