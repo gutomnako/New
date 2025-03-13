@@ -263,11 +263,24 @@ def toggle_favorite(request):
         else:
             Favorite.objects.filter(user=user, resort=resort).delete()
 
-        updated_favorite_count = Resort.objects.annotate(favorite_count=Count('favorite_resorts')).get(id=resort_id).favorite_count
+        # Update favorite count for the resort
+        updated_favorite_count = Resort.objects.annotate(favorite_count=Count('favorite_resorts'))\
+            .get(id=resort_id).favorite_count
 
-        return JsonResponse({'status': 'success', 'favorite_count': updated_favorite_count})
+        # **Get updated recommendations for the user**
+        recommended_resorts = get_recommendations(user.id, n_recommendations=5)
+
+        # Convert recommendations to JSON-friendly format
+        recommended_resorts_list = [{'id': resort.id, 'name': resort.name} for resort in recommended_resorts]
+
+        return JsonResponse({
+            'status': 'success',
+            'favorite_count': updated_favorite_count,
+            'recommended_resorts': recommended_resorts_list  # Include recommended resorts
+        })
     
     return JsonResponse({'status': 'failed'}, status=400)
+
 
 def home(request):
     q = request.GET.get('q') if request.GET.get('q') is not None else ''
@@ -504,6 +517,22 @@ def updateResort(request, pk):
       context = {'form': form}
       return render(request, 'app/resort_form.html', context)
 
+@login_required
+def update_resort(request, resort_id):
+    resort = get_object_or_404(Resort, id=resort_id)
+
+    if request.user != resort.host:
+        return redirect("resort-detail", resort_id=resort.id)
+
+    if request.method == "POST":
+        new_description = request.POST.get("description")
+        if new_description:  # Ensure it's not empty
+            resort.description = new_description
+            resort.save()
+        return redirect("resort-detail", resort_id=resort.id)
+
+    return render(request, "resort_detail.html", {"resort": resort})
+
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['Pinakaadmin'])
 def deleteResort(request, pk):
@@ -513,39 +542,32 @@ def deleteResort(request, pk):
             return redirect('home')
       return render(request, 'app/delete.html', {'obj': resort})
 
-@login_required(login_url='login')
+@login_required
 @csrf_exempt
-def update_resort_inline(request, pk):
-    resort = Resort.objects.get(id=pk)
-
-    # Check if user is authorized
-    if request.user != resort.host:
-        return JsonResponse({'error': 'You are not allowed to edit this resort'}, status=403)
-
+def update_resort_inline(request, resort_id):
     if request.method == "POST":
-        if request.FILES.get("resort_image"):
-            # Handle image update
-            resort.resort_image = request.FILES["resort_image"]
-            resort.save()
-            return JsonResponse({"status": "success", "image_url": resort.resort_image.url})
+        resort = Resort.objects.get(id=resort_id)
 
-        else:
-            # Handle text updates
-            try:
-                data = json.loads(request.body)
-                field = data.get("field")
-                value = data.get("value")
+        # Ensure only the host can edit
+        if request.user != resort.host:
+            return JsonResponse({"success": False, "error": "❌ Unauthorized!"})
 
-                if field and hasattr(resort, field):
-                    setattr(resort, field, value)
-                    resort.save()
-                    return JsonResponse({"status": "success", "field": field, "value": value})
-                else:
-                    return JsonResponse({"error": "Invalid field"}, status=400)
-            except json.JSONDecodeError:
-                return JsonResponse({"error": "Invalid JSON data"}, status=400)
+        try:
+            data = json.loads(request.body)
+            field = data.get("field")
+            value = data.get("value")
 
-    return JsonResponse({"error": "Invalid request"}, status=400)
+            if field == "description":
+                resort.description = value
+                resort.save()
+                return JsonResponse({"success": True, "message": "✅ Description updated successfully!"})
+
+            return JsonResponse({"success": False, "error": "❌ Invalid field provided!"})
+
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
+
+    return JsonResponse({"success": False, "error": "❌ Invalid request!"})
 
 @login_required(login_url='login')
 @csrf_exempt

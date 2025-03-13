@@ -32,6 +32,7 @@ urlpatterns = [
     
     path('map/', views.map_view, name='map'),
 
+    path("resort/update/<int:resort_id>/", views.update_resort, name="update_resort"),
     path("update_resort_inline/<int:pk>/", views.update_resort_inline, name="update_resort_inline"),
     path("update_resort_image/<int:pk>/", views.update_resort_image, name="update_resort_image"),
 ]
