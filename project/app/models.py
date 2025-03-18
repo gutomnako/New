@@ -58,6 +58,7 @@ class Resort(models.Model):
      # message =
      location = models.ManyToManyField(Location, blank=True, related_name="resorts", help_text="Location of the resort")
      description = models.TextField(help_text="Brief description of the resort", blank=True, null=True)
+     mini_description = models.TextField(help_text="Brief description of the resort", blank=True, null=True)
      amenities = models.ManyToManyField(Amenity, blank=True, related_name="resorts", help_text="Amenities available at the resort")
      favorites = models.ManyToManyField(User, through='Favorite', related_name='favorite_resorts')
      price_per_night = models.DecimalField(max_digits=10, decimal_places=2)
@@ -65,8 +66,10 @@ class Resort(models.Model):
      entrance_adults = models.DecimalField(max_digits=10, decimal_places=2, validators=[validate_non_negative], default=0.00)
      cottage = models.CharField(max_length=100, default="Default Cottage Name")  # Example field
      price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+     amenities = models.ManyToManyField(Amenity, blank=True)
      contact_number = models.CharField(max_length=20, help_text="Contact phone number")
      resort_image = models.ImageField(upload_to='resorts/', default='paradise.jpg', blank=True, help_text="Image of the resort")
+     hero_image = models.ImageField(upload_to='resorts/', blank=True, null=True)
      location_rating = models.FloatField(default=0.0, help_text="A score representing the resort's location")  
      created_at = models.DateTimeField(auto_now_add=True, help_text="Date and time the resort was added")
      updated_at = models.DateTimeField(auto_now=True, help_text="Date and time the resort was last updated")

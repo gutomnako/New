@@ -14,7 +14,8 @@ urlpatterns = [
 
     path('home/', views.home, name='home'),
     path('', views.index_view, name='index-view'),
-    path('resort/<str:pk>/', views.resort, name='resort'),
+    path('resort/<int:pk>/', views.resort, name='resort'),  # Make sure 'resort' matches the redirect name
+    path('resort/<int:pk>/update/', views.update_resort, name="update_resort"),
     path('profile/<int:pk>/', views.userProfile, name='user-profile'),
 
     path('create-resort/', views.createResort, name='create-resort'),

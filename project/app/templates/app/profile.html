@@ -1,43 +1,67 @@
 {% extends 'main.html' %}
-
+{% load static %}
 {% block content %}
 
-<h2>{{ user.username }}'s Profile</h2>
-{% if request.user == user %}
-<a href="{% url 'update-user' %}">Edit profile</a>
-{% endif %}
-<h3>Favorite Resorts:</h3>
-<ul>
-    {% for favorite in favorites %}
-        <li>{{ favorite.resort.name }}</li>
-    {% empty %}
-        <p>No favorite resorts yet.</p>
-    {% endfor %}
-</ul>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beach Resort Profile</title>
+    <link rel="stylesheet" href="{% static 'styles/profile.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+        <div class="container">
+            <aside class="sidebar">
+                <h2>Favorite Resorts</h2>
+                <div class="beach-list-container">
+                    <ul id="beachList">
+                        {% for favorite in favorites %}
+                            <li>{{ favorite.resort.name }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+        </aside>
+        <main class="profile">
+            <div class="profile-img">
+                {% if request.user.is_authenticated %}
+                    <img src="{{ request.user.avatar.url }}" alt="User Avatar">
+                {% else %}
+                    <img src="/media/avatar-default.svg" alt="Default Avatar">
+                {% endif %}
+            </div>
+            <input type="file" id="uploadInput" accept="image/*" style="display: none;">
+            <button class="upload-btn" onclick="document.getElementById('uploadInput').click();">Upload Image</button>
+            <h1>{{ user.username }}</h1>
+            <h2>{{ user.username }}'s Profile</h2>
+            <p>Email: {{ user.email}}</p>
+        </main>
+        <aside class="comments">
+            <h2>ACTIVITY LOG</h2>
+                {% for message in messages %}
+                    <div class="comment">
+                        <p><strong>{{ message.user.username }}:</strong> Commented on <strong>{{ message.resort.name }}</strong> - "{{ message.comment }}"</p>
+                    </div>
+                {% endfor %}
 
-<h3>Comments:</h3>
-<ul>
-    {% for message in messages %}
-        <li>
-            <strong>On {{ message.resort.name }}</strong>: {{ message.comment }} 
-            <br>
-        </li>
-    {% empty %}
-        <p>No comments yet.</p>
-    {% endfor %}
-</ul>
-
-<h3>User Ratings</h3>
-<ul class="user-ratings">
-    {% for rating in ratings %}
-    <li>
-        <strong>{{ rating.resort.name }}</strong>  
-        - Rated: {{ rating.rating }} ⭐
-    </li>
-    {% empty %}
-    <p>No ratings given yet.</p>
-    {% endfor %}
-</ul>
-
-
+                {% for rating in ratings %}
+                    <div class="comment">
+                        <p><strong>{{ rating.user.username }}:</strong> Rated <strong>{{ rating.resort.name }}</strong>  
+                            <span class="stars">
+                                {% for i in "12345"|make_list %}
+                                    {% if forloop.counter <= rating.rating %}
+                                        <i class="fas fa-star"></i>  <!-- Filled Star -->
+                                    {% else %}
+                                        <i class="far fa-star"></i>  <!-- Empty Star -->
+                                    {% endif %}
+                                {% endfor %}
+                            </span>
+                            - "{{ rating.review }}"
+                        </p>
+                    </div>
+                {% endfor %}
+        </aside>
+    </div>
+    <script src="{% static 'scripts/profile.css' %}"></script>
+</body>
+</html>
 {% endblock content %}

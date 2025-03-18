@@ -1,54 +1,531 @@
-body {
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+
+* {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+nav {
+    background-color: #089cff; /* Dark background for contrast */
+    padding: 10px 0; /* Adds space above and below the nav */
+    display: flex;
+    justify-content: center; /* Centers the nav items */
+    align-items: center;
+    width: 100%;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+    padding: 0;
+    margin: 0; 
+}
+
+nav li {
+    margin: 0 20px; /* Adds more spacing between nav items */
+}
+
+nav a {
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 18px; /* Slightly larger font for better readability */
+    font-weight: bold;
+    font-family: "Quicksand", sans-serif; /* Fixed the incorrect font family */
+    padding: 10px 15px; /* More padding for better clickable area */
+    border-radius: 5px; /* Rounded edges for a smoother look */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+nav a:hover {
+    background-color: #e0e0e0;
     color: #333;
-  }
-  
-  h1 {
+}
+
+
+body {
+    background: linear-gradient(to bottom, #0099ff, #ffcc66);
+    color: #333;
     text-align: center;
-    margin: 20px 0;
-    color: #0077b6;
-  }
-  
-  .beach-list {
-    padding: 20px;
-  }
-  
-  .beach-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
+}
+
+input[type="file"] {
+    display: none; 
+}
+
+.custom-file-upload {
+    display: inline-block;
+    padding: 10px 10px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background: #007BFF;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s ease;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.custom-file-upload:hover {
+    background: #0056b3;
+}
+
+
+.resort-description {
+    padding: 50px 20px;
+    background: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.description-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     max-width: 1200px;
     margin: 0 auto;
-  }
-  
-  .beach-card {
-    background: #fff;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-  }
-  
-  .beach-card:hover {
-    transform: scale(1.05);
-  }
-  
-  .beach-card img {
+}
+
+.description-text {
+    flex: 1;
+    padding-right: 20px;
+}
+
+.description-text h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: #333;
+}
+
+.description-text p {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    color: #555;
+}
+
+.description-image {
+    flex: 1;
+    max-width: 600px;
+}
+
+.description-image img {
     width: 100%;
-    height: 150px;
-    object-fit: cover;
-  }
-  
-  .beach-card h2 {
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.hero {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+    position: relative;
+
+    /* ✅ Fix Background Image Issues */
+    background-size: cover;  /* Ensures image covers the whole section */
+    background-position: center; /* Centers the image */
+    background-repeat: no-repeat; /* Prevents tiling/duplication */
+}
+
+
+.hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+.cta-button {
+    background: #ffcc66;
+    color: #333;
+    padding: 10px 20px;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.cta-button:hover {
+    background: #ff9900;
+}
+
+.amenities {
+    padding: 50px;
+    background: #33b3e5;
+    text-align: center;
+}
+
+.amenities h2 {
+    font-size: 2.5rem;
+    color: #555 ;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.amenities-list {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.amenities-list li {
+    background: #0099ff;
+    color: white;
+    padding: 15px 25px;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.amenities-list li:hover {
+    background: #ff9900;
+    transform: scale(1.1);
+}
+
+
+.pricing-amenities {
+    padding: 50px;
+    text-align: center;
+    background: #deb16d;
+}
+
+.pricing-amenities h2 {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.info-container {
+    display: flex;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    gap: 50px; 
+}
+
+.info-box {
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 480px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: white;
+}
+
+
+.amenities-list {
+    list-style: none;
+    padding: 0;
+}
+
+.amenities-list li {
+    font-size: 1.2rem;
     margin: 10px 0;
-    text-align: center;
-  }
-  
-  .beach-card p {
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.info-box h3 {
+    color: black;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.info-box p {
+    font-size: 1.1rem;
     color: #555;
     margin-bottom: 10px;
-  }
-  
+}
+
+.info-box ul {
+    padding: 0;
+    list-style: none;
+}
+
+.info-box ul li {
+    font-size: 1.1rem;
+    color: #444;
+    margin: 5px 0;
+}
+
+
+
+.contact {
+    padding: 50px 20px;
+    background: #33b3e5;    
+    color: white;
+    text-align: center;
+}
+
+.contact h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.contact p {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.contact p strong {
+    font-size: 1.3rem;
+}
+
+/* Wrapper for all comments */
+.comment-wrapper {
+    max-width: 800px; /* Increased width for better readability */
+    margin: 20px auto;
+    padding: 15px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Section Header */
+.comment-wrapper h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* Divider Line */
+.comment-wrapper hr {
+    border: none;
+    height: 1px;
+    background: #ddd;
+    margin-bottom: 15px;
+}
+
+/* Comment Box */
+.comment {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: #f9f9f9;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* User Avatar */
+.avatar {
+    width: 45px; /* Slightly bigger for better visibility */
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+}
+
+/* Comment Content */
+.comment-content {
+    flex: 1;
+    text-align: left; /* Ensures everything is aligned to the left */
+}
+
+/* Header: Username + Timestamp */
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Adds slight spacing */
+    margin-bottom: 4px;
+}
+
+/* Username Link */
+.username {
+    font-weight: bold;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.username:hover {
+    text-decoration: underline;
+}
+
+/* Timestamp */
+.timestamp {
+    font-size: 12px;
+    color: #777;
+}
+
+/* Comment Text */
+.comment-text {
+    font-size: 14px;
+    line-height: 1.4;
+    color: #333;
+    margin-bottom: 6px;
+    text-align: left; /* Ensures text is left-aligned */
+    word-wrap: break-word; /* Prevents long words from breaking the layout */
+}
+
+/* Delete Button */
+.delete-btn {
+    color: #ff4d4d;
+    font-size: 12px;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 3px 5px;
+    border-radius: 4px;
+    transition: background 0.2s ease-in-out;
+    display: inline-block;
+}
+
+.delete-btn:hover {
+    background: #ff4d4d;
+    color: white;
+    text-decoration: none;
+}
+
+/* No Comments Message */
+.no-comments {
+    text-align: center;
+    font-size: 14px;
+    color: #777;
+    padding: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .comment-wrapper {
+        max-width: 90%; /* Adjusts width for smaller screens */
+    }
+
+    .avatar {
+        width: 40px;
+        height: 40px;
+    }
+
+    .comment {
+        flex-direction: row; /* Keeps avatar on the left */
+        align-items: flex-start;
+    }
+
+    .comment-header {
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .comment-text {
+        text-align: left; /* Ensures text stays left-aligned on mobile */
+    }
+}
+/* Comment Form Wrapper */
+.comment-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.05);
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    max-width: 600px; /* Limits width */
+    margin-left: auto;
+    margin-right: auto; /* Centers it nicely */
+}
+
+/* User Avatar */
+.comment-form .avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+}
+
+/* Form Styling */
+.comment-form form {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Input Field */
+.comment-form input[type="text"] {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    outline: none;
+    font-size: 14px;
+    width: 100%;
+    max-width: 400px; /* Limits input width */
+}
+
+.comment-form input[type="text"]:focus {
+    border-color: #007bff;
+}
+
+/* Submit Button */
+.comment-form button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 7px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s ease-in-out;
+}
+
+.comment-form button:hover {
+    background: #0056b3;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .comment-form {
+        max-width: 100%; /* Allows it to fit on small screens */
+        padding: 8px;
+    }
+
+    .comment-form input[type="text"] {
+        font-size: 13px;
+        max-width: 300px;
+    }
+
+    .comment-form button {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+}
+

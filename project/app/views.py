@@ -354,28 +354,74 @@ def home(request):
 
     return render(request, 'app/home.html', context)
 
+def update_resort(request, resort_id):
+    resort = get_object_or_404(Resort, id=resort_id)
 
+    if request.method == "POST":
+        # Update resort details
+        resort.mini_description = request.POST.get("mini_description", resort.mini_description)
+        resort.description = request.POST.get("description", resort.description)
+        resort.price_per_night = request.POST.get("price_per_night", resort.price_per_night)
+        resort.entrance_kids = request.POST.get("entrance_kids", resort.entrance_kids)
+        resort.entrance_adults = request.POST.get("entrance_adults", resort.entrance_adults)
+        resort.cottage = request.POST.get("cottage", resort.cottage)
+        resort.price = request.POST.get("price", resort.price)
+
+        # ✅ Fix Image Uploads - Update only if a new file is uploaded
+        if 'hero_image' in request.FILES:
+            resort.hero_image = request.FILES['hero_image']
+        if 'resort_image' in request.FILES:
+            resort.resort_image = request.FILES['resort_image']
+
+        # ✅ Fix Amenities - Don't clear all, just update
+        amenity_names = request.POST.getlist("amenities")
+        for name in amenity_names:
+            if name.strip():
+                amenity, created = Amenity.objects.get_or_create(name=name.strip())
+                resort.amenities.add(amenity)
+
+        # ✅ Add a new amenity if provided
+        new_amenity = request.POST.get("new_amenity")
+        if new_amenity:
+            new_amenity_obj, created = Amenity.objects.get_or_create(name=new_amenity.strip())
+            resort.amenities.add(new_amenity_obj)
+
+        # ✅ Save Resort
+        resort.save()
+        messages.success(request, "Resort details updated successfully!")
+        return redirect("resort", pk=resort.id)
+
+    return redirect("resort", pk=resort.id)
+
+
+
+@csrf_exempt
 def resort(request, pk):
     resort = Resort.objects.get(id=pk)
     amenities = Amenity.objects.all()
     resort_messages = resort.messages.all().order_by('-created_at')
 
-    # Track the visit when the resort page is accessed (only for authenticated users)
     if request.user.is_authenticated:
         Visit.objects.create(resort=resort, user=request.user)
 
     average_rating = Rating.objects.filter(resort=resort).aggregate(Avg('rating'))['rating__avg']
 
-    if request.method == 'POST':
-        if request.user.is_authenticated:  # Prevent anonymous users from posting messages
-            message = Message.objects.create(
-                user=request.user,
-                resort=resort,
-                comment=request.POST.get('comment')
-            )
-            return redirect(f"{request.path}?rating=1")  # Redirect with ?rating=1
-        else:
-            return redirect('login')  # Redirect to login if not authenticated
+    # Handle AJAX updates
+    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        try:
+            data = json.loads(request.body)
+            field = data.get('field')  # Example: 'description', 'price_per_night', etc.
+            value = data.get('value')
+
+            if field in ['description', 'mini_description', 'price_per_night', 'entrance_kids', 'entrance_adults', 'cottage', 'price']:
+                setattr(resort, field, value)
+                resort.save()
+                return JsonResponse({'success': True, 'message': 'Updated successfully!'})
+
+            return JsonResponse({'success': False, 'message': 'Invalid field!'})
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)})
 
     context = {
         'resort': resort,
@@ -518,20 +564,20 @@ def updateResort(request, pk):
       return render(request, 'app/resort_form.html', context)
 
 @login_required
-def update_resort(request, resort_id):
-    resort = get_object_or_404(Resort, id=resort_id)
+#def update_resort(request, resort_id):
+#    resort = get_object_or_404(Resort, id=resort_id)
 
-    if request.user != resort.host:
-        return redirect("resort-detail", resort_id=resort.id)
+ #   if request.user != resort.host:
+   #     return redirect("resort-detail", resort_id=resort.id)
 
-    if request.method == "POST":
-        new_description = request.POST.get("description")
-        if new_description:  # Ensure it's not empty
-            resort.description = new_description
-            resort.save()
-        return redirect("resort-detail", resort_id=resort.id)
+  #  if request.method == "POST":
+  #      new_description = request.POST.get("description")
+   #     if new_description:  # Ensure it's not empty
+    #        resort.description = new_description
+   #         resort.save()
+    #    return redirect("resort-detail", resort_id=resort.id)
 
-    return render(request, "resort_detail.html", {"resort": resort})
+   # return render(request, "resort_detail.html", {"resort": resort})
 
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['Pinakaadmin'])
