@@ -282,41 +282,56 @@ def toggle_favorite(request):
     return JsonResponse({'status': 'failed'}, status=400)
 
 
+from django.db.models import F, Avg, Count
+from django.http import JsonResponse
+
 def home(request):
-    q = request.GET.get('q') if request.GET.get('q') is not None else ''
+    q = request.GET.get('q', '')  
 
-    # Get filters from the request
-    selected_amenities = request.GET.getlist('amenities')
-    selected_location = request.GET.getlist('location')
-    min_price = request.GET.get('min_price')
-    max_price = request.GET.get('max_price')
+    # Get filter parameters
+    selected_amenities = request.GET.getlist('amenities')  
+    selected_location = request.GET.getlist('location')   
+    min_price = request.GET.get('min_price') 
+    max_price = request.GET.get('max_price')  
 
-    # Filtering for all resorts
     resorts = Resort.objects.all()
-    rated_resorts = (
-        Resort.objects.annotate(average_rating=Avg('rating__rating'))
-        .order_by('-average_rating') 
-    )
 
+    # Apply filters
     if selected_amenities:
         resorts = resorts.filter(amenities__id__in=selected_amenities).distinct()
+
     if selected_location:
         resorts = resorts.filter(location__id__in=selected_location).distinct()
-    if min_price:
-        resorts = resorts.filter(price__gte=min_price)
-    if max_price:
-        resorts = resorts.filter(price__lte=max_price)
+
+    # Ensure proper price filtering
+    try:
+        min_price = float(min_price) if min_price else None
+        max_price = float(max_price) if max_price else None
+    except ValueError:
+        min_price = None
+        max_price = None
+
+    if min_price is not None or max_price is not None:
+        resorts = resorts.annotate(
+            total_price=F('price_per_night') + F('entrance_kids') + F('entrance_adults')
+        )
+        if min_price is not None:
+            resorts = resorts.filter(total_price__gte=min_price)
+        if max_price is not None:
+            resorts = resorts.filter(total_price__lte=max_price)
 
     # Annotate resorts with favorite count
     resorts = resorts.annotate(favorite_count=Count('favorite_resorts', distinct=True))
 
-    # Apply weighted scoring after filtering
-    ranked_resorts = get_ranked_resorts().filter(id__in=resorts.values_list('id', flat=True)).annotate(average_rating=Avg('rating__rating')).order_by('-average_rating') 
+    # Apply ranking
+    ranked_resorts = get_ranked_resorts().filter(id__in=resorts.values_list('id', flat=True)).annotate(
+        average_rating=Avg('rating__rating')
+    ).order_by('-average_rating')  
 
     user = request.user
     recommendations = []
 
-    # If the user is authenticated, fetch personalized recommendations
+    # Fetch recommendations for authenticated users
     if user.is_authenticated:
         recommendations = get_recommendations(user.id, n_recommendations=5)
 
@@ -327,7 +342,7 @@ def home(request):
             .annotate(favorite_count=Count('favorite_resorts', distinct=True))
         )
 
-        # Map favorite count back to the original recommendations list
+        # Map favorite count back to recommendations
         for resort in recommendations:
             annotated_resort = next((ar for ar in annotated_recommendations if ar.id == resort.id), None)
             if annotated_resort:
@@ -338,21 +353,48 @@ def home(request):
     for resort in ranked_resorts:  
         resort.is_favorite = user.is_authenticated and Favorite.objects.filter(user=user, resort=resort).exists()
 
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        resorts_data = list(resorts.values(
+            'id', 'name', 'description', 'entrance_kids', 'entrance_adults', 'price_per_night', 'resort_image'
+        ))
+
+        for resort in resorts_data:
+            resort['total_price'] = float(resort['price_per_night']) + float(resort['entrance_kids']) + float(resort['entrance_adults'])
+
+            # Ensure image URLs are correct
+            if resort['resort_image']:
+                resort['resort_image'] = f"/media/{resort['resort_image']}"
+
+            resort['is_favorite'] = Favorite.objects.filter(user=user, resort_id=resort['id']).exists() if user.is_authenticated else False  
+            resort['favorite_count'] = Favorite.objects.filter(resort_id=resort['id']).count()
+
+        return JsonResponse({
+            'resorts': resorts_data,
+            'selected_amenities': selected_amenities,
+            'selected_location': selected_location,
+            'min_price': min_price,
+            'max_price': max_price,
+        })
+
     amenities = Amenity.objects.all()
     locations = Location.objects.all()
     resort_count = ranked_resorts.count()  
 
-    
     context = {
         'resorts': ranked_resorts,  
         'recommendations': recommendations,
         'amenities': amenities,
         'resort_count': resort_count,
         'locations': locations,
-        "rated_resorts": rated_resorts,
+        'selected_amenities': selected_amenities,
+        'selected_location': selected_location,
+        'min_price': min_price,
+        'max_price': max_price,
+        "rated_resorts": Resort.objects.annotate(average_rating=Avg('rating__rating')).order_by('-average_rating'),
     }
 
     return render(request, 'app/home.html', context)
+
 
 def update_resort(request, resort_id):
     resort = get_object_or_404(Resort, id=resort_id)
@@ -367,26 +409,22 @@ def update_resort(request, resort_id):
         resort.cottage = request.POST.get("cottage", resort.cottage)
         resort.price = request.POST.get("price", resort.price)
 
-        # ✅ Fix Image Uploads - Update only if a new file is uploaded
         if 'hero_image' in request.FILES:
             resort.hero_image = request.FILES['hero_image']
         if 'resort_image' in request.FILES:
             resort.resort_image = request.FILES['resort_image']
 
-        # ✅ Fix Amenities - Don't clear all, just update
         amenity_names = request.POST.getlist("amenities")
         for name in amenity_names:
             if name.strip():
                 amenity, created = Amenity.objects.get_or_create(name=name.strip())
                 resort.amenities.add(amenity)
 
-        # ✅ Add a new amenity if provided
         new_amenity = request.POST.get("new_amenity")
         if new_amenity:
             new_amenity_obj, created = Amenity.objects.get_or_create(name=new_amenity.strip())
             resort.amenities.add(new_amenity_obj)
 
-        # ✅ Save Resort
         resort.save()
         messages.success(request, "Resort details updated successfully!")
         return redirect("resort", pk=resort.id)
@@ -455,78 +493,6 @@ def userProfile(request, pk):
     }
     return render(request, 'app/profile.html', context)
 
-
-def filter_beaches(request):
-    selected_amenities = request.GET.getlist('amenities')  
-    selected_location = request.GET.getlist('location')   
-    min_price = request.GET.get('min_price') 
-    max_price = request.GET.get('max_price')  
-   
-    resorts = Resort.objects.all()
-
-    # Apply filters
-    if selected_amenities:
-        resorts = resorts.filter(amenities__id__in=selected_amenities).distinct()
-
-    if selected_location:
-        resorts = resorts.filter(location__id__in=selected_location).distinct()
-
-    if min_price:
-        try:
-            min_price = float(min_price)  
-            resorts = resorts.annotate(
-                total_price=F('price_per_night') + F('entrance_kids') + F('entrance_adults')
-            ).filter(total_price__gte=min_price)
-        except ValueError:
-            pass  
-
-    if max_price:
-        try:
-            max_price = float(max_price)
-            resorts = resorts.annotate(
-                total_price=F('price_per_night') + F('entrance_kids') + F('entrance_adults')
-            ).filter(total_price__lte=max_price)
-        except ValueError:
-            pass  
-
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        user = request.user  
-        is_authenticated = user.is_authenticated  
-
-        resorts_data = list(resorts.values(
-            'id', 'name', 'description', 'entrance_kids', 'entrance_adults', 'price_per_night', 'resort_image'
-        ))
-
-        for resort in resorts_data:
-            if resort['resort_image']:
-                resort['resort_image'] = f"/media/{resort['resort_image']}"  
-
-            if is_authenticated:
-                resort['is_favorite'] = Favorite.objects.filter(user=user, resort_id=resort['id']).exists()
-            else:
-                resort['is_favorite'] = False  
-
-            resort['favorite_count'] = Favorite.objects.filter(resort_id=resort['id']).count()
-
-            # Compute total price dynamically
-            resort['total_price'] = float(resort['price_per_night']) + float(resort['entrance_kids']) + float(resort['entrance_adults'])
-
-        return JsonResponse({'resorts': resorts_data})
-
-    recommendations = get_recommendations(request.user.id) if request.user.is_authenticated else []
-    amenities = Amenity.objects.all()
-    locations = Location.objects.all()
-
-    context = {
-        'amenities': amenities,
-        'selected_amenities': selected_amenities,
-        'locations': locations,
-        'selected_location': selected_location,
-        'resorts': resorts,
-        'recommendations': recommendations,
-    }
-
-    return render(request, 'app/home.html', context)
 #end resorts
 
 #edit resort

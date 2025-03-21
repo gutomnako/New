@@ -1,5 +1,5 @@
 <aside class="sidebar">
-    <form id="filter-form" action="{% url 'filter_beaches' %}" method="GET">
+    <form id="filter-form" action="{% url 'home' %}" method="GET">
         
         {% csrf_token %}
 
@@ -98,7 +98,7 @@
                     </a>
     
                     <h5>${resort.name}</h5>
-                    <p>${resort.description}</p>
+                    <p>Price: <strong>₱{{ resort.total_price|floatformat:2 }}</strong></p>
                     <button type="button">
                         <a href="/resort/${resort.id}/">See More Details</a>
                     </button>

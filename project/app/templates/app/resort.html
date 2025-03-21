@@ -24,11 +24,15 @@
                 <h1>Welcome to {{ resort.name }}</h1>
                 
                 <!-- Mini Description (Editable) -->
-                <p id="hero-subtitle">{{ resort.mini_description }}</p>
-                <textarea name="mini_description" id="edit-hero-subtitle-input" style="display: none;">{{ resort.mini_description }}</textarea>
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <p id="hero-subtitle" style="margin: 0; text-align: center; flex-grow: 1;">{{ resort.mini_description }}</p>
+                    <button type="button" id="edit-hero-btn">Edit description</button>
+                </div>
                 
-                <button type="button" id="edit-hero-btn">Edit description</button>
+                <textarea name="mini_description" id="edit-hero-subtitle-input" style="display: none;">{{ resort.mini_description }}</textarea>
                 <button type="submit" id="save-hero-btn" style="display: none;">Save</button>
+                
+                
     
                 <!-- Upload Hero Image -->
                 <label for="uploadHeroImageHero" class="custom-file-upload">Upload Image</label>

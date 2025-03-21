@@ -20,7 +20,7 @@ urlpatterns = [
 
     path('create-resort/', views.createResort, name='create-resort'),
     path('update-resort/<str:pk>/', views.updateResort, name='update-resort'),
-    path('filter-beaches/', views.filter_beaches, name='filter_beaches'),
+    #path('filter-beaches/', views.filter_beaches, name='filter_beaches'),
     path('delete-resort/<str:pk>/', views.deleteResort, name='delete-resort'),
     path('delete-message/<str:pk>/', views.deleteMessage, name='delete-message'),
     path('contact-number/', views.contact_number, name='contact-number'),
