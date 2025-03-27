@@ -23,12 +23,6 @@
                         
 
                         <h4>{{ resort.name }}</h4>
-                        <p>
-                            {{ resort.description|truncatechars:100 }} 
-                            {% if resort.description|length > 100 %}
-                                <a href="{% url 'resort' resort.id %}">See more</a>
-                            {% endif %}
-                        </p>
                         <p>Price: <strong>₱{{ resort.total_price|floatformat:2 }}</strong></p>
                         <button type="button">
                             <a href="{% url 'resort' resort.id %}">Details</a>

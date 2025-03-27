@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.db.models import Q, Count
+from django.db.models import Q, Count, F, Sum, OuterRef, Subquery, Avg
 from django.contrib.auth.decorators import login_required
 from .models import Resort, Amenity, Location, Message, User, Favorite, Rating
 from django.contrib.auth import authenticate, login, logout
@@ -12,7 +12,6 @@ from django.utils.timezone import now, timedelta
 from .models import LoginActivity, LoginHistory, Visit
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
-from django.db.models import Avg
 from django.http import JsonResponse
 import json
 from .recommendations import get_recommendations
@@ -21,8 +20,8 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.core.serializers import serialize
 from decimal import Decimal, InvalidOperation
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models import OuterRef, Subquery
-from django.db.models import F, Sum
+
+
 
 #dashboard
 #login
@@ -280,10 +279,6 @@ def toggle_favorite(request):
         })
     
     return JsonResponse({'status': 'failed'}, status=400)
-
-
-from django.db.models import F, Avg, Count
-from django.http import JsonResponse
 
 def home(request):
     q = request.GET.get('q', '')  
