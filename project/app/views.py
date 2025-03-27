@@ -289,7 +289,7 @@ def home(request):
     min_price = request.GET.get('min_price') 
     max_price = request.GET.get('max_price')  
 
-    resorts = Resort.objects.all()
+    resorts = Resort.objects.all().order_by('-created_at')  # Order resorts by creation date
 
     # Apply filters
     if selected_amenities:
@@ -318,10 +318,8 @@ def home(request):
     # Annotate resorts with favorite count
     resorts = resorts.annotate(favorite_count=Count('favorite_resorts', distinct=True))
 
-    # Apply ranking
-    ranked_resorts = get_ranked_resorts().filter(id__in=resorts.values_list('id', flat=True)).annotate(
-        average_rating=Avg('rating__rating')
-    ).order_by('-average_rating')  
+    # Apply ranking for rated resorts (by average rating)
+    rated_resorts = Resort.objects.annotate(average_rating=Avg('rating__rating')).order_by('-average_rating')  
 
     user = request.user
     recommendations = []
@@ -345,7 +343,7 @@ def home(request):
                 resort.is_favorite = Favorite.objects.filter(user=user, resort=resort).exists()
 
     # Add `is_favorite` to all resorts
-    for resort in ranked_resorts:  
+    for resort in rated_resorts:  
         resort.is_favorite = user.is_authenticated and Favorite.objects.filter(user=user, resort=resort).exists()
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -373,10 +371,10 @@ def home(request):
 
     amenities = Amenity.objects.all()
     locations = Location.objects.all()
-    resort_count = ranked_resorts.count()  
+    resort_count = rated_resorts.count()  # Get the count of rated resorts  
 
     context = {
-        'resorts': ranked_resorts,  
+        'resorts': resorts,  # Resorts ordered by creation date
         'recommendations': recommendations,
         'amenities': amenities,
         'resort_count': resort_count,
@@ -385,10 +383,11 @@ def home(request):
         'selected_location': selected_location,
         'min_price': min_price,
         'max_price': max_price,
-        "rated_resorts": Resort.objects.annotate(average_rating=Avg('rating__rating')).order_by('-average_rating'),
+        "rated_resorts": rated_resorts,  # Resorts ordered by average rating
     }
 
     return render(request, 'app/home.html', context)
+
 
 
 def update_resort(request, resort_id):
