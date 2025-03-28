@@ -402,3 +402,28 @@ button a {
 .star-rating .empty {
   color: #CCCCCC; /* Gray for empty stars */
 }
+
+/* Hide extra resorts (e.g., show only first 6 by default) */
+.resort-card {
+  display: none;
+}
+
+.resort-card:nth-child(-n+6) { /* Show only first 6 resorts */
+  display: block;
+}
+
+.all-resorts-cards {
+  display: flex;
+  flex-wrap: wrap; /* Allows wrapping into new rows */
+  justify-content: center; /* Centers the resorts */
+  gap: 20px; /* Space between resorts */
+}
+
+.resort-card {
+  width: 260px; /* Keep card width consistent */
+}
+
+.resort-card {
+  transition: opacity 0.3s ease-in-out;
+}
+

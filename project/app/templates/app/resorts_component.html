@@ -44,12 +44,12 @@
     <div class="all-resorts-section">
         <h2>All Resorts</h2>
         <div class="card-slider-container all-resorts-slider">
-        
+            
             <button class="arrow-btn left">&#10094;</button>
     
             <div class="card-slider all-resorts-cards">
                 {% for resort in resorts %}
-                    <div class="card">
+                    <div class="card resort-card" {% if forloop.counter > 4 %}style="display: none; opacity: 0;"{% endif %}>
                         {% if resort.resort_image %}
                             <img src="{{ resort.resort_image.url }}" alt="">
                         {% endif %}
@@ -70,6 +70,9 @@
             
             <button class="arrow-btn right">&#10095;</button>
         </div>
+    
+        <!-- "See More" Button -->
+        <button id="see-more-btn">See More</button>
     </div>
     
     <div id="most-rated-section" class="most-rated-section">
@@ -125,12 +128,17 @@
     const allResortsSlider = document.querySelector('.all-resorts-section .card-slider');
     const mostRatedSlider = document.querySelector('.most-rated-section .card-slider');
 
+    const seeMoreBtn = document.getElementById("see-more-btn");
+    const resorts = document.querySelectorAll(".resort-card");
+    let expanded = false; 
+
     const visibleCardsCount = 2; 
     const cardWidth = 260;
     const cardGap = 16;
     const scrollAmount = (cardWidth + cardGap) * visibleCardsCount;
 
     function scrollLeft(slider) {
+        if (expanded) return; // Disable when See More is clicked
         slider.style.transition = 'transform 0.5s ease';
         slider.style.transform = `translateX(${scrollAmount}px)`;
 
@@ -150,6 +158,7 @@
     }
 
     function scrollRight(slider) {
+        if (expanded) return; // Disable when See More is clicked
         slider.style.transition = 'transform 0.5s ease';
         slider.style.transform = `translateX(-${scrollAmount}px)`;
 
@@ -182,6 +191,49 @@
         rightArrowMostRated.addEventListener('click', () => scrollRight(mostRatedSlider));
         leftArrowMostRated.addEventListener('click', () => scrollLeft(mostRatedSlider));
     }
+
+    // See More / See Less Button Functionality
+    seeMoreBtn.addEventListener("click", function() {
+        if (!expanded) {
+            // Show all hidden resorts
+            resorts.forEach((resort, index) => {
+                if (index >= 4) {
+                    resort.style.display = "block";
+                    setTimeout(() => {
+                        resort.style.opacity = "1"; 
+                    }, 100);
+                }
+            });
+
+            // Disable Arrow Buttons
+            leftArrowAllResorts.style.pointerEvents = "none";
+            rightArrowAllResorts.style.pointerEvents = "none";
+            leftArrowAllResorts.style.opacity = "0.5";
+            rightArrowAllResorts.style.opacity = "0.5";
+
+            seeMoreBtn.innerText = "See Less";
+            expanded = true;
+        } else {
+            // Hide all except the first 4
+            resorts.forEach((resort, index) => {
+                if (index >= 4) {
+                    resort.style.opacity = "0"; 
+                    setTimeout(() => {
+                        resort.style.display = "none";
+                    }, 300);
+                }
+            });
+
+            // Enable Arrow Buttons
+            leftArrowAllResorts.style.pointerEvents = "auto";
+            rightArrowAllResorts.style.pointerEvents = "auto";
+            leftArrowAllResorts.style.opacity = "1";
+            rightArrowAllResorts.style.opacity = "1";
+
+            seeMoreBtn.innerText = "See More";
+            expanded = false;
+        }
+    });
 
     // Favorite button functionality
     document.querySelectorAll('.favorite-btn').forEach(button => {
@@ -239,5 +291,37 @@
         container.innerHTML = stars;
     });
 });
+document.addEventListener("DOMContentLoaded", function() {
+    let seeMoreBtn = document.getElementById("see-more-btn");
+    let resorts = document.querySelectorAll(".resort-card");
+    let expanded = false;
 
+    seeMoreBtn.addEventListener("click", function() {
+        if (!expanded) {
+            // Show all hidden resorts with fade-in effect
+            resorts.forEach((resort, index) => {
+                if (index >= 4) {
+                    resort.style.display = "block";
+                    setTimeout(() => {
+                        resort.style.opacity = "1"; 
+                    }, 100);
+                }
+            });
+            seeMoreBtn.innerText = "See Less";
+            expanded = true;
+        } else {
+            // Hide all except the first 4
+            resorts.forEach((resort, index) => {
+                if (index >= 4) {
+                    resort.style.opacity = "0"; 
+                    setTimeout(() => {
+                        resort.style.display = "none";
+                    }, 300);
+                }
+            });
+            seeMoreBtn.innerText = "See More";
+            expanded = false;
+        }
+    });
+});
 </script>
