@@ -322,12 +322,14 @@ def home(request):
             Favorite.objects.filter(user=request.user, resort=OuterRef('pk'))
         ) if request.user.is_authenticated else Value(False)
     )
+    resorts = get_ranked_resorts(resorts)
 
     # Apply ranking for rated resorts (by average rating)
     rated_resorts = Resort.objects.annotate(
         average_rating=Avg('rating__rating'),
         favorite_count=Count('favorite_resorts', distinct=True)  # Add favorite count
     ).order_by('-average_rating')  
+
 
     user = request.user
     recommendations = []
@@ -359,7 +361,7 @@ def home(request):
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         resorts_data = list(resorts.values(
-            'id', 'name', 'description', 'entrance_kids', 'entrance_adults', 'price_per_night', 'resort_image'
+            'id', 'name', 'description', 'entrance_kids', 'entrance_adults', 'price_per_night', 'resort_image', 'score'
         ))
 
         for resort in resorts_data:
@@ -395,30 +397,10 @@ def home(request):
         'min_price': min_price,
         'max_price': max_price,
         "rated_resorts": rated_resorts,  # Resorts ordered by average rating
+        "show_scores": True
     }
 
     return render(request, 'app/home.html', context)
-
-    amenities = Amenity.objects.all()
-    locations = Location.objects.all()
-    resort_count = rated_resorts.count()  # Get the count of rated resorts  
-
-    context = {
-        'resorts': resorts,  # Resorts ordered by creation date
-        'recommendations': recommendations,
-        'amenities': amenities,
-        'resort_count': resort_count,
-        'locations': locations,
-        'selected_amenities': selected_amenities,
-        'selected_location': selected_location,
-        'min_price': min_price,
-        'max_price': max_price,
-        "rated_resorts": rated_resorts,  # Resorts ordered by average rating
-    }
-
-    return render(request, 'app/home.html', context)
-
-
 
 def update_resort(request, resort_id):
     resort = get_object_or_404(Resort, id=resort_id)

@@ -1,9 +1,9 @@
 from django.db.models import Count, Min, Max, F, FloatField, ExpressionWrapper, Value
 from app.models import Resort
 
-def get_ranked_resorts():
+def get_ranked_resorts(resorts):
     # First, annotate each resort with the count of favorites and amenities
-    resorts = Resort.objects.annotate(
+    resorts = resorts.annotate(
         favorite_count=Count('favorites', distinct=True),
         amenity_count=Count('amenities', distinct=True)
     )
@@ -28,7 +28,7 @@ def get_ranked_resorts():
         'amenities': 0.1
     }
 
-    # Prevent division by zero by ensuring min != max
+    # Prevent division by zero
     def safe_normalization(field, min_val, max_val):
         return ExpressionWrapper(
             (F(field) - Value(min_val)) / (Value(max_val) - Value(min_val)) if min_val != max_val else Value(0),
@@ -52,5 +52,6 @@ def get_ranked_resorts():
     ).order_by('-score')
 
     return resorts
+
 
 

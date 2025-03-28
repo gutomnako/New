@@ -89,28 +89,31 @@ document.addEventListener('DOMContentLoaded', function () {
     resortsContainer.innerHTML = ''; // Clear existing resorts
 
     resorts.forEach(resort => {
-        const card = document.createElement('div');
-        card.classList.add('card');
+    const card = document.createElement('div');
+    card.classList.add('card');
 
-        card.innerHTML = `
-            ${resort.resort_image ? `<img src="${resort.resort_image}" alt="">` : ''}
+    card.innerHTML = `
+        ${resort.resort_image ? `<img src="${resort.resort_image}" alt="">` : ''}
 
-            <a class="favorite-btn" data-resort-id="${resort.id}">
-                <i class="fa fa-heart ${resort.is_favorite ? 'active' : ''}" aria-hidden="true"></i>
-            </a>
+        <a class="favorite-btn" data-resort-id="${resort.id}">
+            <i class="fa fa-heart ${resort.is_favorite ? 'active' : ''}" aria-hidden="true"></i>
+        </a>
 
-            <h4>${resort.name}</h4>
-            <p>Price: <strong>₱${resort.total_price.toFixed(2)}</strong></p>
-            <button type="button">
-                <a href="/resort/${resort.id}/">Details</a>
-            </button>
-            <p class="favorite-count">Favorites: ${resort.favorite_count}</p>
-        `;
+        <h4>${resort.name}</h4>
+        <p>Price: <strong>₱${resort.total_price.toFixed(2)}</strong></p>
+        <button type="button">
+            <a href="/resort/${resort.id}/">Details</a>
+        </button>
+        <p class="favorite-count">Favorites: ${resort.favorite_count}</p>
 
-        resortsContainer.appendChild(card);
-    });
+        ${resort.score ? `<p>Score: ${resort.score.toFixed(2)}</p>` : ''} 
+    `;
 
-    attachFavoriteListeners(); // Re-attach event listeners for heart icons
+    resortsContainer.appendChild(card);
+});
+
+attachFavoriteListeners(); // Re-attach event listeners for heart icons
+
 }
 
 function attachFavoriteListeners() {
