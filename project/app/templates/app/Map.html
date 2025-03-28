@@ -1,56 +1,40 @@
 {% extends 'main.html' %}
 
+{% load static %}
+
 {% block content %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Santa Magdalena Street View</title>
-    
-    <!-- Include Leaflet.js & Mapillary -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    
-    <script src="https://unpkg.com/mapillary-js@4/dist/mapillary.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/mapillary-js@4/dist/mapillary.min.css" />
-
-    <style>
-        #map { height: 400px; }
-        #mly { height: 400px; }
-    </style>
+    <title>Beach Map</title>
+    <link rel="stylesheet" href="{% static 'styles/map.css' %}">
+    <script src="{% static 'scripts/map.js' %}"></script>
 </head>
 <body>
-
-    <h2>Santa Magdalena, Sorsogon - Interactive Map & Street View</h2>
-    
-    <!-- Map Div -->
-    <div id="map"></div>
-    
-    <!-- Mapillary Street View -->
-    <div id="mly"></div>
-
-    <script>
-        // Set map view to Santa Magdalena, Sorsogon
-        var map = L.map('map').setView([12.6014, 124.1522], 16);
-
-        // Add OpenStreetMap Layer
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
-
-        // Add a marker
-        var marker = L.marker([12.6014, 124.1522]).addTo(map)
-            .bindPopup("Click here for Street View")
-            .openPopup();
-
-        // On marker click, open Mapillary street view
-        marker.on("click", function() {
-            var viewer = new Mapillary.Viewer(
-                "mly",  // The div ID where Mapillary will load
-                "YOUR_MAPILLARY_CLIENT_ID",  // Replace with your Mapillary API Key
-                "IMAGE_ID_FOR_SANTA_MAGDALENA" // Replace with a Mapillary image ID from this area
-            );
-        });
-    </script>
-
+    <div class="box">
+        <div class="sidebar">
+            <h2>BEACHES</h2>
+            <ul id="beachList">
+                <li onclick="loadMap('FMB Beach Resort')">FMB Beach Resort</li>
+                <li onclick="loadMap('Talaonga Beach')">Talaonga Beach</li>
+                <li onclick="loadMap('Rawis Beach')">Rawis Beach</li>
+                <li onclick="loadMap('Rizal Beach')">Rizal Beach</li>
+                <li onclick="loadMap('Balading Beach Resort')">Balading Beach Resort</li>
+                <li onclick="loadMap('Odella Beach Resor')">Odella Beach Resor</li>
+                <li onclick="loadMap('Pamana Beach Resort')">Pamana Beach Resort</li>
+                <li onclick="loadMap('Judith Rose Beach Resort')">Judith Rose Beach Resort</li>
+                <li onclick="loadMap('Frilles Beach Resort')">Frilles Beach Resort</li>
+                <li onclick="loadMap('Lindas Beach Resort')">Linda's Beach Resort</li>
+                <li onclick="loadMap('Suki Beach Resort')">Suki Beach Resort</li>
+                <li onclick="loadMap('Fravel Beach Resortt')">Fravel Beach Resort</li>
+                <li onclick="loadMap('Marahay Beach Resort')">Marahay Beach Resort</li>
+            </ul>
+        </div>
+        <div class="map-container">
+            <h2>MAP LOCATION</h2>
+            <iframe id="mapFrame" src="" frameborder="0" allowfullscreen></iframe>
+        </div>
+    </div>
 </body>
-{% endblock content %}
+</html>
+{% endblock %}

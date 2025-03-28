@@ -3,29 +3,38 @@
 {% load static %}
 
 {% block content %}
-<!DOCTYPE html>
-<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Beaches & Resorts</title>
   <link rel="stylesheet" href="{% static 'styles/beach.css' %}">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </head>
-<body>
   <header class="header">
     <div class="logo">
       <h1>BEACHES & RESORT</h1>
     </div>
-    <nav class="nav">
-      <a href="{% url 'index-view' %}">Home</a>
-      <a href="{% url 'map' %}">Map</a>
-      <a href="#">Contact</a>
-    </nav>
-    <div class="search-bar">
-      <form method="GET" action="{% url 'home' %}">
-        <input type="text" name="q" placeholder="Search Resort...">
-      </form>
-    </div>
+      <nav class="nav">
+        <a href="{% url 'index-view' %}">Home</a>
+        <a href="{% url 'map' %}">Map</a>
+        <a href="#">Contact</a>
+      </nav>
+      <div class="dropdown">
+        {% if request.user.is_authenticated %}
+          <!-- Hamburger Button -->
+          <button class="hamburger-btn" id="hamburgerBtn">
+            <i class="bi bi-list"></i> <!-- Bootstrap Icon (Can be replaced by custom icon) -->
+          </button>
+      
+          <!-- Dropdown Menu -->
+          <ul class="dropdown-menu" id="dropdownMenu">
+              <li><a class="dropdown-item" href="{% url 'user-profile' request.user.pk %}">Settings</a></li>
+              <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+          </ul>
+        {% else %}
+          <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
+        {% endif %}
+      </div>
   </header>
     <div class="container">
       <div class="container">
@@ -34,7 +43,19 @@
         {% include 'app/resorts_component.html' %}
     </div>
 
-</body>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+  const hamburgerBtn = document.getElementById('hamburgerBtn');
+  const dropdownMenu = document.getElementById('dropdownMenu');
+
+  if (hamburgerBtn && dropdownMenu) {
+    hamburgerBtn.addEventListener('click', function() {
+      // Toggle the 'open' class on the dropdown element
+      dropdownMenu.parentElement.classList.toggle('open');
+    });
+  }
+});
+</script>
 </html>
 
 {% endblock content %}

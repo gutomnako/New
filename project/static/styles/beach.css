@@ -12,35 +12,36 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1em 2em;
-  background-color: #089cff;;
+  padding: 0.3em 1.5em; /* Further reduced padding */
+  background-color: #089cff;
   color: black;
   font-family: "Quicksand", serif;
-  position: fixed;  /* Keeps the navbar fixed at the top */
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1000;  /* Makes sure it stays above other content */
-  width: 100%;  /* Ensures it takes the full width of the screen */
-  box-sizing: border-box;  /* Prevents padding from causing layout issues */
+  z-index: 1000;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .header .logo h1 {
-  font-size: 1.8em;
+  font-size: 1.3em;  /* Reduced font size further */
   margin: 0;
 }
 
 .nav {
   display: flex;
-  gap: 1.5em;
+  gap: 1em;  /* Reduced gap between links */
 }
 
 .nav a {
   color: #ffffff;
   text-decoration: none;
   font-weight: bold;
-  padding: 0.5em 0.8em;
-  border-radius: 5px;
+  padding: 0.3em 0.5em; /* Reduced padding for links */
+  border-radius: 4px;  /* Slightly smaller border-radius */
+  font-size: 0.9em;  /* Reduced font size for links */
   transition: background-color 0.3s ease;
 }
 
@@ -48,34 +49,48 @@ body {
   background-color: #0066cc;
 }
 
-/* Search Bar */
-.search-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.5em;
-  padding-left: 20px; /* Ensures the search bar is not too close to the edge */
+/* Basic styling */
+.dropdown {
+  position: relative;
 }
 
-.search-bar input[type="text"] {
-  padding: 0.5em;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  width: 200px;
-  width: 250px; /* Increased width to make it more comfortable */
-}
-
-.search-bar button {
-  background-color: #ffccaa;
-  color: #004080;
+.hamburger-btn {
+  background: none;
   border: none;
-  padding: 0.5em 1em;
   cursor: pointer;
-  border-radius: 5px;
-  margin-left: 10px; /* Adds a little space between the input and the button */
+  font-size: 30px; /* You can adjust size */
 }
 
-.search-bar button:hover {
-  background-color: #ffa070;
+.dropdown-menu {
+  position: absolute;
+  top: 100%; /* Position it right below the button */
+  right: 0;
+  background-color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: none; /* Hidden by default */
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-radius: 5px;
+  width: 150px; /* Adjust width as necessary */
+}
+
+.dropdown-menu li {
+  padding: 10px;
+}
+
+.dropdown-menu li a {
+  text-decoration: none;
+  color: black;
+}
+
+.dropdown-menu li a:hover {
+  background-color: #f1f1f1;
+}
+
+/* When the dropdown is open, show the menu */
+.dropdown.open .dropdown-menu {
+  display: block;
 }
 
 /* Layout */
@@ -426,4 +441,5 @@ button a {
 .resort-card {
   transition: opacity 0.3s ease-in-out;
 }
+
 

@@ -281,7 +281,13 @@ def toggle_favorite(request):
     return JsonResponse({'status': 'failed'}, status=400)
 
 def home(request):
-    q = request.GET.get('q', '')  
+    q = request.GET.get('q','')
+
+    resort = Resort.objects.filter(
+        Q(name__icontains=q) |
+        Q(description__icontains=q) |
+        Q(amenities__name__icontains=q)
+    ).distinct() 
 
     # Get filter parameters
     selected_amenities = request.GET.getlist('amenities')  
