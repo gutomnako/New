@@ -99,10 +99,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 <i class="fa fa-heart ${resort.is_favorite ? 'active' : ''}" aria-hidden="true"></i>
             </a>
 
-            <h5>${resort.name}</h5>
+            <h4>${resort.name}</h4>
             <p>Price: <strong>₱${resort.total_price.toFixed(2)}</strong></p>
             <button type="button">
-                <a href="/resort/${resort.id}/">See More Details</a>
+                <a href="/resort/${resort.id}/">Details</a>
             </button>
             <p class="favorite-count">Favorites: ${resort.favorite_count}</p>
         `;

@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.db.models import Q, Count, F, Sum, OuterRef, Subquery, Avg
+from django.db.models import Q, Count, F, Sum, OuterRef, Subquery, Avg, Exists, Value
 from django.contrib.auth.decorators import login_required
 from .models import Resort, Amenity, Location, Message, User, Favorite, Rating
 from django.contrib.auth import authenticate, login, logout
@@ -316,10 +316,18 @@ def home(request):
             resorts = resorts.filter(total_price__lte=max_price)
 
     # Annotate resorts with favorite count
-    resorts = resorts.annotate(favorite_count=Count('favorite_resorts', distinct=True))
+    resorts = resorts.annotate(
+        favorite_count=Count('favorite_resorts', distinct=True),
+        is_favorite=Exists(
+            Favorite.objects.filter(user=request.user, resort=OuterRef('pk'))
+        ) if request.user.is_authenticated else Value(False)
+    )
 
     # Apply ranking for rated resorts (by average rating)
-    rated_resorts = Resort.objects.annotate(average_rating=Avg('rating__rating')).order_by('-average_rating')  
+    rated_resorts = Resort.objects.annotate(
+        average_rating=Avg('rating__rating'),
+        favorite_count=Count('favorite_resorts', distinct=True)  # Add favorite count
+    ).order_by('-average_rating')  
 
     user = request.user
     recommendations = []
@@ -328,21 +336,24 @@ def home(request):
     if user.is_authenticated:
         recommendations = get_recommendations(user.id, n_recommendations=5)
 
-        # Add `favorite_count` to each recommended resort
+        # Get recommended resort IDs
         recommendation_ids = [resort.id for resort in recommendations]
+
+        # Fetch resorts with favorite count and order by most favorited
         annotated_recommendations = (
             Resort.objects.filter(id__in=recommendation_ids)
             .annotate(favorite_count=Count('favorite_resorts', distinct=True))
+            .order_by('-favorite_count')  # Order by highest favorite count
         )
 
-        # Map favorite count back to recommendations
-        for resort in recommendations:
-            annotated_resort = next((ar for ar in annotated_recommendations if ar.id == resort.id), None)
-            if annotated_resort:
-                resort.favorite_count = annotated_resort.favorite_count
-                resort.is_favorite = Favorite.objects.filter(user=user, resort=resort).exists()
+        # Map favorite count and is_favorite back to recommendations
+        for resort in annotated_recommendations:
+            resort.is_favorite = Favorite.objects.filter(user=user, resort=resort).exists()
 
-    # Add `is_favorite` to all resorts
+        # Assign sorted recommendations back
+        recommendations = list(annotated_recommendations)
+
+    # Add `is_favorite` to all rated resorts
     for resort in rated_resorts:  
         resort.is_favorite = user.is_authenticated and Favorite.objects.filter(user=user, resort=resort).exists()
 
@@ -368,6 +379,25 @@ def home(request):
             'min_price': min_price,
             'max_price': max_price,
         })
+
+    amenities = Amenity.objects.all()
+    locations = Location.objects.all()
+    resort_count = rated_resorts.count()  # Get the count of rated resorts  
+
+    context = {
+        'resorts': resorts,  # Resorts ordered by creation date
+        'recommendations': recommendations,  # Ordered by favorite count
+        'amenities': amenities,
+        'resort_count': resort_count,
+        'locations': locations,
+        'selected_amenities': selected_amenities,
+        'selected_location': selected_location,
+        'min_price': min_price,
+        'max_price': max_price,
+        "rated_resorts": rated_resorts,  # Resorts ordered by average rating
+    }
+
+    return render(request, 'app/home.html', context)
 
     amenities = Amenity.objects.all()
     locations = Location.objects.all()
