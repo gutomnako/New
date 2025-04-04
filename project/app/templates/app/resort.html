@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FMB Resort</title>
     <link rel="stylesheet" href="{% static 'styles/resort.css'%}">
-    <script src="dresort.js"></script>
+    
 </head>
 <body>
     <header class="header">
@@ -18,7 +18,8 @@
     </header>
     <form action="{% url 'update_resort' resort.id %}" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
-        
+    
+        <!-- Hero Section -->
         <header class="hero" id="hero" style="background-image: url('{% if resort.hero_image %}{{ resort.hero_image.url }}{% else %}/static/images/fmb.jpg{% endif %}');">
             <div class="hero-content">
                 <h1>Welcome to {{ resort.name }}</h1>
@@ -30,58 +31,141 @@
                 </div>
                 
                 <textarea name="mini_description" id="edit-hero-subtitle-input" style="display: none;">{{ resort.mini_description }}</textarea>
-                <button type="submit" id="save-hero-btn" style="display: none;">Save</button>
-                
-                
+                <button type="submit" id="save-hero-btn" style="display: none;">Save Description</button>
     
                 <!-- Upload Hero Image -->
                 <label for="uploadHeroImageHero" class="custom-file-upload">Upload Image</label>
-                <button type="submit" class="save-image-btn">Save</button>
                 <input type="file" name="hero_image" id="uploadHeroImageHero" accept="image/*" hidden>
+                <button type="submit" class="save-image-btn">Save Hero Image</button>
             </div>
         </header>
     
+        <!-- Resort Description Section -->
         <section class="resort-description">
             <div class="description-container">
                 <div class="description-text">
                     <h2>About {{ resort.name }}</h2>
-                    
-                    <!-- Resort Description (Editable) -->
                     <p id="resort-description">{{ resort.description }}</p>
                     <textarea name="description" id="edit-description-input" style="display: none;">{{ resort.description }}</textarea>
-    
-                    <button type="button" id="edit-description-btn">Edit</button>
-                    <button type="submit" id="save-description-btn" style="display: none;">Save</button>
+                    <button type="button" id="edit-description-btn">Edit Description</button>
+                    <button type="submit" id="save-description-btn" style="display: none;">Save Description</button>
                 </div>
     
                 <!-- Resort Image Upload -->
                 <div class="description-image">
                     <img id="resort-image" src="{{ resort.resort_image.url|default:'/static/images/fmb.jpg' }}" alt="Resort Image">
-                    <label for="uploadHeroImageResort" class="custom-file-upload">Upload Image</label>
-                    <button type="submit" class="save-image-btn">Save</button>
-                    <input type="file" name="resort_image" id="uploadHeroImageResort" accept="image/*">
+                    <label for="uploadResortImage" class="custom-file-upload">Upload Image</label>
+                    <input type="file" name="resort_image" id="uploadResortImage" accept="image/*">
+                    <button type="submit" id="save-resort-image-btn" class="save-image-btn">Save Resort Image</button>
                 </div>
             </div>
         </section>
     
+        <!-- Rooms Section -->
+        <div class="rooms-container">
+            <section class="room-description">
+                <div class="description-container">
+                    <div class="description-text">
+                        <h2>Rooms</h2>
+                        <p id="room-description">{{ resort.room_description }}</p>
+                        <textarea name="room_description" id="edit-room-description-input" style="display: none;">{{ resort.room_description }}</textarea>
+                        <button type="button" id="edit-room-description-btn">Edit Room Description</button>
+                        <button type="submit" id="save-room-description-btn" style="display: none;">Save Room Description</button>
+                    </div>
+                    <div class="slider-container">
+                        <button class="prev" type="button" onclick="changeSlide(-1)">&#10094;</button>
+                        <img id="sliderImage" 
+                            src="{% if resort.roomimage %}{{ resort.roomimage.url }}{% else %}/static/images/fmb.jpg{% endif %}" 
+                            alt="Room Image">
+                        <button class="next" type="button" onclick="changeSlide(1)">&#10095;</button>
+                        <label for="uploadRoomImage" class="custom-file-upload">Upload Image</label>
+                        <input type="file" name="roomimage" id="uploadRoomImage" accept="image/*">
+                        <button type="submit" id="save-room-image-btn" class="save-image-btn">Save Room Image</button>
+                    </div>
+                </div>
+            </section>
+        </div>        
+    
+        <!-- Beach Section -->
+        <div class="beach-container">
+            <section class="beach-description">
+                <div class="description-container">
+                    <div class="slider-container">
+                        <button class="prev" type="button" onclick="changeBeachSlide(-1)">&#10094;</button>
+                        <img id="sliderImage" 
+                            src="{% if resort.beachimage %}{{ resort.beachimage.url }}{% else %}/static/images/fmb.jpg{% endif %}" 
+                            alt="Beach Image">
+                        <button class="next" type="button" onclick="changeBeachSlide(1)">&#10095;</button>
+    
+                        <!-- File upload form -->
+                        <label for="uploadBeachImage" class="custom-file-upload">Upload Image</label>
+                        <input type="file" name="beachimage" id="uploadBeachImage" accept="image/*">
+                        <button type="submit" id="save-beach-image-btn" class="save-image-btn">Save Beach Image</button>
+                    </div>
+    
+                    <div class="description-text">
+                        <h2>Beach</h2>
+                        <p id="beach-description">{{ resort.beach_description }}</p>
+                        <textarea name="beach_description" id="edit-beach-description-input" style="display: none;">{{ resort.beach_description }}</textarea>
+                        <button type="button" id="edit-beach-description-btn">Edit Beach Description</button>
+                        <button type="submit" id="save-beach-description-btn" style="display: none;">Save Beach Description</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    
+        <!-- Activities Section -->
+        <div class="activities-container">
+            <section class="activities-description">
+                <div class="description-container">
+                    <div class="description-text">
+                        <h2>Activities</h2>
+                        <p id="activity-description">{{ resort.activity_description }}</p>
+                        <textarea name="activity_description" id="edit-activity-description-input" style="display: none;">{{ resort.activity_description }}</textarea>
+                        <button type="button" id="edit-activity-description-btn">Edit Activity Description</button>
+                        <button type="submit" id="save-activity-description-btn" style="display: none;">Save Activity Description</button>
+                    </div>
+                    <div class="slider-container">
+                        <button class="prev" type="button" onclick="changeActivity(-1)">&#10094;</button>
+                        <img id="activity-sliderImage" 
+                            src="{% if resort.activities_image %}{{ resort.activities_image.url }}{% else %}/static/images/fmb.jpg{% endif %}" 
+                            alt="Activity Image">
+                        <button class="next" type="button" onclick="changeActivity(1)">&#10095;</button>
+    
+                        <!-- Image Upload Form -->
+                        <label for="uploadActivityImage" class="custom-file-upload">Upload Image</label>
+                        <input type="file" name="activities_image" id="uploadActivityImage" accept="image/*">
+                        <button type="submit" id="save-activity-image-btn" class="save-image-btn">Save Activity Image</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    
+        <!-- Pricing & Amenities Section -->
         <section class="pricing-amenities">
             <h2>Resort Information</h2>
             <div class="info-container">
+                <!-- Amenities Section -->
                 <div class="info-box">
                     <h3>Our Amenities</h3>
+                    
+                    <!-- List of current amenities -->
                     <ul id="amenities-list">
                         {% for amenity in resort.amenities.all %}
-                            <li>{{ amenity.name }}</li>  <!-- Display as text -->
+                            <li>{{ amenity.name }}</li> <!-- Display amenities -->
                         {% endfor %}
                     </ul>
-                
+            
                     <!-- Input for new amenity -->
                     <input type="text" id="new-amenity-input" placeholder="Enter a new amenity">
                     <button type="button" id="add-amenity-btn">Add Amenity</button>
-                
-                    <!-- Hidden field to store new amenities before submission -->
-                    <input type="hidden" name="new_amenities" id="new-amenities-hidden">
-                </div>                
+            
+                    <!-- Hidden field to store new amenity before submission -->
+                    <input type="hidden" name="new_amenity" id="new-amenity-hidden" value="{{ new_amenity }}">
+                    
+                    <!-- Submit button for the form -->
+                    <button type="submit" style="display: none;"></button>  <!-- Hidden button to trigger form submit after adding amenity -->
+                </div>
     
                 <div class="info-box">
                     <h3>Room Rates & Fees</h3>
@@ -93,7 +177,7 @@
                         <p><strong>Cottage Rates:</strong> <span id="cottage-rate-text">{{ resort.cottage }}</span></p>
                         <p><strong>Overnight Fee:</strong> <span id="overnight-fee-text">{{ resort.price }}</span> per night</p>
     
-                        <button type="button" id="edit-btn">Edit</button>
+                        <button type="button" id="edit-btn">Edit Rates</button>
                     </div>
     
                     <div id="edit-mode" style="display: none;">
@@ -112,12 +196,12 @@
                         <label>Overnight Fee:</label>
                         <input type="text" name="price" id="overnight-fee-input" value="{{ resort.price }}">
     
-                        <button type="submit" id="save-btn">Save</button>
+                        <button type="submit" id="save-btn">Save Rates</button>
                     </div>
                 </div>
             </div>
         </section>
-    </form>
+    </form>    
     
     <div class="comment-wrapper">
         <h3>Comments</h3>
@@ -156,24 +240,20 @@
     </div>
     {% endif %}
     
-   <!--</form>-->
-   
     <script>
-document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("DOMContentLoaded", function () {
     let editBtn = document.getElementById("edit-btn");
     let saveBtn = document.getElementById("save-btn");
-    let cancelBtn = document.getElementById("cancel-btn");
-
+ 
     let displayMode = document.getElementById("display-mode");
     let editMode = document.getElementById("edit-mode");
 
-    // Click "Edit" → Show Input Fields
+    // Edit and Save Room Rates
     editBtn.addEventListener("click", function () {
         displayMode.style.display = "none";
         editMode.style.display = "block";
     });
 
-    // Click "Save" → Update Text & Hide Inputs
     saveBtn.addEventListener("click", function () {
         document.getElementById("room-rate-text").innerText = document.getElementById("room-rate-input").value;
         document.getElementById("kids-fee-text").innerText = document.getElementById("kids-fee-input").value;
@@ -184,200 +264,165 @@ document.addEventListener("DOMContentLoaded", function () {
         displayMode.style.display = "block";
         editMode.style.display = "none";
 
-        // Save data to Django
-        saveDataToDjango();
+        document.querySelector("form").submit();  // Submit the form after saving
     });
 
-    // Click "Cancel" → Restore Display Mode
-    cancelBtn.addEventListener("click", function () {
-        displayMode.style.display = "block";
-        editMode.style.display = "none";
+    // Function to edit and save description (general function for reuse)
+    function editAndSaveDescription(editBtnId, saveBtnId, descriptionId, inputId, fieldName) {
+    document.getElementById(editBtnId).addEventListener("click", function () {
+        let description = document.getElementById(descriptionId);
+        let inputField = document.getElementById(inputId);
+        let saveButton = document.getElementById(saveBtnId);
+
+        inputField.value = description.innerText; // Copy current text
+        description.style.display = "none"; // Hide text
+        inputField.style.display = "block"; // Show textarea
+        saveButton.style.display = "block"; // Show save button
+        this.style.display = "none"; // Hide edit button
     });
 
-    // Function to Send Data to Django
-    function saveDataToDjango() {
-        let data = {
-            price_per_night: document.getElementById("room-rate-input").value,
-            entrance_kids: document.getElementById("kids-fee-input").value,
-            entrance_adults: document.getElementById("adults-fee-input").value,
-            cottage: document.getElementById("cottage-rate-input").value,
-            price: document.getElementById("overnight-fee-input").value
-        };
+    document.getElementById(saveBtnId).addEventListener("click", function () {
+        let description = document.getElementById(descriptionId);
+        let inputField = document.getElementById(inputId);
+        let editButton = document.getElementById(editBtnId);
 
-        fetch(window.location.pathname, {  // Automatically get correct URL
+        let updatedText = inputField.value;
+
+        // Send only the updated description via AJAX
+        fetch(window.location.href, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": getCSRFToken(),
-                "X-Requested-With": "XMLHttpRequest",
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": getCSRFToken() // Get CSRF token if using Django
             },
-            body: JSON.stringify(data)
+            body: `${fieldName}=${encodeURIComponent(updatedText)}`
         })
         .then(response => response.json())
-        .then(data => console.log("Saved:", data))
+        .then(data => {
+            if (data.success) {
+                description.innerText = updatedText; // Update text in UI
+                description.style.display = "block"; // Show text
+                inputField.style.display = "none"; // Hide textarea
+                saveButton.style.display = "none"; // Hide save button
+                editButton.style.display = "block"; // Show edit button
+            } else {
+                alert("Failed to update. Please try again.");
+            }
+        })
         .catch(error => console.error("Error:", error));
-    }
-
-    // Function to Get CSRF Token
-    function getCSRFToken() {
-        return document.querySelector('[name=csrfmiddlewaretoken]').value;
-    }
-});
-
-// Adding a new amenity
-function addAmenity() {
-    const input = document.getElementById("amenity-input");
-    const amenityText = input.value.trim();
-
-    if (amenityText !== "") {
-        const list = document.getElementById("amenities-list");
-        const newAmenity = document.createElement("li");
-        newAmenity.textContent = amenityText;
-        list.appendChild(newAmenity);
-        input.value = ""; // Clear the input field
-    }
+    });
 }
 
-// Hero image upload
-document.getElementById("uploadHeroImageHero").addEventListener("change", function (event) {
-    let file = event.target.files[0];
-    if (file) {
-        let reader = new FileReader();
-        reader.onload = function (e) {
-            document.getElementById("hero").style.backgroundImage = `url(${e.target.result})`;
-        };
-        reader.readAsDataURL(file);
-    }
-});
+// Function to get CSRF token for Django
+function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+}
 
-// Resort image upload
-document.getElementById("uploadHeroImageResort").addEventListener("change", function (event) {
-    let file = event.target.files[0];
-    if (file) {
-        let reader = new FileReader();
-        reader.onload = function (e) {
-            document.getElementById("resort-image").src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-});
+// Apply to all description sections
+editAndSaveDescription("edit-description-btn", "save-description-btn", "resort-description", "edit-description-input", "description");
+editAndSaveDescription("edit-room-description-btn", "save-room-description-btn", "room-description", "edit-room-description-input", "room_description");
+editAndSaveDescription("edit-beach-description-btn", "save-beach-description-btn", "beach-description", "edit-beach-description-input", "beach_description");
+editAndSaveDescription("edit-activity-description-btn", "save-activity-description-btn", "activity-description", "edit-activity-description-input", "activity_description");
 
-// Edit and save description
-document.getElementById("edit-description-btn").addEventListener("click", function () {
-    let description = document.getElementById("resort-description");
-    let inputField = document.getElementById("edit-description-input");
-    let saveButton = document.getElementById("save-description-btn");
+    // Hero Section Edit
+    document.getElementById("edit-hero-btn").addEventListener("click", function () {
+        let heroSubtitle = document.getElementById("hero-subtitle");
+        let inputField = document.getElementById("edit-hero-subtitle-input");
+        let saveButton = document.getElementById("save-hero-btn");
 
-    inputField.value = description.innerText; // Copy current text
-    description.style.display = "none"; // Hide text
-    inputField.style.display = "block"; // Show textarea
-    saveButton.style.display = "block"; // Show save button
-    this.style.display = "none"; // Hide edit button
-});
+        inputField.value = heroSubtitle.innerText; // Copy current text
+        heroSubtitle.style.display = "none"; // Hide text
+        inputField.style.display = "block"; // Show textarea
+        saveButton.style.display = "block"; // Show save button
+        this.style.display = "none"; // Hide edit button
+    });
 
-document.getElementById("save-description-btn").addEventListener("click", function () {
-    let description = document.getElementById("resort-description");
-    let inputField = document.getElementById("edit-description-input");
-    let editButton = document.getElementById("edit-description-btn");
+    document.getElementById("save-hero-btn").addEventListener("click", function () {
+        let heroSubtitle = document.getElementById("hero-subtitle");
+        let inputField = document.getElementById("edit-hero-subtitle-input");
+        let editButton = document.getElementById("edit-hero-btn");
 
-    description.innerText = inputField.value; // Update text
-    description.style.display = "block"; // Show text
-    inputField.style.display = "none"; // Hide textarea
-    this.style.display = "none"; // Hide save button
-    editButton.style.display = "block"; // Show edit button
+        heroSubtitle.innerText = inputField.value; // Update text
+        heroSubtitle.style.display = "block"; // Show text
+        inputField.style.display = "none"; // Hide textarea
+        this.style.display = "none"; // Hide save button
+        editButton.style.display = "block"; // Show edit button
 
-    // Save to Django
-    fetch(window.location.pathname, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": getCSRFToken(),
-            "X-Requested-With": "XMLHttpRequest",
-        },
-        body: JSON.stringify({ description: inputField.value }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert("Description updated successfully!");
-        } else {
-            alert("Error: " + data.message);
-        }
-    })
-    .catch(error => console.error("Error:", error));
-});
+        // Ensure the form will be submitted with new data after saving
+        document.querySelector("form").submit();  // Submit the form here
+    });
 
-// Edit and save hero section
-document.getElementById("edit-hero-btn").addEventListener("click", function () {
-    let subtitle = document.getElementById("hero-subtitle");
-    let subtitleInput = document.getElementById("edit-hero-subtitle-input");
-    let saveButton = document.getElementById("save-hero-btn");
-
-    subtitleInput.value = subtitle.innerText;
-    subtitle.style.display = "none";
-    subtitleInput.style.display = "block";
-    saveButton.style.display = "block";
-    this.style.display = "none"; // Hide edit button
-});
-
-document.getElementById("save-hero-btn").addEventListener("click", function () {
-    let subtitle = document.getElementById("hero-subtitle");
-    let subtitleInput = document.getElementById("edit-hero-subtitle-input");
-    let editButton = document.getElementById("edit-hero-btn");
-
-    subtitle.innerText = subtitleInput.value;
-    subtitle.style.display = "block";
-    subtitleInput.style.display = "none";
-    this.style.display = "none"; // Hide save button
-    editButton.style.display = "block"; // Show edit button
-
-    // Save hero subtitle to Django
-    fetch(window.location.pathname, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": getCSRFToken(),
-            "X-Requested-With": "XMLHttpRequest",
-        },
-        body: JSON.stringify({ mini_description: subtitleInput.value }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert("Hero section updated successfully!");
-        } else {
-            alert("Error: " + data.message);
-        }
-    })
-    .catch(error => console.error("Error:", error));
-});
-document.addEventListener("DOMContentLoaded", function () {
-    const addAmenityBtn = document.getElementById("add-amenity-btn");
-    const newAmenityInput = document.getElementById("new-amenity-input");
-    const amenitiesList = document.getElementById("amenities-list");
-    const newAmenitiesHidden = document.getElementById("new-amenities-hidden");
-
-    let newAmenities = []; // Store new amenities before submitting
-
-    addAmenityBtn.addEventListener("click", function () {
-        const amenityName = newAmenityInput.value.trim();
-        if (amenityName) {
-            // Add to UI
-            const li = document.createElement("li");
-            li.textContent = amenityName;
-            amenitiesList.appendChild(li);
-
-            // Store new amenity in the hidden input
-            newAmenities.push(amenityName);
-            newAmenitiesHidden.value = newAmenities.join(",");
-
-            // Clear input field
-            newAmenityInput.value = "";
+    // Hero image upload functionality
+    document.getElementById("uploadHeroImageHero").addEventListener("change", function (event) {
+        let file = event.target.files[0];
+        if (file) {
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById("hero").style.backgroundImage = `url(${e.target.result})`;
+            };
+            reader.readAsDataURL(file);
         }
     });
-});
 
-    </script>
+    // Resort image upload functionality
+    document.getElementById("uploadResortImage").addEventListener("change", function (event) {
+        let file = event.target.files[0];
+        if (file) {
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById("resort-image").src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Beach image upload functionality
+    document.getElementById("uploadBeachImage").addEventListener("change", function (event) {
+        let file = event.target.files[0];
+        if (file) {
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById("sliderImage").src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Activities image upload functionality
+    document.getElementById("uploadActivityImage").addEventListener("change", function (event) {
+        let file = event.target.files[0];
+        if (file) {
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById("activity-sliderImage").src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    document.getElementById('add-amenity-btn').addEventListener('click', function() {
+    var newAmenityInput = document.getElementById('new-amenity-input');
+    var newAmenity = newAmenityInput.value.trim();
+    
+    if (newAmenity) {
+        // Set the hidden input value to the new amenity
+        document.getElementById('new-amenity-hidden').value = newAmenity;
+        
+        // Optionally, you can also dynamically update the amenities list on the page
+        var amenitiesList = document.getElementById('amenities-list');
+        var newAmenityLi = document.createElement('li');
+        newAmenityLi.textContent = newAmenity;
+        amenitiesList.appendChild(newAmenityLi);
+        
+        // Clear the input
+        newAmenityInput.value = '';
+        
+        // Trigger the form submit
+        document.querySelector('form button[type="submit"]').click();
+    }
+});
+});
+</script>
 </body>
 </html>
 {% endblock content %}

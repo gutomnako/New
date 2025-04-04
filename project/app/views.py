@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q, Count, F, Sum, OuterRef, Subquery, Avg, Exists, Value
 from django.contrib.auth.decorators import login_required
-from .models import Resort, Amenity, Location, Message, User, Favorite, Rating
+from .models import Resort, Amenity, Location, Message, User, Favorite, Rating, ResortImage
 from django.contrib.auth import authenticate, login, logout
 from .forms import ResortForm, MyUserCreationForm, RatingForm
 from django.contrib import messages
@@ -408,11 +408,34 @@ def home(request):
 
     return render(request, 'app/home.html', context)
 
+
 def update_resort(request, resort_id):
     resort = get_object_or_404(Resort, id=resort_id)
 
     if request.method == "POST":
-        # Update resort details
+        # Handle AJAX requests
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            field_map = {
+                "mini_description": "mini_description",
+                "description": "description",
+                "price_per_night": "price_per_night",
+                "entrance_kids": "entrance_kids",
+                "entrance_adults": "entrance_adults",
+                "cottage": "cottage",
+                "price": "price",
+                "room_description": "room_description",
+                "beach_description": "beach_description",
+                "activity_description": "activity_description",
+            }
+
+            for field, model_field in field_map.items():
+                if field in request.POST:
+                    setattr(resort, model_field, request.POST[field])
+
+            resort.save()
+            return JsonResponse({"success": True})
+
+        # Update text fields
         resort.mini_description = request.POST.get("mini_description", resort.mini_description)
         resort.description = request.POST.get("description", resort.description)
         resort.price_per_night = request.POST.get("price_per_night", resort.price_per_night)
@@ -420,12 +443,23 @@ def update_resort(request, resort_id):
         resort.entrance_adults = request.POST.get("entrance_adults", resort.entrance_adults)
         resort.cottage = request.POST.get("cottage", resort.cottage)
         resort.price = request.POST.get("price", resort.price)
+        resort.room_description = request.POST.get("room_description", resort.room_description)
+        resort.beach_description = request.POST.get("beach_description", resort.beach_description)  # Fixed
+        resort.activity_description = request.POST.get("activity_description", resort.activity_description)  # Fixed
 
+        # Handle image uploads
         if 'hero_image' in request.FILES:
             resort.hero_image = request.FILES['hero_image']
         if 'resort_image' in request.FILES:
             resort.resort_image = request.FILES['resort_image']
+        if 'roomimage' in request.FILES:
+            resort.roomimage = request.FILES['roomimage']
+        if 'beachimage' in request.FILES:
+            resort.beachimage = request.FILES['beachimage']
+        if 'activities_image' in request.FILES:
+            resort.activities_image = request.FILES['activities_image']
 
+        # Handle amenities
         amenity_names = request.POST.getlist("amenities")
         for name in amenity_names:
             if name.strip():
@@ -442,7 +476,6 @@ def update_resort(request, resort_id):
         return redirect("resort", pk=resort.id)
 
     return redirect("resort", pk=resort.id)
-
 
 
 @csrf_exempt
@@ -593,22 +626,41 @@ def update_resort_inline(request, resort_id):
 
     return JsonResponse({"success": False, "error": "❌ Invalid request!"})
 
-@login_required(login_url='login')
-@csrf_exempt
-def update_resort_image(request, pk):
+@login_required
+def update_resort_images(request, pk):
     resort = Resort.objects.get(id=pk)
 
-    # Check if user is authorized
+    # Check if the user is authorized
     if request.user != resort.host:
         return JsonResponse({'error': 'You are not allowed to edit this resort'}, status=403)
 
-    if request.method == "POST" and request.FILES.get("image"):
-        resort.image = request.FILES["image"]
-        resort.save()
-        return JsonResponse({"status": "success", "image_url": resort.image.url})
+    if request.method == "POST":
+        updated_images = {}
 
-    return JsonResponse({"error": "No image uploaded"}, status=400)
+        # Handle hero image upload
+        if 'hero_image' in request.FILES:
+            resort.hero_image = request.FILES['hero_image']
+            updated_images["hero_image_url"] = resort.hero_image.url
 
+        # Handle room images
+        if 'roomimage' in request.FILES:
+            resort.roomimage = request.FILES['roomimage']
+            updated_images["roomimage_url"] = resort.roomimage.url
+
+        # Handle beach image upload
+        if 'beachimage' in request.FILES:
+            resort.beachimage = request.FILES['beachimage']
+            updated_images["beachimage_url"] = resort.beachimage.url
+
+        if 'activities_image' in request.FILES:
+            resort.activities_image = request.FILES['activities_image']
+            updated_images["activities_image_url"] = resort.activities_image.url
+
+        if updated_images:
+            resort.save()
+            return JsonResponse({"status": "success", "updated_images": updated_images})
+
+    return JsonResponse({"error": "Invalid request method or missing file"}, status=400)
 #end edit
 
 #comments
