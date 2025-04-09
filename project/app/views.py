@@ -20,6 +20,8 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.core.serializers import serialize
 from decimal import Decimal, InvalidOperation
 from django.views.decorators.csrf import csrf_exempt
+import re
+from collections import Counter
 
 
 
@@ -280,22 +282,44 @@ def toggle_favorite(request):
     
     return JsonResponse({'status': 'failed'}, status=400)
 
-def home(request):
-    q = request.GET.get('q','')
+def autocomplete(request):
+    query = request.GET.get('q', '').lower()
+    suggestions = []
 
-    resort = Resort.objects.filter(
-        Q(name__icontains=q) |
-        Q(description__icontains=q) |
-        Q(amenities__name__icontains=q)
-    ).distinct() 
+    if query:
+        resorts = Resort.objects.all()
+        for resort in resorts:
+            # Combine all text to search through
+            text = f"{resort.name} {resort.description or ''} {' '.join(resort.amenities.values_list('name', flat=True))}"
+            words = re.findall(r'\b\w+\b', text.lower())  # Split text into words
+
+            # Match query and gather two-word suggestions
+            for i, word in enumerate(words[:-1]):  # Loop through all words except the last one
+                if word.startswith(query):  # Match based on the query starting the word
+                    next_word = words[i + 1]  # Get the next word as suggestion
+                    suggestion = f"{word} {next_word}"  # Combine word and next word
+                    suggestions.append(suggestion)  # Add to list
+
+    return JsonResponse({'suggestions': suggestions[:5]})  # Limit to 5 suggestions
+
+
+def home(request):
+    q = request.GET.get('q', '').strip()
+
+    if q:
+        resorts = Resort.objects.filter(
+            Q(name__icontains=q) |
+            Q(description__icontains=q) |
+            Q(amenities__name__icontains=q)
+        ).distinct().order_by('-created_at')
+    else:
+        resorts = Resort.objects.all().order_by('-created_at')
 
     # Get filter parameters
     selected_amenities = request.GET.getlist('amenities')  
     selected_location = request.GET.getlist('location')   
     min_price = request.GET.get('min_price') 
     max_price = request.GET.get('max_price')  
-
-    resorts = Resort.objects.all().order_by('-created_at')  # Order resorts by creation date
 
     # Apply filters
     if selected_amenities:
@@ -403,12 +427,13 @@ def home(request):
         'min_price': min_price,
         'max_price': max_price,
         "rated_resorts": rated_resorts,  # Resorts ordered by average rating
-        "show_scores": True
+        "show_scores": True,
+        'q': q
     }
 
     return render(request, 'app/home.html', context)
 
-
+@login_required
 def update_resort(request, resort_id):
     resort = get_object_or_404(Resort, id=resort_id)
 
@@ -470,6 +495,16 @@ def update_resort(request, resort_id):
         if new_amenity:
             new_amenity_obj, created = Amenity.objects.get_or_create(name=new_amenity.strip())
             resort.amenities.add(new_amenity_obj)
+
+             # Handle comments
+        if "comment" in request.POST:
+            comment_text = request.POST.get("comment", "").strip()  # Strip spaces
+            if comment_text:  # Check if the comment is not empty
+                Message.objects.create(
+                    user=request.user,
+                    resort=resort,
+                    comment=comment_text
+                )
 
         resort.save()
         messages.success(request, "Resort details updated successfully!")

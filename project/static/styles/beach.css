@@ -443,3 +443,83 @@ button a {
 }
 
 
+/* Ensure the search bar stays on top, fixed within the container */
+.search-bar-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 1rem 2rem;
+  background-color: #ddd;
+  z-index: 10;  /* Ensures it's on top of other elements */
+}
+
+.search-form {
+  display: flex;
+  max-width: 600px;
+  width: 100%;
+}
+
+.search-input {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px 0 0 4px;
+  font-size: 1rem;
+}
+
+.search-button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  border-left: none;
+  background-color: #007BFF;
+  color: white;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+}
+
+/* Add space to the top of the container so the search bar doesn't overlap content */
+.container {
+  position: relative;
+  padding-top: 3.5rem; /* Adjust based on your search bar height */
+}
+
+/* Adjust layout for other content */
+.filter-container,
+.resorts-container {
+  margin-top: 1rem;  /* Optional: Adds space between content */
+}
+
+.search-form {
+  display: flex;
+  max-width: 600px;
+  width: 100%;
+  position: relative; /* Needed for the suggestion box to position relative to this */
+}
+
+.suggestions-box {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #ccc;
+  max-height: 150px;
+  overflow-y: auto;
+  background: white;
+  position: absolute;
+  top: 100%; /* Makes it appear just below the input */
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.suggestion-item {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.suggestion-item:hover {
+  background-color: #f0f0f0;
+}
+

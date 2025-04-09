@@ -36,13 +36,25 @@
         {% endif %}
       </div>
   </header>
-    <div class="container">
-      <div class="container">
-      {% include 'app/checkbox_component.html' %}
-      </div>
-        {% include 'app/resorts_component.html' %}
+  <div class="container">
+    <!-- Search Bar (positioned on top) -->
+    <div class="search-bar-wrapper">
+      <form method="get" action="{% url 'home' %}" class="search-form" autocomplete="off">
+        <input type="text" name="q" id="search-input" placeholder="Search resorts..." class="search-input" value="{{ request.GET.q }}">
+        <button type="submit" class="search-button">Search</button>
+        <ul id="suggestions" class="suggestions-box"></ul>
+      </form>
     </div>
-
+  
+    <!-- Other content below the search bar -->
+    <div class="filter-container">
+      {% include 'app/checkbox_component.html' %}
+    </div>
+  
+    <div class="resorts-container">
+      {% include 'app/resorts_component.html' %}
+    </div>
+  </div>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
   const hamburgerBtn = document.getElementById('hamburgerBtn');
@@ -55,6 +67,84 @@
     });
   }
 });
+const searchInput = document.getElementById('search-input');
+const suggestionsBox = document.getElementById('suggestions');
+let currentSuggestions = [];
+let selectedIndex = -1;
+
+// Handle input event (when the user types in the search bar)
+searchInput.addEventListener('input', function () {
+  const query = this.value;
+
+  if (query.length > 0) {
+    // Make an API call to get suggestions based on the query
+    fetch(`/autocomplete/?q=${encodeURIComponent(query)}`)
+      .then(res => res.json())
+      .then(data => {
+        console.log('Suggestions:', data.suggestions);  // Log suggestions to check API response
+        currentSuggestions = data.suggestions;
+        selectedIndex = -1; // Reset selected index
+        suggestionsBox.innerHTML = ''; // Clear previous suggestions
+
+        // Render new suggestions (words starting with the query)
+        currentSuggestions.forEach(suggestion => {
+          const li = document.createElement('li');
+          li.textContent = suggestion;
+          li.classList.add('suggestion-item');
+
+          // Add click event to replace the last word with the selected suggestion
+          li.addEventListener('click', () => {
+            replaceLastWord(searchInput, suggestion);
+            suggestionsBox.innerHTML = ''; // Clear suggestions after selection
+          });
+
+          suggestionsBox.appendChild(li);
+        });
+      })
+      .catch(err => console.error('Error fetching suggestions:', err));  // Log any errors
+  } else {
+    suggestionsBox.innerHTML = ''; // Clear suggestions if query is empty
+  }
+});
+
+// Handle Tab key to accept the first suggestion (adds the next word instead of replacing)
+searchInput.addEventListener('keydown', function (e) {
+  if (e.key === 'Tab' && currentSuggestions.length > 0) {
+    e.preventDefault();
+    addNextWord(searchInput, currentSuggestions[0]); // Add the next word (first suggestion)
+    suggestionsBox.innerHTML = ''; // Clear suggestions after Tab press
+  }
+});
+
+// Function to replace the last word in the input with the suggestion
+function replaceLastWord(inputElement, suggestion) {
+  const currentValue = inputElement.value;
+  const lastSpaceIndex = currentValue.lastIndexOf(' ');
+
+  if (lastSpaceIndex === -1) {
+    // If no space is found, replace the entire input with the suggestion
+    inputElement.value = suggestion + ' ';
+  } else {
+    // Replace only the last word
+    const before = currentValue.substring(0, lastSpaceIndex + 1); // includes the space
+    inputElement.value = before + suggestion + ' ';
+  }
+}
+
+// Function to add the next word instead of replacing
+function addNextWord(inputElement, suggestion) {
+  const currentValue = inputElement.value;
+  const lastSpaceIndex = currentValue.lastIndexOf(' ');
+
+  if (lastSpaceIndex === -1) {
+    // If no space is found, just add the suggestion as the first word
+    inputElement.value = suggestion + ' ';
+  } else {
+    // Add the next word after the existing input
+    inputElement.value = currentValue + suggestion + ' ';
+  }
+}
+
 </script>
 </html>
 

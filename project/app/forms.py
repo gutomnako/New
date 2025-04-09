@@ -67,9 +67,7 @@ class ResortForm(ModelForm):
         model = Resort
         fields = [
             'host', 'name', 'location', 'description', 
-            'amenities', 'price_per_night', 
-            'entrance_kids', 'entrance_adults', 
-            'contact_number', 'resort_image', 'price'
+            'amenities', 'resort_image'
             ]
         
 

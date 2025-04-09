@@ -23,6 +23,7 @@ urlpatterns = [
     path('delete-resort/<str:pk>/', views.deleteResort, name='delete-resort'),
     path('delete-message/<str:pk>/', views.deleteMessage, name='delete-message'),
     path('contact-number/', views.contact_number, name='contact-number'),
+    path('autocomplete/', views.autocomplete, name='autocomplete'),
 
     path('update-user/', views.updateUser, name='update-user'),
 

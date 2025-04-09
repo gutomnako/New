@@ -92,7 +92,7 @@
                 <div class="description-container">
                     <div class="slider-container">
                         <button class="prev" type="button" onclick="changeBeachSlide(-1)">&#10094;</button>
-                        <img id="sliderImage" 
+                        <img id="sliderImage2" 
                             src="{% if resort.beachimage %}{{ resort.beachimage.url }}{% else %}/static/images/fmb.jpg{% endif %}" 
                             alt="Beach Image">
                         <button class="next" type="button" onclick="changeBeachSlide(1)">&#10095;</button>
@@ -232,7 +232,7 @@
     {% if request.user.is_authenticated %}
     <div class="comment-form">
         <img src="{{ request.user.avatar.url }}" class="avatar">
-        <form method="POST" action="" id="commentForm" style="display: flex; width: 100%;">
+        <form method="POST" action="{% url 'update_resort' resort.id %}">
             {% csrf_token %}
             <input type="text" name="comment" placeholder="Write your comment here..." required>
             <button type="submit">Send</button>
