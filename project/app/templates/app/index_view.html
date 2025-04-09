@@ -28,6 +28,7 @@
   
   <nav>
       <ul>
+          <li><a href="{% url 'index-view' %}">Home</a></li>
           <li><a href="{% url 'home' %}">Beaches & Resorts</a></li>
           <li><a href="{% url 'map' %}">Map</a></li>
           <li><a href="#">Contact</a></li>
@@ -95,12 +96,11 @@
     <br>
     <div class="card-container">
       <div class="card-grid">
-        {% for resort in rated_resorts|slice:":4" %}
+        {% for resort in rated_resorts|slice:":3" %}
         <div class="card">
           {% if resort.resort_image %}
           <img src="{{ resort.resort_image.url }}" alt="">
           {% endif %}
-          <br>
           <h4>{{ resort.name }}</h4>
           <p>{{ resort.description }}</p>
           <p>
@@ -114,11 +114,12 @@
         {% endfor %}
       </div>
     </div>
-    <div>
+    <div class="see-more-btn-container">
       <a href="{% url 'home' %}#most-rated-section">
         <button id="see-more-btn" class="see-more-btn">See More!</button>
-    </a>
-    </div>    
+      </a>
+    </div>
+  </div>
   <div class="discover-section">
     <div class="discover-cards">
       <div class="discover-card">
@@ -160,9 +161,6 @@
       <a href="#"><img src="{% static 'images/gmail.png' %}" alt="Email"></a>
     </div>
   </div>
-  
-  
-
 </body>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </html>
@@ -198,5 +196,22 @@
       dropdown.classList.remove("active");
     }
   });
+  // Optional: JavaScript for extra interactivity (like a carousel or lightbox)
+    // This script is for adding a simple lightbox feature for images
+
+    document.querySelectorAll('.image-gallery img').forEach(img => {
+      img.addEventListener('click', () => {
+        const overlay = document.createElement('div');
+        overlay.className = 'overlay';
+        const fullImg = document.createElement('img');
+        fullImg.src = img.src;
+        overlay.appendChild(fullImg);
+        document.body.appendChild(overlay);
+
+        overlay.addEventListener('click', () => {
+          document.body.removeChild(overlay);
+        });
+      });
+    });
 </script>
 {% endblock content %}

@@ -15,9 +15,10 @@
       <h1>BEACHES & RESORT</h1>
     </div>
       <nav class="nav">
-        <a href="{% url 'index-view' %}">Home</a>
-        <a href="{% url 'map' %}">Map</a>
-        <a href="#">Contact</a>
+          <a href="{% url 'index-view' %}">Home</a>
+          <a href="{% url 'home' %}">Beaches & Resorts</a>
+          <a href="{% url 'map' %}">Map</a>
+          <a href="#">Contact</a>
       </nav>
       <div class="dropdown">
         {% if request.user.is_authenticated %}

@@ -4,7 +4,7 @@ body {
   margin: 0;
   padding: 0;
   background-color: #f3f3f3;
-  padding-top: 80px;  /* Adds space below the fixed navbar */
+  padding-top: 70px;  /* Adds space below the fixed navbar */
 }
 
 /* Header / Navbar */
@@ -12,8 +12,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.3em 1.5em; /* Further reduced padding */
-  background-color: #089cff;
+  padding: 8px 20px;
+  background-color: #006f89;
   color: black;
   font-family: "Quicksand", serif;
   position: fixed;
@@ -28,6 +28,7 @@ body {
 .header .logo h1 {
   font-size: 1.3em;  /* Reduced font size further */
   margin: 0;
+  color:  #f3f3f3;
 }
 
 .nav {
@@ -41,8 +42,9 @@ body {
   font-weight: bold;
   padding: 0.3em 0.5em; /* Reduced padding for links */
   border-radius: 4px;  /* Slightly smaller border-radius */
-  font-size: 0.9em;  /* Reduced font size for links */
+  font-size: 16px;  /* Reduced font size for links */
   transition: background-color 0.3s ease;
+  margin: 0 15px;
 }
 
 .nav a:hover {
@@ -58,7 +60,7 @@ body {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 30px; /* You can adjust size */
+  font-size: 20px; /* You can adjust size */
 }
 
 .dropdown-menu {
@@ -140,7 +142,7 @@ body {
 }
 
 .filter-section button {
-  background-color: #004080;
+  background-color: #006f89; /* Updated color */
   color: #fff;
   border: none;
   padding: 0.5em 1em;
@@ -150,7 +152,7 @@ body {
 }
 
 .filter-section button:hover {
-  background-color: #002f4f;
+  background-color: #005a72; /* Slightly darker shade for hover */
 }
 
 /* Price Range Box */
@@ -190,7 +192,7 @@ body {
   display: block;
   width: 100%;
   padding: 0.5em;
-  background-color: #004080;
+  background-color: #006f89; /* Updated color */
   color: #fff;
   border: none;
   border-radius: 5px;
@@ -200,7 +202,7 @@ body {
 }
 
 .price-range-box button:hover {
-  background-color: #002f4f;
+  background-color: #005a72; /* Slightly darker shade for hover */
 }
 
 /* Card Grid */
@@ -305,7 +307,7 @@ body {
 
 /* Buttons */
 button {
-  background-color: #3498db;
+  background-color: #006f89; /* Updated color */
   color: white;
   padding: 12px 20px;
   border: none;
@@ -317,7 +319,7 @@ button {
 }
 
 button:hover {
-  background-color: #2980b9;
+  background-color: #005a72; /* Slightly darker shade for hover */
 }
 
 button a {
@@ -338,6 +340,7 @@ button a {
 .card-slider-container .all-resorts-card {
   flex-grow: 1
 }
+
 /* Arrow buttons fixed to the left and right */
 .arrow-btn {
   position: absolute;
@@ -501,25 +504,20 @@ button a {
   list-style: none;
   margin: 0;
   padding: 0;
-  border: 1px solid #ccc;
-  max-height: 150px;
-  overflow-y: auto;
-  background: white;
   position: absolute;
-  top: 100%; /* Makes it appear just below the input */
+  top: 100%;
   left: 0;
   width: 100%;
-  z-index: 1000;
-  border-radius: 0 0 4px 4px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 100;
 }
 
-.suggestion-item {
-  padding: 8px 12px;
+.suggestions-box li {
+  padding: 10px;
   cursor: pointer;
 }
 
-.suggestion-item:hover {
+.suggestions-box li:hover {
   background-color: #f0f0f0;
 }
-

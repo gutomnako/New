@@ -8,47 +8,96 @@
     box-sizing: border-box;
     font-family: 'Poppins', sans-serif;
 }
-nav {
-    background-color: #089cff; /* Dark background for contrast */
-    padding: 10px 0; /* Adds space above and below the nav */
+/* Header / Navbar */
+.header {
     display: flex;
-    justify-content: center; /* Centers the nav items */
+    justify-content: space-between;
     align-items: center;
+    padding:  16px 40px;
+    background-color: #006f89;
+    color: black;
+    font-family: "Quicksand", serif;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
     width: 100%;
-}
-
-nav ul {
-    list-style: none;
+    box-sizing: border-box;
+  }
+  
+  .header .logo h1 {
+    font-size: 1.3em;  /* Reduced font size further */
+    margin: 0;
+    color:  #f3f3f3;
+  }
+  
+  .nav {
     display: flex;
-    justify-content: center; 
-    align-items: center;
-    padding: 0;
-    margin: 0; 
-}
-
-nav li {
-    margin: 0 20px; /* Adds more spacing between nav items */
-}
-
-nav a {
-    text-decoration: none;
+    gap: 1em;  /* Reduced gap between links */
+  }
+  
+  .nav a {
     color: #ffffff;
-    font-size: 18px; /* Slightly larger font for better readability */
+    text-decoration: none;
     font-weight: bold;
-    font-family: "Quicksand", sans-serif; /* Fixed the incorrect font family */
-    padding: 10px 15px; /* More padding for better clickable area */
-    border-radius: 5px; /* Rounded edges for a smoother look */
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-nav a:hover {
-    background-color: #e0e0e0;
-    color: #333;
-}
-
-
+    padding: 0.3em 0.5em; /* Reduced padding for links */
+    border-radius: 4px;  /* Slightly smaller border-radius */
+    font-size: 16px;  /* Reduced font size for links */
+    transition: background-color 0.3s ease;
+    margin: 0 15px;
+  }
+  
+  .nav a:hover {
+    background-color: #0066cc;
+  }
+  
+  /* Basic styling */
+  .dropdown {
+    position: relative;
+  }
+  
+  .hamburger-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px; /* You can adjust size */
+  }
+  
+  .dropdown-menu {
+    position: absolute;
+    top: 100%; /* Position it right below the button */
+    right: 0;
+    background-color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: none; /* Hidden by default */
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-radius: 5px;
+    width: 150px; /* Adjust width as necessary */
+  }
+  
+  .dropdown-menu li {
+    padding: 10px;
+  }
+  
+  .dropdown-menu li a {
+    text-decoration: none;
+    color: black;
+  }
+  
+  .dropdown-menu li a:hover {
+    background-color: #f1f1f1;
+  }
+  
+  /* When the dropdown is open, show the menu */
+  .dropdown.open .dropdown-menu {
+    display: block;
+  }
+  
 body {
-    background: linear-gradient(to bottom, #0099ff, #ffcc66);
+    background: linear-gradient(135deg, #004B6D, #6A8D92);
     color: #333;
     text-align: center;
 }
@@ -102,13 +151,13 @@ input[type="file"] {
     font-size: 2.5rem;
     margin-bottom: 20px;
     font-weight: bold;
-    color: #333;
+    color: white;;
 }
 
 .description-text p {
     font-size: 1.2rem;
     line-height: 1.8;
-    color: #555;
+    color: white;
 }
 
 .description-image {
@@ -213,11 +262,10 @@ input[type="file"] {
     transform: scale(1.1);
 }
 
-
 .pricing-amenities {
     padding: 50px;
     text-align: center;
-    background: #deb16d;
+    background: #f5f5f5;
 }
 
 .pricing-amenities h2 {
@@ -242,9 +290,8 @@ input[type="file"] {
     border: 1px solid rgba(255, 255, 255, 0.3);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    color: white;
+    background-color: #6A8D92;
 }
-
 
 .amenities-list {
     list-style: none;
@@ -257,10 +304,11 @@ input[type="file"] {
     display: flex;
     align-items: center;
     justify-content: center;
+    
 }
 
 .info-box h3 {
-    color: black;
+    color: white;
     font-size: 1.5rem;
     margin-bottom: 15px;
     font-weight: bold;
@@ -268,7 +316,7 @@ input[type="file"] {
 
 .info-box p {
     font-size: 1.1rem;
-    color: #555;
+    color: white;
     margin-bottom: 10px;
 }
 
@@ -279,7 +327,7 @@ input[type="file"] {
 
 .info-box ul li {
     font-size: 1.1rem;
-    color: #444;
+    color: white;
     margin: 5px 0;
 }
 

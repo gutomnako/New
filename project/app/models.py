@@ -56,6 +56,9 @@ class Resort(models.Model):
      host = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
      name = models.CharField(max_length=255, help_text="Name of the resort")
      # message =
+     map_url = models.URLField(blank=True, null=True) 
+     latitude = models.FloatField(null=True, blank=True)  # Latitude field
+     longitude = models.FloatField(null=True, blank=True)  # Longitude field
      location = models.ManyToManyField(Location, blank=True, related_name="resorts", help_text="Location of the resort")
      description = models.TextField(help_text="Brief description of the resort", blank=True, null=True)
      mini_description = models.TextField(help_text="Brief description of the resort", blank=True, null=True)
@@ -88,6 +91,13 @@ class Resort(models.Model):
      def total_price(self):
         """Compute the total price including entrance fees and stay price."""
         return self.price_per_night + self.entrance_kids + self.entrance_adults
+     
+     def get_map_url(self):
+        if self.latitude and self.longitude:
+            # Google Maps URL with dynamic latitude and longitude
+            return f"https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q={self.latitude},{self.longitude}"
+        else:
+            return self.map_url  # Fallback to the manually set map_url if available
 
 class Rating(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

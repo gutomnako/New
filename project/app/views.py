@@ -550,7 +550,9 @@ def resort(request, pk):
     return render(request, 'app/resort.html', context)
 
 def map_view(request):
-    return render(request, 'app/map.html')
+    resorts = Resort.objects.all()
+    context = {'resorts': resorts}
+    return render(request, 'app/map.html', context)
 
 def contact_number(request):
       resort = Resort.objects.first()

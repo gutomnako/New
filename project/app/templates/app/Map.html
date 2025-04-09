@@ -8,33 +8,107 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Beach Map</title>
     <link rel="stylesheet" href="{% static 'styles/map.css' %}">
-    <script src="{% static 'scripts/map.js' %}"></script>
+    <!-- Leaflet.js -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
+
+<header class="header">
+    <div class="logo">
+      <h1>BEACHES & RESORT</h1>
+    </div>
+      <nav class="nav">
+          <a href="{% url 'index-view' %}">Home</a>
+          <a href="{% url 'home' %}">Beaches & Resorts</a>
+          <a href="{% url 'map' %}">Map</a>
+          <a href="#">Contact</a>
+      </nav>
+      <div class="dropdown">
+        {% if request.user.is_authenticated %}
+          <!-- Hamburger Button -->
+          <button class="hamburger-btn" id="hamburgerBtn">
+            <i class="bi bi-list"></i> <!-- Bootstrap Icon (Can be replaced by custom icon) -->
+          </button>
+      
+          <!-- Dropdown Menu -->
+          <ul class="dropdown-menu" id="dropdownMenu">
+              <li><a class="dropdown-item" href="{% url 'user-profile' request.user.pk %}">Settings</a></li>
+              <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+          </ul>
+        {% else %}
+          <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
+        {% endif %}
+      </div>
+  </header>
+
 <body>
     <div class="box">
         <div class="sidebar">
             <h2>BEACHES</h2>
             <ul id="beachList">
-                <li onclick="loadMap('FMB Beach Resort')">FMB Beach Resort</li>
-                <li onclick="loadMap('Talaonga Beach')">Talaonga Beach</li>
-                <li onclick="loadMap('Rawis Beach')">Rawis Beach</li>
-                <li onclick="loadMap('Rizal Beach')">Rizal Beach</li>
-                <li onclick="loadMap('Balading Beach Resort')">Balading Beach Resort</li>
-                <li onclick="loadMap('Odella Beach Resor')">Odella Beach Resor</li>
-                <li onclick="loadMap('Pamana Beach Resort')">Pamana Beach Resort</li>
-                <li onclick="loadMap('Judith Rose Beach Resort')">Judith Rose Beach Resort</li>
-                <li onclick="loadMap('Frilles Beach Resort')">Frilles Beach Resort</li>
-                <li onclick="loadMap('Lindas Beach Resort')">Linda's Beach Resort</li>
-                <li onclick="loadMap('Suki Beach Resort')">Suki Beach Resort</li>
-                <li onclick="loadMap('Fravel Beach Resortt')">Fravel Beach Resort</li>
-                <li onclick="loadMap('Marahay Beach Resort')">Marahay Beach Resort</li>
+                {% for resort in resorts %}
+                    <li>
+                        <a href="#" data-lat="{{ resort.latitude }}" data-lng="{{ resort.longitude }}" data-name="{{ resort.name }}">
+                            {{ resort.name }}
+                        </a>
+                    </li>
+                {% endfor %}
             </ul>
         </div>
         <div class="map-container">
             <h2>MAP LOCATION</h2>
-            <iframe id="mapFrame" src="" frameborder="0" allowfullscreen></iframe>
+            <div id="map" style="height: 400px; width: 100%; border-radius: 10px;"></div>
         </div>
     </div>
 </body>
-</html>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const list = document.getElementById('beachList');
+    const mapContainer = document.getElementById('map');
+
+    let map = L.map(mapContainer).setView([12.6199, 124.0942], 13);  // Default location
+
+    // Add OpenStreetMap Tile Layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    let marker;
+
+    // Event listener for each resort link
+    list.addEventListener('click', function (e) {
+        // Check if it's a resort link
+        if (e.target.tagName === 'A') {
+            const lat = parseFloat(e.target.getAttribute('data-lat'));
+            const lng = parseFloat(e.target.getAttribute('data-lng'));
+            const name = e.target.getAttribute('data-name');
+
+            // If a marker exists, remove it
+            if (marker) {
+                map.removeLayer(marker);
+            }
+
+            // Set map view to the resort's location
+            map.setView([lat, lng], 13);
+
+            // Add a marker to the map
+            marker = L.marker([lat, lng]).addTo(map);
+            marker.bindPopup(name).openPopup();
+        }
+    });
+});
+document.addEventListener('DOMContentLoaded', function () {
+  const hamburgerBtn = document.getElementById('hamburgerBtn');
+  const dropdownMenu = document.getElementById('dropdownMenu');
+
+  if (hamburgerBtn && dropdownMenu) {
+    hamburgerBtn.addEventListener('click', function() {
+      // Toggle the 'open' class on the dropdown element
+      dropdownMenu.parentElement.classList.toggle('open');
+    });
+  }
+});
+</script>
+
 {% endblock %}
