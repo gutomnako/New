@@ -577,3 +577,15 @@ input[type="file"] {
     }
 }
 
+.star {
+    color: gray;
+    transition: color 0.3s ease;
+}
+
+.star.selected {
+    color: gold;
+}
+
+.hidden {
+    display: none;
+}

@@ -17,43 +17,36 @@
   <title>Beach and Resort</title>
   <link rel="stylesheet" href="{% static 'styles/index.css' %}">
 </head>
+<header class="header">
+  <div class="logo">
+    <h1>BEACHES & RESORT</h1>
+  </div>
+    <nav class="nav">
+        <a href="{% url 'index-view' %}">Home</a>
+        <a href="{% url 'home' %}">Beaches & Resorts</a>
+        <a href="{% url 'map' %}">Map</a>
+        <a href="#">Contact</a>
+    </nav>
+    <div class="dropdown">
+      {% if request.user.is_authenticated %}
+        <!-- Hamburger Button -->
+        <button class="hamburger-btn" id="hamburgerBtn">
+          <i class="bi bi-list"></i> <!-- Bootstrap Icon (Can be replaced by custom icon) -->
+        </button>
+    
+        <!-- Dropdown Menu -->
+        <ul class="dropdown-menu" id="dropdownMenu">
+            <li><a class="dropdown-item" href="{% url 'user-profile' request.user.pk %}">Settings</a></li>
+            <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+        </ul>
+      {% else %}
+      <a href="{% url 'login' %}" class="btn btn-primary" style="padding: 8px 16px; font-size: 16px; line-height: 1.4;">Login</a>
+      {% endif %}
+    </div>
+</header>
 <body>  
  {% csrf_token %}
- <div class="navbar">
-  <div class="logo">
-      <a href="#home">
-          <img src="{% static 'images/icon.png' %}" alt="Logo">
-      </a>
-  </div>
-  
-  <nav>
-      <ul>
-          <li><a href="{% url 'index-view' %}">Home</a></li>
-          <li><a href="{% url 'home' %}">Beaches & Resorts</a></li>
-          <li><a href="{% url 'map' %}">Map</a></li>
-          <li><a href="#">Contact</a></li>
-      </ul>
-  </nav>
-
-  <div class="dropdown">
-      {% if request.user.is_authenticated %}
-      <!-- Hamburger Button with Bootstrap dropdown -->
-      <button class="btn dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-          <i class="bi bi-list"></i> <!-- Bootstrap Icon -->
-      </button>
-    
-      <!-- Dropdown Menu -->
-      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-          <li><a class="dropdown-item" href="{% url 'user-profile' request.user.pk %}">Settings</a></li>
-          <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
-      </ul>
-      {% else %}
-      <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
-      {% endif %}
-  </div>
-</div>
-
-  
+ 
   <div class="main">
     <div class="content">
       {% if request.user.is_authenticated %}
@@ -66,7 +59,6 @@
       <button class="cn"><a href="{% url 'home' %}">Explore Now!</a></button>
     </div>
   </div>
-
  
   <div class="welcome-section">
     <div class="text-content">
@@ -184,18 +176,17 @@
     });
   });
 
-  document.getElementById("userDropdown").addEventListener("click", function(event) {
-    event.stopPropagation();
-    this.parentElement.classList.toggle("active");
-  });
+  document.addEventListener('DOMContentLoaded', function () {
+  const hamburgerBtn = document.getElementById('hamburgerBtn');
+  const dropdownMenu = document.getElementById('dropdownMenu');
 
-  // Close dropdown when clicking outside
-  document.addEventListener("click", function(event) {
-    let dropdown = document.querySelector(".dropdown");
-    if (!dropdown.contains(event.target)) {
-      dropdown.classList.remove("active");
-    }
-  });
+  if (hamburgerBtn && dropdownMenu) {
+    hamburgerBtn.addEventListener('click', function() {
+      // Toggle the 'open' class on the dropdown element
+      dropdownMenu.parentElement.classList.toggle('open');
+    });
+  }
+});
   // Optional: JavaScript for extra interactivity (like a carousel or lightbox)
     // This script is for adding a simple lightbox feature for images
 
@@ -213,5 +204,6 @@
         });
       });
     });
+
 </script>
 {% endblock content %}

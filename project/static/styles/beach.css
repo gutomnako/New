@@ -334,7 +334,6 @@ button a {
   overflow: hidden; /* Hide the overflowing content */
   display: flex;
   flex-wrap: wrap;
-  
 }
 
 .card-slider-container .all-resorts-card {
@@ -396,6 +395,39 @@ button a {
     border-right: none;
     margin-bottom: 10px;
   }
+
+  /* Adjust the slider for mobile */
+  .card-slider {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .card-slider .card {
+    width: 100%; /* Cards will take full width */
+  }
+
+  /* Adjust the search form for smaller screens */
+  .search-form {
+    flex-direction: column;
+  }
+
+  .search-input,
+  .search-button {
+    width: 100%; /* Full-width inputs for mobile */
+  }
+
+  /* Adjust buttons for mobile */
+  button {
+    width: 100%;
+  }
+
+  .favorite-btn i {
+    font-size: 24px; /* Smaller size on mobile */
+  }
+
+  .card {
+    width: 100%; /* Cards will take full width on mobile */
+  }
 }
 
 .star-rating {
@@ -445,34 +477,47 @@ button a {
   transition: opacity 0.3s ease-in-out;
 }
 
-
 /* Ensure the search bar stays on top, fixed within the container */
 .search-bar-wrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
+  position: fixed; /* Fixed position to stay at the top-right */
+  top: 60px; /* Adjust this value based on your navbar height */
+  right: 20px; /* Align it to the right side */
+  width: 80%; /* Make the search bar longer, adjust percentage as needed */
+  max-width: 800px; /* Set a maximum width to avoid it becoming too wide */
   padding: 1rem 2rem;
-  background-color: #ddd;
+  background-color: transparent; /* Remove background color */
   z-index: 10;  /* Ensures it's on top of other elements */
+  border-radius: 10px; /* Optional: Rounded corners */
+  box-sizing: border-box; /* Ensures padding is included in the width calculation */
 }
 
+/* Form styling */
 .search-form {
   display: flex;
-  max-width: 600px;
   width: 100%;
+  background-color: transparent; /* Remove background color */
 }
 
 .search-input {
   flex: 1;
-  padding: 0.5rem 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px 0 0 4px;
+  padding: 0.75rem 1rem; /* Increase padding to make the text box bigger */
+  border: 2px solid #007BFF; /* Blue border to make it stand out */
+  border-radius: 4px; /* Keep rounded corners */
   font-size: 1rem;
+  background-color: transparent; /* Remove background color */
+  transition: all 0.3s ease; /* Smooth transition for focus effect */
 }
 
+/* Add a glow effect on focus */
+.search-input:focus {
+  outline: none; /* Remove default focus outline */
+  border-color: #0056b3; /* Darker blue border on focus */
+  box-shadow: 0 0 8px rgba(0, 91, 255, 0.6); /* Subtle glow effect */
+}
+
+/* Button styling */
 .search-button {
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1rem; /* Increase padding for the button */
   border: 1px solid #ccc;
   border-left: none;
   background-color: #007BFF;
@@ -493,13 +538,7 @@ button a {
   margin-top: 1rem;  /* Optional: Adds space between content */
 }
 
-.search-form {
-  display: flex;
-  max-width: 600px;
-  width: 100%;
-  position: relative; /* Needed for the suggestion box to position relative to this */
-}
-
+/* Suggestions box styling */
 .suggestions-box {
   list-style: none;
   margin: 0;

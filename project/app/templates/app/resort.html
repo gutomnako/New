@@ -39,33 +39,34 @@
     <form action="{% url 'update_resort' resort.id %}" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
     
-        <!-- Hero Section -->
-        <header class="hero" id="hero" style="background-image: url('{% if resort.hero_image %}{{ resort.hero_image.url }}{% else %}/static/images/fmb.jpg{% endif %}');">
-            <div class="hero-content">
-                <h1>Welcome to {{ resort.name }}</h1>
-                
-                <!-- Mini Description (Editable) -->
-                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                    <p id="hero-subtitle" style="margin: 0; text-align: center; flex-grow: 1;">{{ resort.mini_description }}</p>
-                    <button type="button" id="edit-hero-btn">Edit description</button>
-                </div>
-                
-                <textarea name="mini_description" id="edit-hero-subtitle-input" style="display: none;">{{ resort.mini_description }}</textarea>
-                <button type="submit" id="save-hero-btn" style="display: none;">Save Description</button>
-    
-                <!-- Upload Hero Image -->
-                <label for="uploadHeroImageHero" class="custom-file-upload">Upload Image</label>
-                <input type="file" name="hero_image" id="uploadHeroImageHero" accept="image/*" hidden>
-                <button type="submit" class="save-image-btn">Save Hero Image</button>
+       <!-- Hero Section -->
+<header class="hero" id="hero" style="background-image: url('{% if resort.hero_image %}{{ resort.hero_image.url }}{% else %}/static/images/fmb.jpg{% endif %}');">
+    <div class="hero-content">
+        <h1>Welcome to {{ resort.name }}</h1>
+
+        <!-- Mini Description (Editable) -->
+        <div class="hero-description-wrapper">
+            <p id="hero-subtitle">{{ resort.mini_description }}</p>
+            <textarea name="mini_description" id="edit-hero-subtitle-input" class="editable-textarea" style="display: none;">{{ resort.mini_description }}</textarea>
+            <div class="description-buttons">
+                <button type="button" id="edit-hero-btn" class="edit-btn">Edit Description</button>
+                <button type="submit" id="save-hero-btn" class="save-btn" style="display: none;">Save Description</button>
             </div>
-        </header>
+        </div>
+
+        <!-- Upload Hero Image -->
+        <label for="uploadHeroImageHero" class="custom-file-upload">Upload Image</label>
+        <input type="file" name="hero_image" id="uploadHeroImageHero" accept="image/*" hidden>
+        <button type="submit" class="save-image-btn">Save Hero Image</button>
+    </div>
+</header>
     
         <!-- Resort Description Section -->
         <section class="resort-description">
             <div class="description-container">
                 <div class="description-text">
-                    <h2>About {{ resort.name }}</h2>
-                    <p id="resort-description">{{ resort.description }}</p>
+                    <h2 style="color: black;">About {{ resort.name }}</h2>
+                    <p id="resort-description" style="color: black;">{{ resort.description }}</p>
                     <textarea name="description" id="edit-description-input" style="display: none;">{{ resort.description }}</textarea>
                     <button type="button" id="edit-description-btn">Edit Description</button>
                     <button type="submit" id="save-description-btn" style="display: none;">Save Description</button>
@@ -82,85 +83,113 @@
         </section>
     
         <!-- Rooms Section -->
-        <div class="rooms-container">
-            <section class="room-description">
-                <div class="description-container">
-                    <div class="description-text">
-                        <h2>Rooms</h2>
-                        <p id="room-description">{{ resort.room_description }}</p>
-                        <textarea name="room_description" id="edit-room-description-input" style="display: none;">{{ resort.room_description }}</textarea>
-                        <button type="button" id="edit-room-description-btn">Edit Room Description</button>
-                        <button type="submit" id="save-room-description-btn" style="display: none;">Save Room Description</button>
-                    </div>
-                    <div class="slider-container">
-                        <button class="prev" type="button" onclick="changeSlide(-1)">&#10094;</button>
-                        <img id="sliderImage" 
-                            src="{% if resort.roomimage %}{{ resort.roomimage.url }}{% else %}/static/images/fmb.jpg{% endif %}" 
-                            alt="Room Image">
-                        <button class="next" type="button" onclick="changeSlide(1)">&#10095;</button>
-                        <label for="uploadRoomImage" class="custom-file-upload">Upload Image</label>
-                        <input type="file" name="roomimage" id="uploadRoomImage" accept="image/*">
-                        <button type="submit" id="save-room-image-btn" class="save-image-btn">Save Room Image</button>
-                    </div>
+<div class="rooms-container" style="background: linear-gradient(to bottom right, #1f5d63, #3f8ca0); padding: 60px 40px; color: white;">
+    <section class="room-description">
+        <div class="description-container" style="display: flex; justify-content: space-between; align-items: center; gap: 40px; flex-wrap: wrap;">
+            
+            <!-- Image Slider Left -->
+            <div class="slider-container" style="flex: 1; max-width: 50%; text-align: center;">
+                <div style="position: relative;">
+                    <button class="prev" type="button" onclick="changeSlide(-1)" style="position: absolute; left: -30px; top: 50%; transform: translateY(-50%); font-size: 24px;">&#10094;</button>
+                    <img id="sliderImage" 
+                         src="{% if resort.roomimage %}{{ resort.roomimage.url }}{% else %}/static/images/fmb.jpg{% endif %}" 
+                         alt="Room Image" style="max-width: 100%; border-radius: 10px;">
+                    <button class="next" type="button" onclick="changeSlide(1)" style="position: absolute; right: -30px; top: 50%; transform: translateY(-50%); font-size: 24px;">&#10095;</button>
                 </div>
-            </section>
-        </div>        
-    
-        <!-- Beach Section -->
-        <div class="beach-container">
-            <section class="beach-description">
-                <div class="description-container">
-                    <div class="slider-container">
-                        <button class="prev" type="button" onclick="changeBeachSlide(-1)">&#10094;</button>
-                        <img id="sliderImage2" 
-                            src="{% if resort.beachimage %}{{ resort.beachimage.url }}{% else %}/static/images/fmb.jpg{% endif %}" 
-                            alt="Beach Image">
-                        <button class="next" type="button" onclick="changeBeachSlide(1)">&#10095;</button>
-    
-                        <!-- File upload form -->
-                        <label for="uploadBeachImage" class="custom-file-upload">Upload Image</label>
-                        <input type="file" name="beachimage" id="uploadBeachImage" accept="image/*">
-                        <button type="submit" id="save-beach-image-btn" class="save-image-btn">Save Beach Image</button>
-                    </div>
-    
-                    <div class="description-text">
-                        <h2>Beach</h2>
-                        <p id="beach-description">{{ resort.beach_description }}</p>
-                        <textarea name="beach_description" id="edit-beach-description-input" style="display: none;">{{ resort.beach_description }}</textarea>
-                        <button type="button" id="edit-beach-description-btn">Edit Beach Description</button>
-                        <button type="submit" id="save-beach-description-btn" style="display: none;">Save Beach Description</button>
-                    </div>
+                <div style="margin-top: 10px;">
+                    <label for="uploadRoomImage" class="custom-file-upload">Upload Image</label>
+                    <input type="file" name="roomimage" id="uploadRoomImage" accept="image/*">
+                    <button type="submit" id="save-room-image-btn" class="save-image-btn">Save Room Image</button>
                 </div>
-            </section>
+            </div>
+
+            <!-- Description Right -->
+            <div class="description-text" style="flex: 1; max-width: 50%;">
+                <h2 style="color: white; font-size: 32px; font-weight: bold; margin-bottom: 16px;">Rooms</h2>
+                <p id="room-description" style="font-size: 17px; line-height: 1.6;">{{ resort.room_description }}</p>
+                <textarea name="room_description" id="edit-room-description-input" style="display: none; width: 100%; padding: 10px;">{{ resort.room_description }}</textarea>
+                <div style="margin-top: 10px;">
+                    <button type="button" id="edit-room-description-btn">Edit Room Description</button>
+                    <button type="submit" id="save-room-description-btn" style="display: none;">Save Room Description</button>
+                </div>
+            </div>
+
         </div>
-    
-        <!-- Activities Section -->
-        <div class="activities-container">
-            <section class="activities-description">
-                <div class="description-container">
-                    <div class="description-text">
-                        <h2>Activities</h2>
-                        <p id="activity-description">{{ resort.activity_description }}</p>
-                        <textarea name="activity_description" id="edit-activity-description-input" style="display: none;">{{ resort.activity_description }}</textarea>
-                        <button type="button" id="edit-activity-description-btn">Edit Activity Description</button>
-                        <button type="submit" id="save-activity-description-btn" style="display: none;">Save Activity Description</button>
-                    </div>
-                    <div class="slider-container">
-                        <button class="prev" type="button" onclick="changeActivity(-1)">&#10094;</button>
-                        <img id="activity-sliderImage" 
-                            src="{% if resort.activities_image %}{{ resort.activities_image.url }}{% else %}/static/images/fmb.jpg{% endif %}" 
-                            alt="Activity Image">
-                        <button class="next" type="button" onclick="changeActivity(1)">&#10095;</button>
-    
-                        <!-- Image Upload Form -->
-                        <label for="uploadActivityImage" class="custom-file-upload">Upload Image</label>
-                        <input type="file" name="activities_image" id="uploadActivityImage" accept="image/*">
-                        <button type="submit" id="save-activity-image-btn" class="save-image-btn">Save Activity Image</button>
-                    </div>
+    </section>
+</div>
+
+<!-- Beach Section -->
+<div class="beach-container" style="background: #ffffff; padding: 60px 40px; color: #333;">
+    <section class="beach-description">
+        <div class="description-container" style="display: flex; justify-content: space-between; align-items: center; gap: 40px; flex-wrap: wrap;">
+            
+            <!-- Text Left -->
+            <div class="description-text" style="flex: 1; max-width: 50%;">
+                <h2 style="color: #333; font-size: 32px; font-weight: bold; margin-bottom: 16px;">Beach</h2>
+                <p id="beach-description" style="font-size: 17px; line-height: 1.6; color: #333;">{{ resort.beach_description }}</p>
+                <textarea name="beach_description" id="edit-beach-description-input" style="display: none; width: 100%; padding: 10px;">{{ resort.beach_description }}</textarea>
+                <div style="margin-top: 10px;">
+                    <button type="button" id="edit-beach-description-btn">Edit Beach Description</button>
+                    <button type="submit" id="save-beach-description-btn" style="display: none;">Save Beach Description</button>
                 </div>
-            </section>
+            </div>
+
+            <!-- Image Right -->
+            <div class="slider-container" style="flex: 1; max-width: 50%; text-align: center;">
+                <div style="position: relative;">
+                    <button class="prev" type="button" onclick="changeBeachSlide(-1)" style="position: absolute; left: -30px; top: 50%; transform: translateY(-50%); font-size: 24px;">&#10094;</button>
+                    <img id="sliderImage2" 
+                         src="{% if resort.beachimage %}{{ resort.beachimage.url }}{% else %}/static/images/fmb.jpg{% endif %}" 
+                         alt="Beach Image" style="max-width: 100%; border-radius: 10px;">
+                    <button class="next" type="button" onclick="changeBeachSlide(1)" style="position: absolute; right: -30px; top: 50%; transform: translateY(-50%); font-size: 24px;">&#10095;</button>
+                </div>
+                <div style="margin-top: 10px;">
+                    <label for="uploadBeachImage" class="custom-file-upload">Upload Image</label>
+                    <input type="file" name="beachimage" id="uploadBeachImage" accept="image/*">
+                    <button type="submit" id="save-beach-image-btn" class="save-image-btn">Save Beach Image</button>
+                </div>
+            </div>
+
         </div>
+    </section>
+</div>
+
     
+<!-- Activities Section -->
+<div class="activities-container" style="background: linear-gradient(to bottom right, #1f5d63, #3f8ca0); padding: 60px 40px; color: white;">
+    <section class="activities-description">
+        <div class="description-container" style="display: flex; justify-content: space-between; align-items: center; gap: 40px; flex-wrap: wrap;">
+            
+            <!-- Image Slider Left -->
+            <div class="slider-container" style="flex: 1; max-width: 50%; text-align: center;">
+                <div style="position: relative;">
+                    <button class="prev" type="button" onclick="changeActivity(-1)" style="position: absolute; left: -30px; top: 50%; transform: translateY(-50%); font-size: 24px;">&#10094;</button>
+                    <img id="activity-sliderImage" 
+                         src="{% if resort.activities_image %}{{ resort.activities_image.url }}{% else %}/static/images/fmb.jpg{% endif %}" 
+                         alt="Activity Image" style="max-width: 100%; border-radius: 10px;">
+                    <button class="next" type="button" onclick="changeActivity(1)" style="position: absolute; right: -30px; top: 50%; transform: translateY(-50%); font-size: 24px;">&#10095;</button>
+                </div>
+                <div style="margin-top: 10px;">
+                    <label for="uploadActivityImage" class="custom-file-upload">Upload Image</label>
+                    <input type="file" name="activities_image" id="uploadActivityImage" accept="image/*">
+                    <button type="submit" id="save-activity-image-btn" class="save-image-btn">Save Activity Image</button>
+                </div>
+            </div>
+
+            <!-- Description Right -->
+            <div class="description-text" style="flex: 1; max-width: 50%;">
+                <h2 style="color: white; font-size: 32px; font-weight: bold; margin-bottom: 16px;">Activities</h2>
+                <p id="activity-description" style="font-size: 17px; line-height: 1.6;">{{ resort.activity_description }}</p>
+                <textarea name="activity_description" id="edit-activity-description-input" style="display: none; width: 100%; padding: 10px;">{{ resort.activity_description }}</textarea>
+                <div style="margin-top: 10px;">
+                    <button type="button" id="edit-activity-description-btn">Edit Activity Description</button>
+                    <button type="submit" id="save-activity-description-btn" style="display: none;">Save Activity Description</button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+</div>
         <!-- Pricing & Amenities Section -->
         <section class="pricing-amenities">
             <h2>Resort Information</h2>
@@ -169,22 +198,18 @@
                 <div class="info-box">
                     <h3>Our Amenities</h3>
                     
-                    <!-- List of current amenities -->
                     <ul id="amenities-list">
                         {% for amenity in resort.amenities.all %}
-                            <li>{{ amenity.name }}</li> <!-- Display amenities -->
+                            <li>{{ amenity.name }}</li> 
                         {% endfor %}
                     </ul>
             
-                    <!-- Input for new amenity -->
                     <input type="text" id="new-amenity-input" placeholder="Enter a new amenity">
                     <button type="button" id="add-amenity-btn">Add Amenity</button>
             
-                    <!-- Hidden field to store new amenity before submission -->
                     <input type="hidden" name="new_amenity" id="new-amenity-hidden" value="{{ new_amenity }}">
                     
-                    <!-- Submit button for the form -->
-                    <button type="submit" style="display: none;"></button>  <!-- Hidden button to trigger form submit after adding amenity -->
+                    <button type="submit" style="display: none;"></button> 
                 </div>
     
                 <div class="info-box">
@@ -222,7 +247,22 @@
             </div>
         </section>
     </form>    
-    
+<!-- Rating Modal (Hidden by Default) -->
+<div id="ratingModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 9999;">
+    <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
+        <h3>Rate this Resort</h3>
+        <div class="stars" style="margin: 10px 0;">
+            <span class="star" data-value="1" style="font-size: 24px; cursor: pointer;">★</span>
+            <span class="star" data-value="2" style="font-size: 24px; cursor: pointer;">★</span>
+            <span class="star" data-value="3" style="font-size: 24px; cursor: pointer;">★</span>
+            <span class="star" data-value="4" style="font-size: 24px; cursor: pointer;">★</span>
+            <span class="star" data-value="5" style="font-size: 24px; cursor: pointer;">★</span>
+        </div>
+        <button id="submitRatingBtn" style="padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 5px;">Submit Rating</button>
+    </div>
+</div>
+
+{% csrf_token %}
     <div class="comment-wrapper">
         <h3>Comments</h3>
         <hr>
@@ -252,10 +292,10 @@
     {% if request.user.is_authenticated %}
     <div class="comment-form">
         <img src="{{ request.user.avatar.url }}" class="avatar">
-        <form method="POST" action="{% url 'update_resort' resort.id %}">
+        <form id="commentForm">
             {% csrf_token %}
-            <input type="text" name="comment" placeholder="Write your comment here..." required>
-            <button type="submit">Send</button>
+            <input type="text" id="commentInput" name="comment" placeholder="Write your comment here..." required>
+            <button type="button" id="triggerRatingBeforeComment">Send</button>
         </form>
     </div>
     {% endif %}
@@ -452,6 +492,68 @@ document.addEventListener('DOMContentLoaded', function () {
       dropdownMenu.parentElement.classList.toggle('open');
     });
   }
+});
+let selectedRating = null;
+
+// Show modal when user clicks the "Send" button in comment form
+document.getElementById("triggerRatingBeforeComment").addEventListener("click", function() {
+    document.getElementById("ratingModal").style.display = "flex";
+});
+
+// Handle star click
+document.querySelectorAll('.star').forEach(function(star) {
+    star.addEventListener('click', function () {
+        selectedRating = this.getAttribute('data-value');
+        document.querySelectorAll('.star').forEach(function (s) {
+            s.style.color = s.getAttribute('data-value') <= selectedRating ? 'gold' : 'gray';
+        });
+    });
+});
+
+// Submit comment + rating
+document.getElementById("submitRatingBtn").addEventListener("click", function () {
+    const comment = document.getElementById("commentInput").value;
+    const resortId = "{{ resort.id }}";  // Injected by Django
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    if (!selectedRating) {
+        alert("Please select a rating.");
+        return;
+    }
+
+    if (!comment.trim()) {
+        alert("Please write a comment.");
+        return;
+    }
+
+    fetch("/rate-resort/" + resortId + "/", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken
+        },
+        body: JSON.stringify({
+            rating: selectedRating,
+            comment: comment
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Comment and rating submitted!");
+            document.getElementById("ratingModal").style.display = "none";
+            document.getElementById("commentInput").value = ""; // clear input
+            selectedRating = null;
+            // Optional: clear star colors
+            document.querySelectorAll('.star').forEach(s => s.style.color = 'gray');
+        } else {
+            alert("Error: " + data.message);
+        }
+    })
+    .catch(error => {
+        alert("Failed to submit.");
+        console.error(error);
+    });
 });
 </script>
 </body>

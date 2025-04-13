@@ -22,6 +22,7 @@ from decimal import Decimal, InvalidOperation
 from django.views.decorators.csrf import csrf_exempt
 import re
 from collections import Counter
+from django.utils import timezone
 
 
 
@@ -221,33 +222,45 @@ def index_view(request):
         'rated_resorts': rated_resorts, 
         'recommended_resorts': recommended_resorts,  
     })
+
 @login_required
 def rate_resort(request, resort_id):
     resort = get_object_or_404(Resort, id=resort_id)
-    
-    if request.method == 'POST':
-        rating_value = request.POST.get('rating')
 
-        if not rating_value:
-            return HttpResponse("Rating value is required.", status=400)
-
+    if request.method == 'POST' and request.content_type == 'application/json':
         try:
-            rating_value = int(rating_value)
-            if rating_value < 1 or rating_value > 5:
-                return HttpResponse("Rating must be between 1 and 5.", status=400)
-        except ValueError:
-            return HttpResponse("Invalid rating value.", status=400)
+            data = json.loads(request.body)
+            rating_value = data.get('rating')
+            comment_text = data.get('comment')
 
-        existing_rating = Rating.objects.filter(user=request.user, resort=resort).first()
-        if existing_rating:
-            existing_rating.rating = rating_value
-            existing_rating.save()
-        else:
-            Rating.objects.create(user=request.user, resort=resort, rating=rating_value)
+            if not rating_value:
+                return JsonResponse({'success': False, 'message': 'Rating is required.'}, status=400)
 
-        return redirect('home')
+            try:
+                rating_value = int(rating_value)
+                if not (1 <= rating_value <= 5):
+                    return JsonResponse({'success': False, 'message': 'Rating must be between 1 and 5.'}, status=400)
+            except ValueError:
+                return JsonResponse({'success': False, 'message': 'Invalid rating value.'}, status=400)
 
-    return render(request, 'app/resort.html', {'resort': resort})
+            # Save rating (create or update)
+            existing_rating = Rating.objects.filter(user=request.user, resort=resort).first()
+            if existing_rating:
+                existing_rating.rating = rating_value
+                existing_rating.save()
+            else:
+                Rating.objects.create(user=request.user, resort=resort, rating=rating_value)
+
+            # Save comment if provided
+            if comment_text:
+                Message.objects.create(user=request.user, resort=resort, comment=comment_text)
+
+            return JsonResponse({'success': True})
+
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'message': 'Invalid JSON.'}, status=400)
+
+    return JsonResponse({'success': False, 'message': 'Invalid request method.'}, status=400)
 
 @login_required
 def toggle_favorite(request):
@@ -512,6 +525,16 @@ def update_resort(request, resort_id):
 
     return redirect("resort", pk=resort.id)
 
+def resort_detail(request, resort_id):
+    resort = get_object_or_404(Resort, id=resort_id)
+
+    # Record the visit (example logic — you may adapt)
+    Visit.objects.create(user=request.user, resort=resort, date=timezone.now().date())
+
+    return render(request, 'resort_detail.html', {
+        'resort': resort,
+        # other context
+    })
 
 @csrf_exempt
 def resort(request, pk):
