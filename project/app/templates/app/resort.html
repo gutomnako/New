@@ -49,15 +49,18 @@
             <p id="hero-subtitle">{{ resort.mini_description }}</p>
             <textarea name="mini_description" id="edit-hero-subtitle-input" class="editable-textarea" style="display: none;">{{ resort.mini_description }}</textarea>
             <div class="description-buttons">
+                {% if request.user.groups.all.0.name == "subadmin" %}
                 <button type="button" id="edit-hero-btn" class="edit-btn">Edit Description</button>
                 <button type="submit" id="save-hero-btn" class="save-btn" style="display: none;">Save Description</button>
+                {% endif %}
             </div>
         </div>
-
+        {% if request.user.groups.all.0.name == "subadmin" %}
         <!-- Upload Hero Image -->
         <label for="uploadHeroImageHero" class="custom-file-upload">Upload Image</label>
         <input type="file" name="hero_image" id="uploadHeroImageHero" accept="image/*" hidden>
         <button type="submit" class="save-image-btn">Save Hero Image</button>
+        {% endif %}
     </div>
 </header>
     
@@ -67,17 +70,21 @@
                 <div class="description-text">
                     <h2 style="color: black;">About {{ resort.name }}</h2>
                     <p id="resort-description" style="color: black;">{{ resort.description }}</p>
+                    {% if request.user.groups.all.0.name == "subadmin" %}
                     <textarea name="description" id="edit-description-input" style="display: none;">{{ resort.description }}</textarea>
                     <button type="button" id="edit-description-btn">Edit Description</button>
                     <button type="submit" id="save-description-btn" style="display: none;">Save Description</button>
+                    {% endif %}
                 </div>
     
                 <!-- Resort Image Upload -->
                 <div class="description-image">
                     <img id="resort-image" src="{{ resort.resort_image.url|default:'/static/images/fmb.jpg' }}" alt="Resort Image">
+                    {% if request.user.groups.all.0.name == "subadmin" %}
                     <label for="uploadResortImage" class="custom-file-upload">Upload Image</label>
                     <input type="file" name="resort_image" id="uploadResortImage" accept="image/*">
                     <button type="submit" id="save-resort-image-btn" class="save-image-btn">Save Resort Image</button>
+                    {% endif %}
                 </div>
             </div>
         </section>
@@ -97,9 +104,11 @@
                     <button class="next" type="button" onclick="changeSlide(1)" style="position: absolute; right: -30px; top: 50%; transform: translateY(-50%); font-size: 24px;">&#10095;</button>
                 </div>
                 <div style="margin-top: 10px;">
+                    {% if request.user.groups.all.0.name == "subadmin" %}
                     <label for="uploadRoomImage" class="custom-file-upload">Upload Image</label>
                     <input type="file" name="roomimage" id="uploadRoomImage" accept="image/*">
                     <button type="submit" id="save-room-image-btn" class="save-image-btn">Save Room Image</button>
+                    {% endif %}
                 </div>
             </div>
 
@@ -109,8 +118,10 @@
                 <p id="room-description" style="font-size: 17px; line-height: 1.6;">{{ resort.room_description }}</p>
                 <textarea name="room_description" id="edit-room-description-input" style="display: none; width: 100%; padding: 10px;">{{ resort.room_description }}</textarea>
                 <div style="margin-top: 10px;">
+                    {% if request.user.groups.all.0.name == "subadmin" %}
                     <button type="button" id="edit-room-description-btn">Edit Room Description</button>
                     <button type="submit" id="save-room-description-btn" style="display: none;">Save Room Description</button>
+                    {% endif %}
                 </div>
             </div>
 
@@ -129,8 +140,10 @@
                 <p id="beach-description" style="font-size: 17px; line-height: 1.6; color: #333;">{{ resort.beach_description }}</p>
                 <textarea name="beach_description" id="edit-beach-description-input" style="display: none; width: 100%; padding: 10px;">{{ resort.beach_description }}</textarea>
                 <div style="margin-top: 10px;">
+                    {% if request.user.groups.all.0.name == "subadmin" %}
                     <button type="button" id="edit-beach-description-btn">Edit Beach Description</button>
                     <button type="submit" id="save-beach-description-btn" style="display: none;">Save Beach Description</button>
+                    {% endif %}
                 </div>
             </div>
 
@@ -144,9 +157,11 @@
                     <button class="next" type="button" onclick="changeBeachSlide(1)" style="position: absolute; right: -30px; top: 50%; transform: translateY(-50%); font-size: 24px;">&#10095;</button>
                 </div>
                 <div style="margin-top: 10px;">
+                    {% if request.user.groups.all.0.name == "subadmin" %}
                     <label for="uploadBeachImage" class="custom-file-upload">Upload Image</label>
                     <input type="file" name="beachimage" id="uploadBeachImage" accept="image/*">
                     <button type="submit" id="save-beach-image-btn" class="save-image-btn">Save Beach Image</button>
+                    {% endif %}
                 </div>
             </div>
 
@@ -170,9 +185,11 @@
                     <button class="next" type="button" onclick="changeActivity(1)" style="position: absolute; right: -30px; top: 50%; transform: translateY(-50%); font-size: 24px;">&#10095;</button>
                 </div>
                 <div style="margin-top: 10px;">
+                    {% if request.user.groups.all.0.name == "subadmin" %}
                     <label for="uploadActivityImage" class="custom-file-upload">Upload Image</label>
                     <input type="file" name="activities_image" id="uploadActivityImage" accept="image/*">
                     <button type="submit" id="save-activity-image-btn" class="save-image-btn">Save Activity Image</button>
+                    {% endif %}
                 </div>
             </div>
 
@@ -182,8 +199,10 @@
                 <p id="activity-description" style="font-size: 17px; line-height: 1.6;">{{ resort.activity_description }}</p>
                 <textarea name="activity_description" id="edit-activity-description-input" style="display: none; width: 100%; padding: 10px;">{{ resort.activity_description }}</textarea>
                 <div style="margin-top: 10px;">
+                    {% if request.user.groups.all.0.name == "subadmin" %}
                     <button type="button" id="edit-activity-description-btn">Edit Activity Description</button>
                     <button type="submit" id="save-activity-description-btn" style="display: none;">Save Activity Description</button>
+                    {% endif %}
                 </div>
             </div>
 
@@ -203,13 +222,14 @@
                             <li>{{ amenity.name }}</li> 
                         {% endfor %}
                     </ul>
-            
+                    {% if request.user.groups.all.0.name == "subadmin" %}
                     <input type="text" id="new-amenity-input" placeholder="Enter a new amenity">
                     <button type="button" id="add-amenity-btn">Add Amenity</button>
             
                     <input type="hidden" name="new_amenity" id="new-amenity-hidden" value="{{ new_amenity }}">
                     
                     <button type="submit" style="display: none;"></button> 
+                    {% endif %}
                 </div>
     
                 <div class="info-box">
@@ -221,8 +241,9 @@
                         <p><strong>Adults:</strong> <span id="adults-fee-text">{{ resort.entrance_adults }}</span></p>
                         <p><strong>Cottage Rates:</strong> <span id="cottage-rate-text">{{ resort.cottage }}</span></p>
                         <p><strong>Overnight Fee:</strong> <span id="overnight-fee-text">{{ resort.price }}</span> per night</p>
-    
+                        {% if request.user.groups.all.0.name == "subadmin" %}
                         <button type="button" id="edit-btn">Edit Rates</button>
+                        {% endif %}
                     </div>
     
                     <div id="edit-mode" style="display: none;">

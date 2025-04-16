@@ -64,7 +64,7 @@ class Resort(models.Model):
      mini_description = models.TextField(help_text="Brief description of the resort", blank=True, null=True)
      amenities = models.ManyToManyField(Amenity, blank=True, related_name="resorts", help_text="Amenities available at the resort")
      favorites = models.ManyToManyField(User, through='Favorite', related_name='favorite_resorts')
-     price_per_night = models.DecimalField(max_digits=10, decimal_places=2)
+     price_per_night = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
      entrance_kids = models.DecimalField(max_digits=10, decimal_places=2, validators=[validate_non_negative], default=0.00)
      entrance_adults = models.DecimalField(max_digits=10, decimal_places=2, validators=[validate_non_negative], default=0.00)
      cottage = models.CharField(max_length=100, default="Default Cottage Name")  # Example field

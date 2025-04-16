@@ -485,7 +485,7 @@ button a {
 }
 
 .discover-card p {
-  font-size: 1.1em; /* Balanced text size */
+  font-size: 25px; /* Balanced text size */
   color: #333333; /* Dark grey text for readability */
   line-height: 1.5em; /* Slightly increased line height for better readability */
   font-weight: 600;
