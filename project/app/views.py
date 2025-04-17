@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
+import logging
 from django.db.models import Q, Count, F, Sum, OuterRef, Subquery, Avg, Exists, Value
 from django.contrib.auth.decorators import login_required
-from .models import Resort, Amenity, Location, Message, User, Favorite, Rating, ResortImage
+from .models import Resort, Amenity, Location, Message, User, Favorite, Rating, RoomImage, ActivityImage, BeachImage
 from django.contrib.auth import authenticate, login, logout
 from .forms import ResortForm, MyUserCreationForm, RatingForm
 from django.contrib import messages
@@ -23,6 +24,7 @@ from django.views.decorators.csrf import csrf_exempt
 import re
 from collections import Counter
 from django.utils import timezone
+from django.views.decorators.http import require_POST
 
 
 
@@ -482,20 +484,42 @@ def update_resort(request, resort_id):
         resort.cottage = request.POST.get("cottage", resort.cottage)
         resort.price = request.POST.get("price", resort.price)
         resort.room_description = request.POST.get("room_description", resort.room_description)
-        resort.beach_description = request.POST.get("beach_description", resort.beach_description)  # Fixed
-        resort.activity_description = request.POST.get("activity_description", resort.activity_description)  # Fixed
+        resort.beach_description = request.POST.get("beach_description", resort.beach_description)
+        resort.activity_description = request.POST.get("activity_description", resort.activity_description)
 
         # Handle image uploads
         if 'hero_image' in request.FILES:
             resort.hero_image = request.FILES['hero_image']
         if 'resort_image' in request.FILES:
             resort.resort_image = request.FILES['resort_image']
-        if 'roomimage' in request.FILES:
-            resort.roomimage = request.FILES['roomimage']
-        if 'beachimage' in request.FILES:
-            resort.beachimage = request.FILES['beachimage']
-        if 'activities_image' in request.FILES:
-            resort.activities_image = request.FILES['activities_image']
+
+        # Handle room images
+        if 'room_image' in request.FILES:
+            current_count = resort.room_images.count()
+            upload_limit = 3 - current_count  # Calculate remaining slots
+            if upload_limit > 0:  # Only allow new uploads if there's space
+                for uploaded_image in request.FILES.getlist('room_image')[:upload_limit]:
+                    RoomImage.objects.create(resort=resort, image=uploaded_image)
+            else:
+                messages.error(request, "You can only upload up to 3 room images.")
+        
+        # Handle other images (beach, activities, etc.)
+        if 'beach_image' in request.FILES:
+            current_count = resort.beach_images.count()  # Adjust based on actual model and field
+            upload_limit = 3 - current_count
+            if upload_limit > 0:  # Only allow new uploads if there's space
+                for uploaded_image in request.FILES.getlist('beach_image')[:upload_limit]:
+                    resort.beach_images.create(image=uploaded_image)
+            else:
+                messages.error(request, "You can only upload up to 3 beach images.")
+        if 'activity_image' in request.FILES:
+            current_count = resort.activity_images.count()  # Adjust based on actual model and field
+            upload_limit = 3 - current_count
+            if upload_limit > 0:  # Only allow new uploads if there's space
+                for uploaded_image in request.FILES.getlist('activity_image')[:upload_limit]:
+                    ActivityImage.objects.create(resort=resort, image=uploaded_image)
+            else:
+                messages.error(request, "You can only upload up to 3 activity images.")
 
         # Handle amenities
         amenity_names = request.POST.getlist("amenities")
@@ -509,7 +533,7 @@ def update_resort(request, resort_id):
             new_amenity_obj, created = Amenity.objects.get_or_create(name=new_amenity.strip())
             resort.amenities.add(new_amenity_obj)
 
-             # Handle comments
+        # Handle comments
         if "comment" in request.POST:
             comment_text = request.POST.get("comment", "").strip()  # Strip spaces
             if comment_text:  # Check if the comment is not empty
@@ -524,6 +548,114 @@ def update_resort(request, resort_id):
         return redirect("resort", pk=resort.id)
 
     return redirect("resort", pk=resort.id)
+
+logger = logging.getLogger(__name__)  # Get a logger instance
+
+@login_required
+@require_POST
+def upload_room_image_ajax(request, resort_id):
+    resort = get_object_or_404(Resort, pk=resort_id)
+
+    try:
+        if 'room_image' not in request.FILES:
+            return JsonResponse({'success': False, 'error': 'No image uploaded.'})
+
+        uploaded_image = request.FILES['room_image']
+
+        # Check if we're replacing an existing image
+        image_id = request.POST.get('image_id')
+        if image_id:
+            room_image = get_object_or_404(RoomImage, pk=image_id, resort=resort)
+            room_image.image = uploaded_image
+            room_image.save(update_fields=['image'])
+            return JsonResponse({'success': True, 'image_url': room_image.image.url})
+
+        # If no image_id, we are uploading a new image
+        if resort.room_images.count() >= 3:
+            return JsonResponse({'success': False, 'error': 'Maximum of 3 images allowed.'})
+
+        new_image = RoomImage.objects.create(resort=resort, image=uploaded_image)
+        return JsonResponse({'success': True, 'image_url': new_image.image.url})
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+    
+@require_POST
+@csrf_exempt  # Only use this if CSRF token isn't being sent properly — ideally not needed
+def upload_beach_image_ajax(request, resort_id):
+    resort = Resort.objects.get(pk=resort_id)
+    image_file = request.FILES.get('beach_image')
+    image_id = request.POST.get('image_id')
+
+    if not image_file:
+        return JsonResponse({'success': False, 'error': 'No image provided'})
+
+    # Replace image if image_id is sent
+    if image_id:
+        try:
+            existing_image = BeachImage.objects.get(id=image_id, resort=resort)
+            existing_image.image = image_file
+            existing_image.save()
+            return JsonResponse({
+                'success': True,
+                'image_url': existing_image.image.url,
+                'image_id': existing_image.id
+            })
+        except BeachImage.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Image not found'})
+
+    # Check image count limit
+    if resort.beach_images.count() >= 3:
+        return JsonResponse({'success': False, 'error': 'Maximum of 3 images allowed'})
+
+    # Save new image
+    new_image = BeachImage.objects.create(resort=resort, image=image_file)
+
+    return JsonResponse({
+        'success': True,
+        'image_url': new_image.image.url,
+        'image_id': new_image.id
+    })
+
+
+# --- ACTIVITY IMAGE AJAX UPLOAD/REPLACE ---
+@require_POST
+@csrf_exempt  # Only use this if CSRF token isn't being sent properly — ideally not needed
+def upload_activity_image_ajax(request, resort_id):
+    resort = Resort.objects.get(pk=resort_id)
+    image_file = request.FILES.get('activity_image')
+    image_id = request.POST.get('image_id')
+
+    if not image_file:
+        return JsonResponse({'success': False, 'error': 'No image provided'})
+
+    # Replace image if image_id is sent
+    if image_id:
+        try:
+            existing_image = ActivityImage.objects.get(id=image_id, resort=resort)
+            existing_image.image = image_file
+            existing_image.save()
+            return JsonResponse({
+                'success': True,
+                'image_url': existing_image.image.url,
+                'image_id': existing_image.id
+            })
+        except ActivityImage.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Image not found'})
+
+    # Check image count limit
+    if resort.activity_images.count() >= 3:
+        return JsonResponse({'success': False, 'error': 'Maximum of 3 activity images allowed'})
+
+    # Save new image
+    new_image = ActivityImage.objects.create(resort=resort, image=image_file)
+
+    return JsonResponse({
+        'success': True,
+        'image_url': new_image.image.url,
+        'image_id': new_image.id
+    })
+    
 
 def resort_detail(request, resort_id):
     resort = get_object_or_404(Resort, id=resort_id)

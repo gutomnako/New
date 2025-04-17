@@ -589,3 +589,71 @@ input[type="file"] {
 .hidden {
     display: none;
 }
+
+.room-slide {
+    max-width: 100%;
+    border-radius: 10px;
+    display: none;
+}
+
+.room-slide.active {
+    display: block;
+}
+
+/* Styling the Replace Image Button */
+.replace-button {
+    background-color: #007bff; /* Blue background */
+    color: white; /* White text */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 8px 16px; /* Padding for better size */
+    font-size: 14px; /* Adjust font size */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+    margin-top: 10px; /* Add space between image and button */
+}
+
+/* Hover effect for the Replace Image button */
+.replace-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Styling the button when it's disabled */
+.replace-button:disabled {
+    background-color: #d6d6d6; /* Gray background */
+    cursor: not-allowed; /* Disable cursor */
+}
+
+/* Responsive styling for button */
+@media (max-width: 768px) {
+    .replace-button {
+        font-size: 12px; /* Smaller font on smaller screens */
+        padding: 6px 12px; /* Adjust padding */
+    }
+}
+
+.beach-slide {
+    max-width: 100%;
+    display: none;
+    border-radius: 10px
+}
+
+.beach-slide.active {
+    display: block;
+}
+
+.beach-image-container {
+    position: relative;
+}
+
+/* Activity image styling */
+.activity-slide {
+    max-width: 100%;
+    border-radius: 10px;
+    display: none;  /* Hide images by default */
+}
+
+/* Show active image */
+.activity-slide.active {
+    display: block;  /* Only the active image will be displayed */
+}

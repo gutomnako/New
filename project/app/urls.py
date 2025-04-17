@@ -36,4 +36,8 @@ urlpatterns = [
     path("resort/update/<int:resort_id>/", views.update_resort, name="update_resort"),
     path("update_resort_inline/<int:pk>/", views.update_resort_inline, name="update_resort_inline"),
     path("update_resort_images/<int:pk>/", views.update_resort_images, name="update_resort_images"),
+
+    path('resort/<int:resort_id>/upload_room_image_ajax/', views.upload_room_image_ajax, name='upload_room_image_ajax'),
+    path('resort/<int:resort_id>/upload_beach_image_ajax/', views.upload_beach_image_ajax, name='upload_beach_image_ajax'),
+    path('resort/<int:resort_id>/upload_activity_image_ajax/', views.upload_activity_image_ajax, name='upload_activity_image_ajax'),
 ]

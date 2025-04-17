@@ -9,6 +9,33 @@
     <link rel="stylesheet" href="{% static 'styles/profile.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+<header class="header">
+    <div class="logo">
+      <h1>BEACHES & RESORT</h1>
+    </div>
+      <nav class="nav">
+          <a href="{% url 'index-view' %}">Home</a>
+          <a href="{% url 'home' %}">Beaches & Resorts</a>
+          <a href="{% url 'map' %}">Map</a>
+          <a href="#">Contact</a>
+      </nav>
+      <div class="dropdown">
+        {% if request.user.is_authenticated %}
+          <!-- Hamburger Button -->
+          <button class="hamburger-btn" id="hamburgerBtn">
+            <i class="bi bi-list"></i> <!-- Bootstrap Icon (Can be replaced by custom icon) -->
+          </button>
+      
+          <!-- Dropdown Menu -->
+          <ul class="dropdown-menu" id="dropdownMenu">
+              <li><a class="dropdown-item" href="{% url 'user-profile' request.user.pk %}">Settings</a></li>
+              <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+          </ul>
+        {% else %}
+          <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
+        {% endif %}
+    </div>
+</header>
 <body>
         <div class="container">
             <aside class="sidebar">
@@ -62,6 +89,19 @@
         </aside>
     </div>
     <script src="{% static 'scripts/profile.css' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+  const hamburgerBtn = document.getElementById('hamburgerBtn');
+  const dropdownMenu = document.getElementById('dropdownMenu');
+
+  if (hamburgerBtn && dropdownMenu) {
+    hamburgerBtn.addEventListener('click', function() {
+      // Toggle the 'open' class on the dropdown element
+      dropdownMenu.parentElement.classList.toggle('open');
+    });
+  }
+});
+    </script>
 </body>
 </html>
 {% endblock content %}

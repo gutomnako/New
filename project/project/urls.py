@@ -18,9 +18,11 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from app import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('test-upload/<int:resort_id>/', views.upload_room_image_ajax), # Simple test
     path('', include('app.urls'))
 ]
 

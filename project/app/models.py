@@ -72,11 +72,8 @@ class Resort(models.Model):
      contact_number = models.CharField(max_length=20, help_text="Contact phone number")
      resort_image = models.ImageField(upload_to='resorts/', default='paradise.jpg', blank=True, help_text="Image of the resort")
      hero_image = models.ImageField(upload_to='resorts/', blank=True, null=True)
-     roomimage = models.ImageField(upload_to='resorts/rooms/', blank=True, null=True)
      room_description = models.TextField(help_text="Brief description of the resort", blank=True, null=True)
-     beachimage = models.ImageField(upload_to='resorts/beach/', blank=True, null=True)
      beach_description = models.TextField(help_text="Brief description of the resort", blank=True, null=True)
-     activities_image = models.ImageField(upload_to='resorts/', blank=True, null=True)
      activity_description = models.TextField(help_text="Brief description of the resort", blank=True, null=True)
      location_rating = models.FloatField(default=0.0, help_text="A score representing the resort's location")  
      created_at = models.DateTimeField(auto_now_add=True, help_text="Date and time the resort was added")
@@ -135,10 +132,28 @@ class Visit(models.Model):
     def __str__(self):
         return f"{self.user} visited {self.resort} on {self.timestamp}"
 
-class ResortImage(models.Model):
-    resort = models.ForeignKey('Resort', on_delete=models.CASCADE, related_name="room_images")
-    image = models.ImageField(upload_to="resorts/rooms/")
+class RoomImage(models.Model):
+    resort = models.ForeignKey('Resort', on_delete=models.CASCADE, related_name='room_images')
+    image = models.ImageField(upload_to='resorts/rooms/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Image for {self.resort.name}"
+        return f"{self.resort} - Room Image"
+
+
+class BeachImage(models.Model):
+    resort = models.ForeignKey('Resort', on_delete=models.CASCADE, related_name='beach_images')
+    image = models.ImageField(upload_to='resorts/beaches/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.resort} - Beach Image"
+
+
+class ActivityImage(models.Model):
+    resort = models.ForeignKey('Resort', on_delete=models.CASCADE, related_name='activity_images')
+    image = models.ImageField(upload_to='resorts/activities/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.resort} - Activity Image"

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FMB Resort</title>
     <link rel="stylesheet" href="{% static 'styles/resort.css'%}">
-    
+    <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
 </head>
 <body>
     <header class="header">
@@ -49,13 +49,13 @@
             <p id="hero-subtitle">{{ resort.mini_description }}</p>
             <textarea name="mini_description" id="edit-hero-subtitle-input" class="editable-textarea" style="display: none;">{{ resort.mini_description }}</textarea>
             <div class="description-buttons">
-                {% if request.user.groups.all.0.name == "subadmin" %}
+                {% if request.user == resort.host %}
                 <button type="button" id="edit-hero-btn" class="edit-btn">Edit Description</button>
                 <button type="submit" id="save-hero-btn" class="save-btn" style="display: none;">Save Description</button>
                 {% endif %}
             </div>
         </div>
-        {% if request.user.groups.all.0.name == "subadmin" %}
+        {% if request.user == resort.host %}
         <!-- Upload Hero Image -->
         <label for="uploadHeroImageHero" class="custom-file-upload">Upload Image</label>
         <input type="file" name="hero_image" id="uploadHeroImageHero" accept="image/*" hidden>
@@ -70,7 +70,7 @@
                 <div class="description-text">
                     <h2 style="color: black;">About {{ resort.name }}</h2>
                     <p id="resort-description" style="color: black;">{{ resort.description }}</p>
-                    {% if request.user.groups.all.0.name == "subadmin" %}
+                    {% if request.user == resort.host %}
                     <textarea name="description" id="edit-description-input" style="display: none;">{{ resort.description }}</textarea>
                     <button type="button" id="edit-description-btn">Edit Description</button>
                     <button type="submit" id="save-description-btn" style="display: none;">Save Description</button>
@@ -80,7 +80,7 @@
                 <!-- Resort Image Upload -->
                 <div class="description-image">
                     <img id="resort-image" src="{{ resort.resort_image.url|default:'/static/images/fmb.jpg' }}" alt="Resort Image">
-                    {% if request.user.groups.all.0.name == "subadmin" %}
+                    {% if request.user == resort.host %}
                     <label for="uploadResortImage" class="custom-file-upload">Upload Image</label>
                     <input type="file" name="resort_image" id="uploadResortImage" accept="image/*">
                     <button type="submit" id="save-resort-image-btn" class="save-image-btn">Save Resort Image</button>
@@ -94,20 +94,34 @@
     <section class="room-description">
         <div class="description-container" style="display: flex; justify-content: space-between; align-items: center; gap: 40px; flex-wrap: wrap;">
             
-            <!-- Image Slider Left -->
-            <div class="slider-container" style="flex: 1; max-width: 50%; text-align: center;">
-                <div style="position: relative;">
-                    <button class="prev" type="button" onclick="changeSlide(-1)" style="position: absolute; left: -30px; top: 50%; transform: translateY(-50%); font-size: 24px;">&#10094;</button>
-                    <img id="sliderImage" 
-                         src="{% if resort.roomimage %}{{ resort.roomimage.url }}{% else %}/static/images/fmb.jpg{% endif %}" 
-                         alt="Room Image" style="max-width: 100%; border-radius: 10px;">
-                    <button class="next" type="button" onclick="changeSlide(1)" style="position: absolute; right: -30px; top: 50%; transform: translateY(-50%); font-size: 24px;">&#10095;</button>
+            <div class="slider-container" data-resort-id="{{ resort.id }}" style="flex: 1; max-width: 50%; text-align: center;">
+                <div style="position: relative;" id="roomSlider">
+                    {% for room_image in resort.room_images.all|slice:":3" %}
+                        <div class="room-image-container">
+                            <img src="{{ room_image.image.url }}" alt="Room Image" class="room-slide {% if forloop.first %}active{% endif %}" data-image-id="{{ room_image.id }}">
+                        {% if request.user == resort.host %}
+                            {% if forloop.counter == 1 %}
+                                <button class="replace-button" data-image-id="{{ room_image.id }}" style="display:block;">Replace Image</button>
+                            {% else %}
+                                <button class="replace-button" data-image-id="{{ room_image.id }}" style="display:none;">Replace Image</button>
+                            {% endif %}
+                        {% endif %}
+                        </div>
+                    {% empty %}
+                        <img src="/static/images/fmb.jpg" alt="Default Room Image" class="room-slide active" data-image-id="default-room-1">
+                    {% endfor %}
+                    
+                    <!-- Arrows -->
+                    <button class="prev" type="button" style="position: absolute; left: -30px; top: 50%; transform: translateY(-50%); font-size: 24px;">&#10094;</button>
+                    <button class="next" type="button" style="position: absolute; right: -30px; top: 50%; transform: translateY(-50%); font-size: 24px;">&#10095;</button>
                 </div>
+            
+                <!-- Upload form -->
                 <div style="margin-top: 10px;">
-                    {% if request.user.groups.all.0.name == "subadmin" %}
-                    <label for="uploadRoomImage" class="custom-file-upload">Upload Image</label>
-                    <input type="file" name="roomimage" id="uploadRoomImage" accept="image/*">
-                    <button type="submit" id="save-room-image-btn" class="save-image-btn">Save Room Image</button>
+                    {% if request.user == resort.host %}
+                        <label for="uploadRoomImage" class="custom-file-upload">Upload Image</label>
+                        <input type="file" name="room_image" id="uploadRoomImage" accept="image/*">
+                        <button type="button" id="save-room-image-btn" class="save-image-btn">Save Room Image</button>
                     {% endif %}
                 </div>
             </div>
@@ -118,7 +132,7 @@
                 <p id="room-description" style="font-size: 17px; line-height: 1.6;">{{ resort.room_description }}</p>
                 <textarea name="room_description" id="edit-room-description-input" style="display: none; width: 100%; padding: 10px;">{{ resort.room_description }}</textarea>
                 <div style="margin-top: 10px;">
-                    {% if request.user.groups.all.0.name == "subadmin" %}
+                    {% if request.user == resort.host %}
                     <button type="button" id="edit-room-description-btn">Edit Room Description</button>
                     <button type="submit" id="save-room-description-btn" style="display: none;">Save Room Description</button>
                     {% endif %}
@@ -140,30 +154,44 @@
                 <p id="beach-description" style="font-size: 17px; line-height: 1.6; color: #333;">{{ resort.beach_description }}</p>
                 <textarea name="beach_description" id="edit-beach-description-input" style="display: none; width: 100%; padding: 10px;">{{ resort.beach_description }}</textarea>
                 <div style="margin-top: 10px;">
-                    {% if request.user.groups.all.0.name == "subadmin" %}
+                    {% if request.user == resort.host %}
                     <button type="button" id="edit-beach-description-btn">Edit Beach Description</button>
                     <button type="submit" id="save-beach-description-btn" style="display: none;">Save Beach Description</button>
                     {% endif %}
                 </div>
             </div>
 
-            <!-- Image Right -->
-            <div class="slider-container" style="flex: 1; max-width: 50%; text-align: center;">
-                <div style="position: relative;">
-                    <button class="prev" type="button" onclick="changeBeachSlide(-1)" style="position: absolute; left: -30px; top: 50%; transform: translateY(-50%); font-size: 24px;">&#10094;</button>
-                    <img id="sliderImage2" 
-                         src="{% if resort.beachimage %}{{ resort.beachimage.url }}{% else %}/static/images/fmb.jpg{% endif %}" 
-                         alt="Beach Image" style="max-width: 100%; border-radius: 10px;">
-                    <button class="next" type="button" onclick="changeBeachSlide(1)" style="position: absolute; right: -30px; top: 50%; transform: translateY(-50%); font-size: 24px;">&#10095;</button>
+            <div class="slider-container" data-resort-id="{{ resort.id }}" style="flex: 1; max-width: 50%; text-align: center;">
+                <div style="position: relative;" id="beachSlider">
+                    {% for beach_image in resort.beach_images.all|slice:":3" %}
+                        <div class="beach-image-container">
+                            <img src="{{ beach_image.image.url }}" alt="Beach Image" class="beach-slide {% if forloop.first %}active{% endif %}" data-image-id="{{ beach_image.id }}">
+                            {% if request.user == resort.host %}
+                                {% if forloop.counter == 1 %}
+                                    <button class="replace-button" data-image-id="{{ beach_image.id }}" style="display:block;">Replace Image</button>
+                                {% else %}
+                                    <button class="replace-button" data-image-id="{{ beach_image.id }}" style="display:none;">Replace Image</button>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    {% empty %}
+                        <img src="/static/images/fmb.jpg" alt="Default Beach Image 1" class="beach-slide active" data-image-id="default-beach-1">
+                    {% endfor %}
+                    
+                    <!-- Arrows -->
+                    <button class="prev" type="button" style="position: absolute; left: -30px; top: 50%; transform: translateY(-50%); font-size: 24px;">&#10094;</button>
+                    <button class="next" type="button" style="position: absolute; right: -30px; top: 50%; transform: translateY(-50%); font-size: 24px;">&#10095;</button>
                 </div>
+            
+                <!-- Upload form -->
                 <div style="margin-top: 10px;">
-                    {% if request.user.groups.all.0.name == "subadmin" %}
-                    <label for="uploadBeachImage" class="custom-file-upload">Upload Image</label>
-                    <input type="file" name="beachimage" id="uploadBeachImage" accept="image/*">
-                    <button type="submit" id="save-beach-image-btn" class="save-image-btn">Save Beach Image</button>
+                    {% if request.user == resort.host %}
+                        <label for="uploadBeachImage" class="custom-file-upload">Upload Image</label>
+                        <input type="file" name="beach_image" id="uploadBeachImage" accept="image/*">
+                        <button type="button" id="save-beach-image-btn" class="save-image-btn">Save Beach Image</button>
                     {% endif %}
                 </div>
-            </div>
+            </div>            
 
         </div>
     </section>
@@ -175,20 +203,40 @@
     <section class="activities-description">
         <div class="description-container" style="display: flex; justify-content: space-between; align-items: center; gap: 40px; flex-wrap: wrap;">
             
-            <!-- Image Slider Left -->
-            <div class="slider-container" style="flex: 1; max-width: 50%; text-align: center;">
-                <div style="position: relative;">
-                    <button class="prev" type="button" onclick="changeActivity(-1)" style="position: absolute; left: -30px; top: 50%; transform: translateY(-50%); font-size: 24px;">&#10094;</button>
-                    <img id="activity-sliderImage" 
-                         src="{% if resort.activities_image %}{{ resort.activities_image.url }}{% else %}/static/images/fmb.jpg{% endif %}" 
-                         alt="Activity Image" style="max-width: 100%; border-radius: 10px;">
-                    <button class="next" type="button" onclick="changeActivity(1)" style="position: absolute; right: -30px; top: 50%; transform: translateY(-50%); font-size: 24px;">&#10095;</button>
+            <!-- Activity Image Slider -->
+            <div class="slider-container" data-resort-id="{{ resort.id }}" style="flex: 1; max-width: 50%; text-align: center;">
+                <div style="position: relative;" id="activitySlider">
+                    {% for activity_image in resort.activity_images.all|slice:":3" %}
+                        <div class="activity-image-container">
+                            <img src="{{ activity_image.image.url }}"
+                                 alt="Activity Image"
+                                 class="activity-slide {% if forloop.first %}active{% endif %}"
+                                 style="max-width: 100%; border-radius: 10px;"
+                                 data-image-id="{{ activity_image.id }}">
+            
+                            {% if request.user == resort.host %}
+                                {% if forloop.counter == 1 %}
+                                    <button class="replace-button" data-image-id="{{ activity_image.id }}" style="display:block;">Replace Image</button>
+                                {% else %}
+                                    <button class="replace-button" data-image-id="{{ activity_image.id }}" style="display:none;">Replace Image</button>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    {% empty %}
+                        <img src="/static/images/fmb.jpg" alt="Default Beach Image 1" class="beach-slide active" data-image-id="default-beach-1">
+                    {% endfor %}
+            
+                    <!-- Arrows -->
+                    <button class="prev" type="button" style="position: absolute; left: -30px; top: 50%; transform: translateY(-50%); font-size: 24px;">&#10094;</button>
+                    <button class="next" type="button" style="position: absolute; right: -30px; top: 50%; transform: translateY(-50%); font-size: 24px;">&#10095;</button>
                 </div>
+            
+                <!-- Upload form -->
                 <div style="margin-top: 10px;">
-                    {% if request.user.groups.all.0.name == "subadmin" %}
-                    <label for="uploadActivityImage" class="custom-file-upload">Upload Image</label>
-                    <input type="file" name="activities_image" id="uploadActivityImage" accept="image/*">
-                    <button type="submit" id="save-activity-image-btn" class="save-image-btn">Save Activity Image</button>
+                    {% if request.user == resort.host %}
+                        <label for="uploadActivityImage" class="custom-file-upload">Upload Image</label>
+                        <input type="file" name="activity_image" id="uploadActivityImage" accept="image/*">
+                        <button type="button" id="save-activity-image-btn" class="save-image-btn">Save Activity Image</button>
                     {% endif %}
                 </div>
             </div>
@@ -199,7 +247,7 @@
                 <p id="activity-description" style="font-size: 17px; line-height: 1.6;">{{ resort.activity_description }}</p>
                 <textarea name="activity_description" id="edit-activity-description-input" style="display: none; width: 100%; padding: 10px;">{{ resort.activity_description }}</textarea>
                 <div style="margin-top: 10px;">
-                    {% if request.user.groups.all.0.name == "subadmin" %}
+                    {% if request.user == resort.host %}
                     <button type="button" id="edit-activity-description-btn">Edit Activity Description</button>
                     <button type="submit" id="save-activity-description-btn" style="display: none;">Save Activity Description</button>
                     {% endif %}
@@ -222,7 +270,7 @@
                             <li>{{ amenity.name }}</li> 
                         {% endfor %}
                     </ul>
-                    {% if request.user.groups.all.0.name == "subadmin" %}
+                    {% if request.user == resort.host %}
                     <input type="text" id="new-amenity-input" placeholder="Enter a new amenity">
                     <button type="button" id="add-amenity-btn">Add Amenity</button>
             
@@ -241,7 +289,7 @@
                         <p><strong>Adults:</strong> <span id="adults-fee-text">{{ resort.entrance_adults }}</span></p>
                         <p><strong>Cottage Rates:</strong> <span id="cottage-rate-text">{{ resort.cottage }}</span></p>
                         <p><strong>Overnight Fee:</strong> <span id="overnight-fee-text">{{ resort.price }}</span> per night</p>
-                        {% if request.user.groups.all.0.name == "subadmin" %}
+                        {% if request.user == resort.host %}
                         <button type="button" id="edit-btn">Edit Rates</button>
                         {% endif %}
                     </div>
@@ -457,30 +505,6 @@ editAndSaveDescription("edit-activity-description-btn", "save-activity-descripti
         }
     });
 
-    // Beach image upload functionality
-    document.getElementById("uploadBeachImage").addEventListener("change", function (event) {
-        let file = event.target.files[0];
-        if (file) {
-            let reader = new FileReader();
-            reader.onload = function (e) {
-                document.getElementById("sliderImage").src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-
-    // Activities image upload functionality
-    document.getElementById("uploadActivityImage").addEventListener("change", function (event) {
-        let file = event.target.files[0];
-        if (file) {
-            let reader = new FileReader();
-            reader.onload = function (e) {
-                document.getElementById("activity-sliderImage").src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-
     document.getElementById('add-amenity-btn').addEventListener('click', function() {
     var newAmenityInput = document.getElementById('new-amenity-input');
     var newAmenity = newAmenityInput.value.trim();
@@ -575,6 +599,537 @@ document.getElementById("submitRatingBtn").addEventListener("click", function ()
         alert("Failed to submit.");
         console.error(error);
     });
+});
+document.addEventListener('DOMContentLoaded', function () {
+    const roomSliderElement = document.getElementById('roomSlider');
+    const uploadRoomImageInput = document.getElementById('uploadRoomImage');
+    const saveRoomImageBtn = document.getElementById('save-room-image-btn');
+    const resortId = document.querySelector('.slider-container')?.dataset.resortId;
+
+    let currentSlide = 0;  // Keep track of the current slide
+
+    // Function to refresh the slider and get the current image count
+    function refreshSlides() {
+        return Array.from(roomSliderElement.querySelectorAll('.room-slide'));
+    }
+
+    // Handle image upload (Add new image)
+    saveRoomImageBtn?.addEventListener('click', function (event) {
+        event.preventDefault();
+
+        // Check if a file is selected for upload
+        const file = uploadRoomImageInput.files[0];
+        if (!file) {
+            alert('Please select an image.');
+            return;
+        }
+
+        // Refresh the slides to get the current count
+        const slides = refreshSlides();
+        if (slides.length >= 3) {
+            alert('Maximum of 3 images allowed.');
+            return;
+        }
+
+        // Prepare form data to upload image
+        const formData = new FormData();
+        formData.append('room_image', file);
+
+        // Send the image upload request
+        fetch(`/resort/${resortId}/upload_room_image_ajax/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.image_url) {
+                // Add new image to the slider
+                const newImage = document.createElement('img');
+                newImage.src = data.image_url;
+                newImage.classList.add('room-slide');
+                newImage.style.maxWidth = '100%';
+
+                // If there are no images, make the new one active
+                if (slides.length === 0) {
+                    newImage.classList.add('active');
+                }
+
+                // Append new image to the slider
+                roomSliderElement.appendChild(newImage);
+
+                // Clear the file input after upload
+                uploadRoomImageInput.value = '';
+                
+                // Refresh the slider and show only the replace button for the new active image
+                refreshSlider();
+            } else {
+                alert('Image upload failed');
+            }
+        })
+        .catch(err => console.error('Error uploading image:', err));
+    });
+
+    // Handle image replacement (by clicking "Replace Image" button)
+    roomSliderElement?.addEventListener('click', function (event) {
+        if (event.target && event.target.classList.contains('replace-button')) {
+            // Prevent the default action (scrolling, anchor link behavior)
+            event.preventDefault();
+            const imageElement = event.target.closest('.room-image-container').querySelector('.room-slide');
+            const imageId = imageElement.dataset.imageId;
+
+            // Trigger file input for replacing image
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+            fileInput.style.display = 'none'; // Hide the input initially
+            document.body.appendChild(fileInput);
+
+            // When file is selected for replacement
+            fileInput.addEventListener('change', function () {
+                const file = fileInput.files[0];
+                if (!file) return;
+
+                const formData = new FormData();
+                formData.append('room_image', file);
+                formData.append('image_id', imageId); // The ID of the image to replace
+
+                // Send the replace image request
+                fetch(`/resort/${resortId}/upload_room_image_ajax/`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.image_url) {
+                        // Replace the old image with the new one
+                        imageElement.src = data.image_url;
+                    } else {
+                        alert('Image replacement failed');
+                    }
+                })
+                .catch(err => console.error('Error replacing image:', err));
+
+                // Clean up by removing the input field
+                document.body.removeChild(fileInput);
+            });
+
+            // Open the file input dialog
+            fileInput.click();
+        }
+    });
+
+    // Function to change the slide (Previous or Next)
+    function changeSlide(direction) {
+        const slides = refreshSlides();
+        if (slides.length === 0) return;
+
+        // Hide the current slide
+        slides[currentSlide].style.display = 'none';
+
+        // Calculate the new slide index
+        currentSlide = (currentSlide + direction + slides.length) % slides.length;
+
+        // Show the new slide
+        slides[currentSlide].style.display = 'block';
+
+        // Refresh slider to show only one replace button for the active slide
+        refreshSlider();
+    }
+
+    // Function to refresh the slider and show only the replace button on the active image
+    function refreshSlider() {
+        const slides = refreshSlides();
+        if (slides.length === 0) return;
+
+        // Hide all replace buttons first
+        document.querySelectorAll('.replace-button').forEach(button => {
+            button.style.display = 'none';
+        });
+
+        // Show the replace button only for the active slide
+        const activeSlide = slides[currentSlide];
+        const activeButton = activeSlide.closest('.room-image-container').querySelector('.replace-button');
+        if (activeButton) {
+            activeButton.style.display = 'block'; // Show the button on the active image
+        }
+    }
+
+    // Add event listeners for the Previous and Next buttons
+    const prevButton = document.querySelector('.prev');
+    const nextButton = document.querySelector('.next');
+
+    if (prevButton) {
+        prevButton.addEventListener('click', function () {
+            changeSlide(-1); // Show previous slide
+        });
+    }
+
+    if (nextButton) {
+        nextButton.addEventListener('click', function () {
+            changeSlide(1); // Show next slide
+        });
+    }
+
+    // Initial setup
+    refreshSlider();
+
+    // Helper function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const beachSliderElement = document.getElementById('beachSlider');
+    const uploadBeachImageInput = document.getElementById('uploadBeachImage');
+    const saveBeachImageBtn = document.getElementById('save-beach-image-btn');
+    const resortId = document.querySelector('.slider-container')?.dataset.resortId;
+
+    let currentBeachSlide = 0;
+
+    function refreshBeachSlides() {
+        return Array.from(beachSliderElement.querySelectorAll('.beach-slide'));
+    }
+
+    // Save new beach image
+    saveBeachImageBtn?.addEventListener('click', function (event) {
+        event.preventDefault();
+        const file = uploadBeachImageInput.files[0];
+        if (!file) {
+            alert('Please select an image.');
+            return;
+        }
+
+        const slides = refreshBeachSlides();
+        if (slides.length >= 3) {
+            alert('Maximum of 3 images allowed.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('beach_image', file);
+
+        fetch(`/resort/${resortId}/upload_beach_image_ajax/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.image_url) {
+                const newImage = document.createElement('img');
+                newImage.src = data.image_url;
+                newImage.classList.add('beach-slide');
+                newImage.dataset.imageId = data.image_id;
+
+                if (slides.length === 0) {
+                    newImage.classList.add('active');
+                }
+
+                beachSliderElement.appendChild(newImage);
+                uploadBeachImageInput.value = '';
+                refreshBeachSlider();
+            } else {
+                alert('Image upload failed.');
+            }
+        })
+        .catch(err => console.error('Error uploading image:', err));
+    });
+
+    // Replace beach image
+    beachSliderElement?.addEventListener('click', function (event) {
+        if (!event.target.classList.contains('replace-button')) return;
+
+        event.preventDefault();  // Prevent scrolling to top
+
+        const imageElement = event.target.closest('.beach-image-container').querySelector('.beach-slide');
+        const imageId = imageElement.dataset.imageId;
+
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.style.display = 'none';
+        document.body.appendChild(fileInput);
+
+        fileInput.addEventListener('change', function () {
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('beach_image', file);
+            formData.append('image_id', imageId);
+
+            fetch(`/resort/${resortId}/upload_beach_image_ajax/`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.image_url) {
+                    imageElement.src = data.image_url;
+                } else {
+                    alert('Image replacement failed.');
+                }
+            })
+            .catch(err => console.error('Error replacing image:', err));
+
+            document.body.removeChild(fileInput);
+        });
+
+        fileInput.click();
+    });
+
+    // Slide navigation
+    function changeBeachSlide(direction) {
+        const slides = refreshBeachSlides();
+        if (slides.length === 0) return;
+
+        slides[currentBeachSlide].style.display = 'none';
+        currentBeachSlide = (currentBeachSlide + direction + slides.length) % slides.length;
+        slides[currentBeachSlide].style.display = 'block';
+        refreshBeachSlider();
+    }
+
+    // Refresh slider (show only replace button for active image)
+    function refreshBeachSlider() {
+        const slides = refreshBeachSlides();
+        if (slides.length === 0) return;
+
+        document.querySelectorAll('.replace-button').forEach(button => {
+            button.style.display = 'none';
+        });
+
+        const activeSlide = slides[currentBeachSlide];
+        const activeButton = activeSlide.closest('.beach-image-container')?.querySelector('.replace-button');
+        if (activeButton) {
+            activeButton.style.display = 'block';
+        }
+    }
+
+    // Navigation buttons
+    const prevBeachButton = beachSliderElement?.closest('.slider-container')?.querySelector('.prev');
+    const nextBeachButton = beachSliderElement?.closest('.slider-container')?.querySelector('.next');
+
+    prevBeachButton?.addEventListener('click', () => changeBeachSlide(-1));
+    nextBeachButton?.addEventListener('click', () => changeBeachSlide(1));
+
+    refreshBeachSlider();
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const activitySliderElement = document.getElementById('activitySlider');
+    const uploadActivityImageInput = document.getElementById('uploadActivityImage');
+    const saveActivityImageBtn = document.getElementById('save-activity-image-btn');
+    const resortId = document.querySelector('.slider-container')?.dataset.resortId;
+
+    let currentActivitySlide = 0;
+
+    function refreshActivitySlides() {
+        return Array.from(activitySliderElement.querySelectorAll('.activity-slide'));
+    }
+
+    saveActivityImageBtn?.addEventListener('click', function (event) {
+        event.preventDefault();
+        const file = uploadActivityImageInput.files[0];
+        if (!file) {
+            alert('Please select an image.');
+            return;
+        }
+
+        const slides = refreshActivitySlides();
+        if (slides.length >= 3) {
+            alert('Maximum of 3 images allowed.');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('activity_image', file);
+
+        fetch(`/resort/${resortId}/upload_activity_image_ajax/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.image_url) {
+                const newImage = document.createElement('img');
+                newImage.src = data.image_url;
+                newImage.classList.add('activity-slide');
+                newImage.dataset.imageId = data.image_id;
+                newImage.style.maxWidth = '100%';
+                newImage.style.borderRadius = '10px';
+
+                if (slides.length === 0) {
+                    newImage.classList.add('active');
+                }
+
+                const imageContainer = document.createElement('div');
+                imageContainer.classList.add('activity-image-container');
+                imageContainer.appendChild(newImage);
+
+                if (slides.length === 0) {
+                    const replaceButton = document.createElement('button');
+                    replaceButton.classList.add('replace-button');
+                    replaceButton.setAttribute('data-image-id', data.image_id);
+                    replaceButton.style.display = 'block';
+                    replaceButton.textContent = 'Replace Image';
+                    imageContainer.appendChild(replaceButton);
+                } else {
+                    const replaceButton = document.createElement('button');
+                    replaceButton.classList.add('replace-button');
+                    replaceButton.setAttribute('data-image-id', data.image_id);
+                    replaceButton.style.display = 'none';
+                    replaceButton.textContent = 'Replace Image';
+                    imageContainer.appendChild(replaceButton);
+                }
+
+                activitySliderElement.insertBefore(imageContainer, activitySliderElement.querySelector('.prev'));
+                uploadActivityImageInput.value = '';
+                refreshActivitySlider();
+            } else {
+                alert('Image upload failed');
+            }
+        })
+        .catch(err => console.error('Error uploading activity image:', err));
+    });
+
+    activitySliderElement?.addEventListener('click', function (event) {
+        if (event.target && event.target.classList.contains('replace-button')) {
+            event.preventDefault();
+            const imageElement = event.target.closest('.activity-image-container').querySelector('.activity-slide');
+            const imageId = imageElement.dataset.imageId;
+
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+            fileInput.style.display = 'none';
+            document.body.appendChild(fileInput);
+
+            fileInput.addEventListener('change', function () {
+                const file = fileInput.files[0];
+                if (!file) return;
+
+                const formData = new FormData();
+                formData.append('activity_image', file);
+                formData.append('image_id', imageId);
+
+                fetch(`/resort/${resortId}/upload_activity_image_ajax/`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.image_url) {
+                        imageElement.src = data.image_url;
+                    } else {
+                        alert('Image replacement failed');
+                    }
+                })
+                .catch(err => console.error('Error replacing activity image:', err));
+
+                document.body.removeChild(fileInput);
+            });
+
+            fileInput.click();
+        }
+    });
+
+    function changeActivitySlide(direction) {
+        const slides = refreshActivitySlides();
+        if (slides.length === 0) return;
+
+        slides[currentActivitySlide].style.display = 'none';
+        currentActivitySlide = (currentActivitySlide + direction + slides.length) % slides.length;
+        slides[currentActivitySlide].style.display = 'block';
+
+        refreshActivitySlider();
+    }
+
+    function refreshActivitySlider() {
+        const slides = refreshActivitySlides();
+        if (slides.length === 0) return;
+
+        document.querySelectorAll('.replace-button').forEach(button => {
+            button.style.display = 'none';
+        });
+
+        const activeSlide = slides[currentActivitySlide];
+        activeSlide.classList.add('active');
+        const activeButton = activeSlide.closest('.activity-image-container')?.querySelector('.replace-button');
+        if (activeButton) {
+            activeButton.style.display = 'block';
+        }
+
+        slides.forEach((slide, index) => {
+            slide.style.display = index === currentActivitySlide ? 'block' : 'none';
+        });
+    }
+
+    const prevActivityBtn = activitySliderElement.querySelector('.prev');
+    const nextActivityBtn = activitySliderElement.querySelector('.next');
+
+    prevActivityBtn?.addEventListener('click', () => changeActivitySlide(-1));
+    nextActivityBtn?.addEventListener('click', () => changeActivitySlide(1));
+
+    refreshActivitySlider();
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
 });
 </script>
 </body>
