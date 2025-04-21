@@ -70,14 +70,22 @@ def adminDashboard(request):
         }
         resort_visit_data.append(resort_data)
 
+    # Fetch Most Rated Resorts
+    most_rated_resorts = Resort.objects.annotate(
+        avg_rating=Avg('rating__rating')
+    ).order_by('-avg_rating').values('name', 'avg_rating')[:5]  # Top 5 most rated resorts
+
+    # Convert to JSON-compatible format
+    most_rated_resorts_data = json.dumps(list(most_rated_resorts), default=float)
+
     all_messages = Message.objects.select_related('user').order_by('-created_at').annotate(
-    rating=Subquery(
-        Rating.objects.filter(
-            user=OuterRef('user'),
-            resort=OuterRef('resort')
-        ).values('rating')[:1]  
+        rating=Subquery(
+            Rating.objects.filter(
+                user=OuterRef('user'),
+                resort=OuterRef('resort')
+            ).values('rating')[:1]  
+        )
     )
-)
 
     context = {
         'resorts': resorts,
@@ -85,6 +93,7 @@ def adminDashboard(request):
         'unique_users_count': unique_users_count,
         'resort_visit_data': resort_visit_data,
         'all_messages': all_messages,  
+        'most_rated_resorts_data': most_rated_resorts_data  # Pass the most rated resorts data
     }
 
     if login_history.exists():

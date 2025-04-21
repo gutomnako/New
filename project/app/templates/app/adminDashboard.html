@@ -107,15 +107,13 @@
 			</div>
 
 			<div class="box-info">
-				<ul>
-					<li>
-						<i class="bx bxs-group"></i>
-						<span class="text">
-							<h3>{{ unique_users_count }}</h3>
-							<p>Users</p>
-						</span>
-					</li>
-				</ul>
+				 <!-- Most Rated Resorts Chart -->
+				<div class="most-rated-info">
+					<h3>Most Rated Resorts</h3>
+
+					<!-- Chart Canvas -->
+					<canvas id="mostRatedChart"></canvas>
+				</div>
 				
 				<div class="resort-visit-info">
 					<h3>Resort Visit Data</h3>
@@ -207,7 +205,9 @@
 		</main>
 		<!-- MAIN -->
 	</section>
-	
+	<script id="resortRatingData" type="application/json">
+		{{ most_rated_resorts_data|safe }}
+	  </script>
 	<script id="resortVisitData" type="application/json">
 		{{ resort_visit_data|json_script:"resortVisitData" }}
 	</script>
@@ -303,6 +303,42 @@
             }
         });
     });
+ // Retrieve the data embedded by json_script and parse it directly
+ var resortRatingData = JSON.parse(document.getElementById('resortRatingData').textContent);
+
+// Extract names and average ratings
+var resortNames = resortRatingData.map(function(data) { return data.name; });
+var averageRatings = resortRatingData.map(function(data) { return data.avg_rating; });
+
+// Create the chart
+var ctx = document.getElementById('mostRatedChart').getContext('2d');
+var mostRatedChart = new Chart(ctx, {
+  type: 'bar',
+  data: {
+	labels: resortNames,
+	datasets: [{
+	  label: 'Average Rating',
+	  data: averageRatings,
+	  backgroundColor: '#f39c12',  // Color for bars
+	  borderColor: '#e67e22',      // Border color
+	  borderWidth: 1
+	}]
+  },
+  options: {
+	scales: {
+	  y: {
+		beginAtZero: true,
+		max: 5  // Rating is out of 5, so limit y-axis to 5
+	  }
+	},
+	responsive: true,
+	plugins: {
+	  legend: {
+		position: 'top',
+	  }
+	}
+  }
+});
 	</script>	
 </body>
 </html>

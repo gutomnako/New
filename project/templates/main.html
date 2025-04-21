@@ -15,94 +15,120 @@
     
     {% block extra_styles %}
     <style>
-        /* Header / Navbar */
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 13px 20px;
-      background-color: #006f89;
-      color: black;
-      font-family: "Quicksand", serif;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-      width: 100%;
-      box-sizing: border-box;
-    }
+      @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap');
     
-    .header .logo h1 {
-      font-size: 1.3em;  /* Reduced font size further */
-      margin: 0;
-      color:  #f3f3f3;
-    }
+      /* Header / Navbar */
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 13px 20px;
+        background-color: #006f89;
+        color: black;
+        font-family: "Quicksand", serif;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        width: 100%;
+        box-sizing: border-box;
+        flex-wrap: nowrap;
+        overflow: hidden;
+      }
     
-    .nav {
-      display: flex;
-      gap: 1em;  /* Reduced gap between links */
-    }
+      .header .logo h1 {
+        font-size: 1.3em;
+        margin: 0;
+        color: #f3f3f3;
+      }
     
-    .nav a {
-      color: #ffffff;
-      text-decoration: none;
-      font-weight: bold;
-      padding: 0.3em 0.5em; /* Reduced padding for links */
-      border-radius: 4px;  /* Slightly smaller border-radius */
-      font-size: 16px;  /* Reduced font size for links */
-      transition: background-color 0.3s ease;
-      margin: 0 15px;
-    }
+      .nav {
+        display: flex;
+        gap: 1em;
+      }
     
-    .nav a:hover {
-      background-color: #0066cc;
-    }
+      .nav a {
+        color: #ffffff;
+        text-decoration: none;
+        font-weight: bold;
+        padding: 0.3em 0.5em;
+        border-radius: 4px;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+        margin: 0 15px;
+      }
     
-    /* Basic styling */
-    .dropdown {
-      position: relative;
-    }
+      .nav a:hover {
+        background-color: #0066cc;
+      }
     
-    .hamburger-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 20px; /* You can adjust size */
-    }
+      .dropdown {
+        position: relative;
+        min-width: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
     
-    .dropdown-menu {
-      position: absolute;
-      top: 100%; /* Position it right below the button */
-      right: 0;
-      background-color: white;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      display: none; /* Hidden by default */
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      border-radius: 5px;
-      width: 150px; /* Adjust width as necessary */
-    }
+      .hamburger-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        color: white;
+      }
     
-    .dropdown-menu li {
-      padding: 10px;
-    }
+      .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background-color: white;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: none;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        border-radius: 5px;
+        width: 150px;
+        z-index: 1001;
+      }
     
-    .dropdown-menu li a {
-      text-decoration: none;
-      color: black;
-    }
+      .dropdown-menu li {
+        padding: 10px;
+      }
     
-    .dropdown-menu li a:hover {
-      background-color: #f1f1f1;
-    }
+      .dropdown-menu li a {
+        text-decoration: none;
+        color: black;
+        display: block;
+      }
     
-    /* When the dropdown is open, show the menu */
-    .dropdown.open .dropdown-menu {
-      display: block;
-    }
-
+      .dropdown-menu li a:hover {
+        background-color: #f1f1f1;
+      }
+    
+      /* Show dropdown on .open */
+      .dropdown.open .dropdown-menu {
+        display: block;
+      }
+    
+      /* Optional: Hide dropdown on small screens or collapse nav */
+      @media (max-width: 768px) {
+        .nav a {
+          font-size: 14px;
+          margin: 0 8px;
+        }
+    
+        .header .logo h1 {
+          font-size: 1.1em;
+        }
+      }
     </style>
     {% endblock %}
 </head>

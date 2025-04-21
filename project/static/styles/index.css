@@ -3,6 +3,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box; /* To avoid overflow issues */
+  font-family: "Quicksand", serif;
 }
 
 /* Main section */
@@ -32,6 +33,12 @@
   border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
+.text-content {
+  width: 100%;
+  max-width: 1200px; /* or 800px for tighter layout */
+  margin: 0 auto;    /* center it horizontally */
+  box-sizing: border-box;
+}
 .content h1 {
   font-family: "Quicksand", serif;
   font-size: 36px;

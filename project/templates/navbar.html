@@ -29,17 +29,16 @@
       </div>
   </header>
   <script>
-     document.addEventListener('DOMContentLoaded', function () {
-  const hamburgerBtn = document.getElementById('hamburgerBtn');
-  const dropdownMenu = document.getElementById('dropdownMenu');
-
-  if (hamburgerBtn && dropdownMenu) {
-    hamburgerBtn.addEventListener('click', function() {
-      // Toggle the 'open' class on the dropdown element
-      dropdownMenu.parentElement.classList.toggle('open');
+    document.addEventListener('DOMContentLoaded', function () {
+      const hamburgerBtn = document.getElementById('hamburgerBtn');
+      const dropdownMenu = document.getElementById('dropdownMenu');
+  
+      if (hamburgerBtn && dropdownMenu) {
+        hamburgerBtn.addEventListener('click', function () {
+          dropdownMenu.parentElement.classList.toggle('open');
+        });
+      }
     });
-  }
-});
   </script>
 
   {% endblock %}
