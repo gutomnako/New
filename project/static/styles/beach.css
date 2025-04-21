@@ -7,94 +7,6 @@ body {
   padding-top: 70px;  /* Adds space below the fixed navbar */
 }
 
-/* Header / Navbar */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 20px;
-  background-color: #006f89;
-  color: black;
-  font-family: "Quicksand", serif;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.header .logo h1 {
-  font-size: 1.3em;  /* Reduced font size further */
-  margin: 0;
-  color:  #f3f3f3;
-}
-
-.nav {
-  display: flex;
-  gap: 1em;  /* Reduced gap between links */
-}
-
-.nav a {
-  color: #ffffff;
-  text-decoration: none;
-  font-weight: bold;
-  padding: 0.3em 0.5em; /* Reduced padding for links */
-  border-radius: 4px;  /* Slightly smaller border-radius */
-  font-size: 16px;  /* Reduced font size for links */
-  transition: background-color 0.3s ease;
-  margin: 0 15px;
-}
-
-.nav a:hover {
-  background-color: #0066cc;
-}
-
-/* Basic styling */
-.dropdown {
-  position: relative;
-}
-
-.hamburger-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 20px; /* You can adjust size */
-}
-
-.dropdown-menu {
-  position: absolute;
-  top: 100%; /* Position it right below the button */
-  right: 0;
-  background-color: white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  display: none; /* Hidden by default */
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  border-radius: 5px;
-  width: 150px; /* Adjust width as necessary */
-}
-
-.dropdown-menu li {
-  padding: 10px;
-}
-
-.dropdown-menu li a {
-  text-decoration: none;
-  color: black;
-}
-
-.dropdown-menu li a:hover {
-  background-color: #f1f1f1;
-}
-
-/* When the dropdown is open, show the menu */
-.dropdown.open .dropdown-menu {
-  display: block;
-}
-
 /* Layout */
 .container {
   display: flex;
@@ -103,6 +15,7 @@ body {
   padding: 20px;
   background-color: #ddd;
   border-radius: 1%;
+  position: relative;
 }
 
 .sidebar {
@@ -268,6 +181,7 @@ body {
   color: #333;
   margin-top: 30px;
   padding-left: 20px;
+  position: relative;
 }
 
 /* Favorite Button Styles */
@@ -501,8 +415,9 @@ button a {
 .search-input {
   flex: 1;
   padding: 0.75rem 1rem; /* Increase padding to make the text box bigger */
-  border: 2px solid #007BFF; /* Blue border to make it stand out */
-  border-radius: 4px; /* Keep rounded corners */
+  border: 1px solid #007BFF; /* Blue border to make it stand out */
+  border-bottom-left-radius: 20px; /* Keep rounded corners */
+  border-top-left-radius: 20px;
   font-size: 1rem;
   background-color: transparent; /* Remove background color */
   transition: all 0.3s ease; /* Smooth transition for focus effect */
@@ -524,6 +439,8 @@ button a {
   color: white;
   border-radius: 0 4px 4px 0;
   cursor: pointer;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
 }
 
 /* Add space to the top of the container so the search bar doesn't overlap content */
