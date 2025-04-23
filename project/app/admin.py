@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import LoginHistory
-from .models import Resort, Message, Location, Amenity, User, Favorite, Rating
+from .models import Resort, Message, Location, Amenity, User, Favorite, Rating, SubAdminApplication, Notification
 
 
 admin.site.register(User)
@@ -23,3 +23,20 @@ class ResortAdmin(admin.ModelAdmin):
 
     # Optionally, add ordering or custom field display
     ordering = ('name',)
+
+@admin.register(SubAdminApplication)
+class SubAdminApplicationAdmin(admin.ModelAdmin):
+    list_display = ('resort_name', 'email', 'submitted_at', 'is_reviewed')
+    list_filter = ('is_reviewed', 'submitted_at')
+    readonly_fields = ('resort_name', 'email', 'verification_permit', 'submitted_at')
+    ordering = ('-submitted_at',)
+
+    def has_add_permission(self, request):
+        return False
+    
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ('recipient', 'message', 'is_read', 'created_at')
+    list_filter = ('is_read', 'created_at')
+    search_fields = ('recipient__username', 'message')
+
+admin.site.register(Notification, NotificationAdmin)

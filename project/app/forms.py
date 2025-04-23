@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from .models import Resort, User, Rating
+from .models import Resort, User, Rating, SubAdminApplication
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from django import forms
@@ -69,7 +69,11 @@ class ResortForm(ModelForm):
             'host', 'name', 'location', 'description', 
             'amenities', 'resort_image'
             ]
-        
+
+class SubAdminApplicationForm(forms.ModelForm):
+    class Meta:
+        model = SubAdminApplication
+        fields = ['resort_name', 'email', 'verification_permit']        
 
 class Userform(ModelForm):
     class Meta:

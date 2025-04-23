@@ -1,0 +1,21 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'styles/signup.css' %}">
+<div class="signup-container1">
+    <h1>Sub-Admin Application</h1>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label for="id_resort_name">Resort Name:</label>
+        {{ form.resort_name }}
+    
+        <label for="id_email">Email:</label>
+        {{ form.email }}
+    
+        <label for="id_verification_permit">Upload Verification Permit:</label>
+        {{ form.verification_permit }}
+    
+        <button type="submit">Submit Application</button>
+    </form>
+</div>
+{% endblock %}

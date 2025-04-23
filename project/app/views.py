@@ -4,13 +4,13 @@ from django.db.models import Q, Count, F, Sum, OuterRef, Subquery, Avg, Exists, 
 from django.contrib.auth.decorators import login_required
 from .models import Resort, Amenity, Location, Message, User, Favorite, Rating, RoomImage, ActivityImage, BeachImage
 from django.contrib.auth import authenticate, login, logout
-from .forms import ResortForm, MyUserCreationForm, RatingForm
+from .forms import ResortForm, MyUserCreationForm, SubAdminApplicationForm
 from django.contrib import messages
 from django.http import HttpResponse
 from .decorators import unauthenticated_user, allowed_users, admin_only
 from django.contrib.auth.models import Group
 from django.utils.timezone import now, timedelta
-from .models import LoginActivity, LoginHistory, Visit
+from .models import LoginActivity, LoginHistory, Visit, Notification
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 from django.http import JsonResponse
@@ -47,6 +47,17 @@ def some_view(request):
 
 @admin_only
 def adminDashboard(request):
+    # If it's a POST request, check if we're marking a notification as read
+    if request.method == 'POST':
+        # Check for the mark notification read action
+        notification_id = request.POST.get('notification_id')
+        if notification_id:
+            notification = get_object_or_404(Notification, id=notification_id, recipient=request.user)
+            notification.is_read = True
+            notification.save()
+            return redirect('adminDashboard')  # Redirect to the dashboard after updating notification
+
+    # Regular GET request (load dashboard data)
     resorts = Resort.objects.all()
     login_history = LoginHistory.objects.all().order_by('-last_login')
     unique_users_count = login_history.values('user').distinct().count()
@@ -87,13 +98,18 @@ def adminDashboard(request):
         )
     )
 
+    # Fetch unread notifications for the logged-in user
+    notifications = Notification.objects.filter(recipient=request.user, is_read=False).order_by('-created_at')
+
+    # Add all the data to the context
     context = {
         'resorts': resorts,
         'login_history': login_history,
         'unique_users_count': unique_users_count,
         'resort_visit_data': resort_visit_data,
-        'all_messages': all_messages,  
-        'most_rated_resorts_data': most_rated_resorts_data  # Pass the most rated resorts data
+        'all_messages': all_messages,
+        'most_rated_resorts_data': most_rated_resorts_data,  # Pass the most rated resorts data
+        'notifications': notifications  # Pass notifications to the template
     }
 
     if login_history.exists():
@@ -102,7 +118,6 @@ def adminDashboard(request):
         context['error'] = 'No login history found.'
 
     return render(request, 'app/adminDashboard.html', context)
-
 
 @admin_only
 def adminresorts(request):
@@ -130,6 +145,40 @@ def adminmonitors(request):
 #end dashboard
 
 #login
+def apply_subadmin(request):
+    if request.method == 'POST':
+        form = SubAdminApplicationForm(request.POST, request.FILES)
+        if form.is_valid():
+            # Save the form instance to the database
+            application = form.save()
+
+            # Access the resort_name and email from the saved SubAdminApplication instance
+            resort_name = application.resort_name
+            email = application.email
+
+            # If the user is authenticated, create a notification for the user
+            if request.user.is_authenticated:
+                Notification.objects.create(
+                    recipient=request.user,
+                    message=f"Your sub-admin application for '{resort_name}' (Email: {email}) has been successfully submitted and is under review."
+                )
+
+            # Notify the admins about the submission
+            admin_users = User.objects.filter(is_superuser=True)  # Get all admin users (superusers)
+            for admin in admin_users:
+                Notification.objects.create(
+                    recipient=admin,
+                    message=f"A new sub-admin application has been submitted for '{resort_name}' (Email: {email})."
+                )
+
+            # Success message to the user
+            messages.success(request, "Application submitted successfully. Admin will review your resort's verification.")
+            return redirect('home')  # Or the appropriate redirect after submission
+    else:
+        form = SubAdminApplicationForm()
+
+    return render(request, 'app/login_register.html', {'form': form})
+
 @unauthenticated_user 
 def loginPage(request):
       page = 'login'
