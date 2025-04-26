@@ -8,34 +8,8 @@
     <link rel="stylesheet" href="{% static 'styles/resort.css'%}">
     <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
 </head>
+{% include 'navbar.html' %}
 <body>
-    <header class="header">
-        <div class="logo">
-          <h1>BEACHES & RESORT</h1>
-        </div>
-          <nav class="nav">
-              <a href="{% url 'index-view' %}">Home</a>
-              <a href="{% url 'home' %}">Beaches & Resorts</a>
-              <a href="{% url 'map' %}">Map</a>
-              <a href="#">Contact</a>
-          </nav>
-          <div class="dropdown">
-            {% if request.user.is_authenticated %}
-              <!-- Hamburger Button -->
-              <button class="hamburger-btn" id="hamburgerBtn">
-                <i class="bi bi-list"></i> <!-- Bootstrap Icon (Can be replaced by custom icon) -->
-              </button>
-          
-              <!-- Dropdown Menu -->
-              <ul class="dropdown-menu" id="dropdownMenu">
-                  <li><a class="dropdown-item" href="{% url 'user-profile' request.user.pk %}">Settings</a></li>
-                  <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
-              </ul>
-            {% else %}
-              <a href="{% url 'login' %}" class="btn btn-primary">Login</a>
-            {% endif %}
-          </div>
-      </header>
     <form action="{% url 'update_resort' resort.id %}" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
     
@@ -284,32 +258,40 @@
                     <h3>Room Rates & Fees</h3>
     
                     <div id="display-mode">
-                        <p><strong>Room Rates:</strong> <span id="room-rate-text">{{ resort.price_per_night }}</span> per night</p>
+                        <p><strong>Room Price:</strong> <span id="room-rate-text">{{resort.room_rate_display}}</span></p>
                         <p><strong>Kids:</strong> <span id="kids-fee-text">{{ resort.entrance_kids }}</span></p>
                         <p><strong>Adults:</strong> <span id="adults-fee-text">{{ resort.entrance_adults }}</span></p>
-                        <p><strong>Cottage Rates:</strong> <span id="cottage-rate-text">{{ resort.cottage }}</span></p>
-                        <p><strong>Overnight Fee:</strong> <span id="overnight-fee-text">{{ resort.price }}</span> per night</p>
-                        {% if request.user == resort.host %}
+                        <p><strong>Cottage Price:</strong> <span id="cottage-rate-text">{{resort.cottage_rate_display}}</span></p>
+                        <p><strong>Overnight Fee:</strong> <span id="overnight-fee-text">{{ resort.price }}</span></p>
+
                         <button type="button" id="edit-btn">Edit Rates</button>
-                        {% endif %}
+
                     </div>
     
                     <div id="edit-mode" style="display: none;">
                         <label>Room Rates:</label>
-                        <input type="text" name="price_per_night" id="room-rate-input" value="{{ resort.price_per_night }}">
-    
+                        <select name="room_price_range" id="room-rate-input">
+                            <option value="Low" {% if resort.room_price_range == "Low" %}selected{% endif %}>Low</option>
+                            <option value="Average" {% if resort.room_price_range == "Average" %}selected{% endif %}>Average</option>
+                            <option value="High" {% if resort.room_price_range == "High" %}selected{% endif %}>High</option>
+                        </select>
+                    
                         <label>Kids Fee:</label>
                         <input type="text" name="entrance_kids" id="kids-fee-input" value="{{ resort.entrance_kids }}">
-    
+                    
                         <label>Adults Fee:</label>
                         <input type="text" name="entrance_adults" id="adults-fee-input" value="{{ resort.entrance_adults }}">
-    
+                    
                         <label>Cottage Rates:</label>
-                        <input type="text" name="cottage" id="cottage-rate-input" value="{{ resort.cottage }}">
-    
+                        <select name="cottage_price_range" id="cottage-rate-input">
+                            <option value="Low" {% if resort.cottage_price_range == "Low" %}selected{% endif %}>Low</option>
+                            <option value="Average" {% if resort.cottage_price_range == "Average" %}selected{% endif %}>Average</option>
+                            <option value="High" {% if resort.cottage_price_range == "High" %}selected{% endif %}>High</option>
+                        </select>
+                    
                         <label>Overnight Fee:</label>
                         <input type="text" name="price" id="overnight-fee-input" value="{{ resort.price }}">
-    
+                    
                         <button type="submit" id="save-btn">Save Rates</button>
                     </div>
                 </div>
@@ -526,17 +508,6 @@ editAndSaveDescription("edit-activity-description-btn", "save-activity-descripti
         document.querySelector('form button[type="submit"]').click();
     }
 });
-});
-document.addEventListener('DOMContentLoaded', function () {
-  const hamburgerBtn = document.getElementById('hamburgerBtn');
-  const dropdownMenu = document.getElementById('dropdownMenu');
-
-  if (hamburgerBtn && dropdownMenu) {
-    hamburgerBtn.addEventListener('click', function() {
-      // Toggle the 'open' class on the dropdown element
-      dropdownMenu.parentElement.classList.toggle('open');
-    });
-  }
 });
 let selectedRating = null;
 

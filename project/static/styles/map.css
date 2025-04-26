@@ -3,7 +3,7 @@ body {
     margin: 0;
     padding: 0;
     padding-top: 80px;
-    background: url('image/das.webp') no-repeat center center fixed;
+    background: url('/static/images/mnbv.jfif');
     background-size: cover;
 }
 

@@ -8,94 +8,7 @@
     box-sizing: border-box;
     font-family: 'Poppins', sans-serif;
 }
-/* Header / Navbar */
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding:  16px 40px;
-    background-color: #006f89;
-    color: black;
-    font-family: "Quicksand", serif;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    width: 100%;
-    box-sizing: border-box;
-  }
-  
-  .header .logo h1 {
-    font-size: 1.3em;  /* Reduced font size further */
-    margin: 0;
-    color:  #f3f3f3;
-  }
-  
-  .nav {
-    display: flex;
-    gap: 1em;  /* Reduced gap between links */
-  }
-  
-  .nav a {
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: bold;
-    padding: 0.3em 0.5em; /* Reduced padding for links */
-    border-radius: 4px;  /* Slightly smaller border-radius */
-    font-size: 16px;  /* Reduced font size for links */
-    transition: background-color 0.3s ease;
-    margin: 0 15px;
-  }
-  
-  .nav a:hover {
-    background-color: #0066cc;
-  }
-  
-  /* Basic styling */
-  .dropdown {
-    position: relative;
-  }
-  
-  .hamburger-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 20px; /* You can adjust size */
-  }
-  
-  .dropdown-menu {
-    position: absolute;
-    top: 100%; /* Position it right below the button */
-    right: 0;
-    background-color: white;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    display: none; /* Hidden by default */
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    border-radius: 5px;
-    width: 150px; /* Adjust width as necessary */
-  }
-  
-  .dropdown-menu li {
-    padding: 10px;
-  }
-  
-  .dropdown-menu li a {
-    text-decoration: none;
-    color: black;
-  }
-  
-  .dropdown-menu li a:hover {
-    background-color: #f1f1f1;
-  }
-  
-  /* When the dropdown is open, show the menu */
-  .dropdown.open .dropdown-menu {
-    display: block;
-  }
-  
+
 body {
     background: linear-gradient(135deg, #004B6D, #6A8D92);
     color: #333;
@@ -656,4 +569,78 @@ input[type="file"] {
 /* Show active image */
 .activity-slide.active {
     display: block;  /* Only the active image will be displayed */
+}
+
+.price-range-filter {
+    margin-top: 15px;
+}
+
+.styled-select {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #fff;
+    color: #333;
+    appearance: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.styled-select:hover,
+.styled-select:focus {
+    border-color: #0077ff;
+    box-shadow: 0 0 0 3px rgba(0, 119, 255, 0.2);
+}
+
+#edit-mode {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+#edit-mode label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+    color: #333;
+}
+
+#edit-mode select, 
+#edit-mode input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #333;
+}
+
+#edit-mode input[type="text"] {
+    height: 40px;
+}
+
+#edit-mode select {
+    height: 45px;
+}
+
+#edit-mode button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#edit-mode button:hover {
+    background-color: #45a049;
 }

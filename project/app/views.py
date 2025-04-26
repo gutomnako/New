@@ -516,10 +516,10 @@ def update_resort(request, resort_id):
             field_map = {
                 "mini_description": "mini_description",
                 "description": "description",
-                "price_per_night": "price_per_night",
+                "room_price_range": "room_price_range",
                 "entrance_kids": "entrance_kids",
                 "entrance_adults": "entrance_adults",
-                "cottage": "cottage",
+                "cottage_price_range": "cottage_price_range",
                 "price": "price",
                 "room_description": "room_description",
                 "beach_description": "beach_description",
@@ -536,10 +536,10 @@ def update_resort(request, resort_id):
         # Update text fields
         resort.mini_description = request.POST.get("mini_description", resort.mini_description)
         resort.description = request.POST.get("description", resort.description)
-        resort.price_per_night = request.POST.get("price_per_night", resort.price_per_night)
+        resort.room_price_range = request.POST.get("room_price_range", resort.room_price_range)
         resort.entrance_kids = request.POST.get("entrance_kids", resort.entrance_kids)
         resort.entrance_adults = request.POST.get("entrance_adults", resort.entrance_adults)
-        resort.cottage = request.POST.get("cottage", resort.cottage)
+        resort.cottage_price_range = request.POST.get("cottage_price_range", resort.cottage_price_range)
         resort.price = request.POST.get("price", resort.price)
         resort.room_description = request.POST.get("room_description", resort.room_description)
         resort.beach_description = request.POST.get("beach_description", resort.beach_description)

@@ -74,48 +74,77 @@ class Amenity(models.Model):
          return self.name
      
 class Resort(models.Model):
-     host = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-     name = models.CharField(max_length=255, help_text="Name of the resort")
-     # message =
-     map_url = models.URLField(blank=True, null=True) 
-     latitude = models.FloatField(null=True, blank=True)  # Latitude field
-     longitude = models.FloatField(null=True, blank=True)  # Longitude field
-     location = models.ManyToManyField(Location, blank=True, related_name="resorts", help_text="Location of the resort")
-     description = models.TextField(help_text="Brief description of the resort", blank=True, null=True)
-     mini_description = models.TextField(help_text="Brief description of the resort", blank=True, null=True)
-     amenities = models.ManyToManyField(Amenity, blank=True, related_name="resorts", help_text="Amenities available at the resort")
-     favorites = models.ManyToManyField(User, through='Favorite', related_name='favorite_resorts')
-     price_per_night = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-     entrance_kids = models.DecimalField(max_digits=10, decimal_places=2, validators=[validate_non_negative], default=0.00)
-     entrance_adults = models.DecimalField(max_digits=10, decimal_places=2, validators=[validate_non_negative], default=0.00)
-     cottage = models.CharField(max_length=100, default="Default Cottage Name")  # Example field
-     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-     contact_number = models.CharField(max_length=20, help_text="Contact phone number")
-     resort_image = models.ImageField(upload_to='resorts/', default='paradise.jpg', blank=True, help_text="Image of the resort")
-     hero_image = models.ImageField(upload_to='resorts/', blank=True, null=True)
-     room_description = models.TextField(help_text="Brief description of the resort", blank=True, null=True)
-     beach_description = models.TextField(help_text="Brief description of the resort", blank=True, null=True)
-     activity_description = models.TextField(help_text="Brief description of the resort", blank=True, null=True)
-     location_rating = models.FloatField(default=0.0, help_text="A score representing the resort's location")  
-     created_at = models.DateTimeField(auto_now_add=True, help_text="Date and time the resort was added")
-     updated_at = models.DateTimeField(auto_now=True, help_text="Date and time the resort was last updated")
-     class Meta:
-         ordering =['-updated_at', '-created_at']
+    host = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    name = models.CharField(max_length=255, help_text="Name of the resort")
+    map_url = models.URLField(blank=True, null=True)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
+    location = models.ManyToManyField('Location', blank=True, related_name="resorts", help_text="Location of the resort")
+    description = models.TextField(help_text="Brief description of the resort", blank=True, null=True)
+    mini_description = models.TextField(help_text="Mini description of the resort", blank=True, null=True)
+    amenities = models.ManyToManyField('Amenity', blank=True, related_name="resorts", help_text="Amenities available at the resort")
+    favorites = models.ManyToManyField(User, through='Favorite', related_name='favorite_resorts')
     
-     def __str__(self):
-         return self.name
-     
-     @property
-     def total_price(self):
+    price_per_night = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Room price
+    entrance_kids = models.DecimalField(max_digits=10, decimal_places=2, validators=[validate_non_negative], default=0.00)
+    entrance_adults = models.DecimalField(max_digits=10, decimal_places=2, validators=[validate_non_negative], default=0.00)
+    cottage = models.CharField(max_length=100, default="Default Cottage Name")
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Cottage price
+    
+    contact_number = models.CharField(max_length=20, help_text="Contact phone number")
+    resort_image = models.ImageField(upload_to='resorts/', default='paradise.jpg', blank=True, help_text="Image of the resort")
+    hero_image = models.ImageField(upload_to='resorts/', blank=True, null=True)
+    
+    room_description = models.TextField(help_text="Room description", blank=True, null=True)
+    beach_description = models.TextField(help_text="Beach description", blank=True, null=True)
+    activity_description = models.TextField(help_text="Activity description", blank=True, null=True)
+    
+    location_rating = models.FloatField(default=0.0, help_text="A score representing the resort's location")
+    
+    created_at = models.DateTimeField(auto_now_add=True, help_text="Date and time the resort was added")
+    updated_at = models.DateTimeField(auto_now=True, help_text="Date and time the resort was last updated")
+
+    # New fields for price range categories
+    room_price_range = models.CharField(max_length=10, choices=[('Low', 'Low'), ('Average', 'Average'), ('High', 'High')], default='Low')
+    cottage_price_range = models.CharField(max_length=10, choices=[('Low', 'Low'), ('Average', 'Average'), ('High', 'High')], default='Low')
+
+    class Meta:
+        ordering = ['-updated_at', '-created_at']
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def total_price(self):
         """Compute the total price including entrance fees and stay price."""
         return self.price_per_night + self.entrance_kids + self.entrance_adults
-     
-     def get_map_url(self):
+
+    def get_map_url(self):
+        """Return Google Map embed link based on coordinates if available."""
         if self.latitude and self.longitude:
-            # Google Maps URL with dynamic latitude and longitude
             return f"https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q={self.latitude},{self.longitude}"
         else:
-            return self.map_url  # Fallback to the manually set map_url if available
+            return self.map_url
+        
+    @property
+    def room_rate_display(self):
+        """Return the actual price based on the room price range."""
+        if self.room_price_range == 'Low':
+            return "Low: 999 or below"
+        elif self.room_price_range == 'Average':
+            return "Average: 1000 - 2999"
+        elif self.room_price_range == 'High':
+            return "High: 3000 or more"
+
+    @property
+    def cottage_rate_display(self):
+        """Return the actual price based on the cottage price range."""
+        if self.cottage_price_range == 'Low':
+            return "Low: 999 or below"
+        elif self.cottage_price_range == 'Average':
+            return "Average: 1000 - 2999"
+        elif self.cottage_price_range == 'High':
+            return "High: 3000 or more"
 
 class Rating(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
