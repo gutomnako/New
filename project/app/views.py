@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 import logging
-from django.db.models import Q, Count, F, Sum, OuterRef, Subquery, Avg, Exists, Value
+from django.db.models import Q, Count, F, Sum, OuterRef, Subquery, Avg, Exists, Value, Case, When, IntegerField
 from django.contrib.auth.decorators import login_required
 from .models import Resort, Amenity, Location, Message, User, Favorite, Rating, RoomImage, ActivityImage, BeachImage
 from django.contrib.auth import authenticate, login, logout
@@ -410,11 +410,33 @@ def home(request):
         max_price = None
 
     if min_price is not None or max_price is not None:
+        # Annotating resorts with the total price including room and cottage prices
         resorts = resorts.annotate(
-            total_price=F('price_per_night') + F('entrance_kids') + F('entrance_adults')
+            total_price=(
+                F('price_per_night') +
+                F('entrance_kids') +
+                F('entrance_adults') +
+                Case(
+                    When(room_price_range='Low', then=Value(999)),
+                    When(room_price_range='Average', then=Value(2000)),
+                    When(room_price_range='High', then=Value(3000)),
+                    default=Value(0),
+                    output_field=IntegerField()
+                ) +
+                Case(
+                    When(cottage_price_range='Low', then=Value(999)),
+                    When(cottage_price_range='Average', then=Value(2000)),
+                    When(cottage_price_range='High', then=Value(3000)),
+                    default=Value(0),
+                    output_field=IntegerField()
+                )
+            )
         )
+
+        # Apply the min_price and max_price filters after computing the total price
         if min_price is not None:
             resorts = resorts.filter(total_price__gte=min_price)
+
         if max_price is not None:
             resorts = resorts.filter(total_price__lte=max_price)
 
@@ -464,12 +486,30 @@ def home(request):
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         resorts_data = list(resorts.values(
-            'id', 'name', 'description', 'entrance_kids', 'entrance_adults', 'price_per_night', 'resort_image', 'score'
+            'id', 'name', 'description', 'entrance_kids', 'entrance_adults', 'price_per_night', 'resort_image', 'room_price_range', 'cottage_price_range', 'score'
         ))
 
         for resort in resorts_data:
-            resort['total_price'] = float(resort['price_per_night']) + float(resort['entrance_kids']) + float(resort['entrance_adults'])
+            # Compute the base total price
+            total_price = float(resort['price_per_night']) + float(resort['entrance_kids']) + float(resort['entrance_adults'])
 
+            # Add the room and cottage price ranges to the total price
+            if resort.get('room_price_range') == 'Low':
+                total_price += 999  # or another value fitting the 'Low' range
+            elif resort.get('room_price_range') == 'Average':
+                total_price += 2000  # or another value fitting the 'Average' range
+            elif resort.get('room_price_range') == 'High':
+                total_price += 3000  # or another value fitting the 'High' range
+
+            if resort.get('cottage_price_range') == 'Low':
+                total_price += 999  # Adjust this to fit the 'Low' range for the cottage
+            elif resort.get('cottage_price_range') == 'Average':
+                total_price += 2000  # Adjust this to fit the 'Average' range for the cottage
+            elif resort.get('cottage_price_range') == 'High':
+                total_price += 3000  # Adjust this to fit the 'High' range for the cottage
+
+            # Set the computed total price
+            resort['total_price'] = total_price
             # Ensure image URLs are correct
             if resort['resort_image']:
                 resort['resort_image'] = f"/media/{resort['resort_image']}"

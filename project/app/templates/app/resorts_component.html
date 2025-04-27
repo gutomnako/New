@@ -23,7 +23,7 @@
                         
 
                         <h4>{{ resort.name }}</h4>
-                        <p>Price: <strong>₱{{ resort.total_price|floatformat:2 }}</strong></p>
+                        <p>Estimated Cost: <strong>₱{{ resort.total_price|floatformat:2 }}</strong></p>
                         <button type="button">
                             <a href="{% url 'resort' resort.id %}">Details</a>
                         </button>
@@ -59,7 +59,7 @@
                         </a>
     
                         <h4>{{ resort.name }}</h4>
-                        <p>Price: <strong>₱{{ resort.total_price|floatformat:2 }}</strong></p>
+                        <p>Estimated Cost: <strong>₱{{ resort.total_price|floatformat:2 }}</strong></p>
                         <button type="button">
                             <a href="{% url 'resort' resort.id %}">Details</a>
                         </button>
@@ -97,7 +97,7 @@
                             Average Rating:
                             <span class="star-rating" data-rating="{{ resort.average_rating }}"></span>
                         </p>
-                        <p>Price: <strong>₱{{ resort.total_price|floatformat:2 }}</strong></p>
+                        <p>Estimated Cost: <strong>₱{{ resort.total_price|floatformat:2 }}</strong></p>
                         <button type="button">
                             <a href="{% url 'resort' resort.id %}">Details</a>
                         </button>

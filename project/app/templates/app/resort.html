@@ -263,9 +263,9 @@
                         <p><strong>Adults:</strong> <span id="adults-fee-text">{{ resort.entrance_adults }}</span></p>
                         <p><strong>Cottage Price:</strong> <span id="cottage-rate-text">{{resort.cottage_rate_display}}</span></p>
                         <p><strong>Overnight Fee:</strong> <span id="overnight-fee-text">{{ resort.price }}</span></p>
-
+                        {% if request.user == resort.host %}
                         <button type="button" id="edit-btn">Edit Rates</button>
-
+                        {% endif %}
                     </div>
     
                     <div id="edit-mode" style="display: none;">
@@ -291,8 +291,9 @@
                     
                         <label>Overnight Fee:</label>
                         <input type="text" name="price" id="overnight-fee-input" value="{{ resort.price }}">
-                    
+                        {% if request.user == resort.host %}
                         <button type="submit" id="save-btn">Save Rates</button>
+                        {% endif %}
                     </div>
                 </div>
             </div>

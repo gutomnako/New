@@ -114,11 +114,7 @@ class Resort(models.Model):
     def __str__(self):
         return self.name
 
-    @property
-    def total_price(self):
-        """Compute the total price including entrance fees and stay price."""
-        return self.price_per_night + self.entrance_kids + self.entrance_adults
-
+   
     def get_map_url(self):
         """Return Google Map embed link based on coordinates if available."""
         if self.latitude and self.longitude:
@@ -127,8 +123,31 @@ class Resort(models.Model):
             return self.map_url
         
     @property
+    def total_price(self):
+        """Compute the total price including entrance fees and stay price based on room and cottage ranges."""
+        
+        # Room price logic based on selected range
+        if self.room_price_range == 'Low':
+            room_price = 999  # Or another value that fits the 'Low' range
+        elif self.room_price_range == 'Average':
+            room_price = 2000  # Or another value that fits the 'Average' range
+        elif self.room_price_range == 'High':
+            room_price = 3000  # Or another value that fits the 'High' range
+
+        # Cottage price logic based on selected range
+        if self.cottage_price_range == 'Low':
+            cottage_price = 999  # Adjust this to fit the 'Low' range for the cottage
+        elif self.cottage_price_range == 'Average':
+            cottage_price = 2000  # Adjust this to fit the 'Average' range for the cottage
+        elif self.cottage_price_range == 'High':
+            cottage_price = 3000  # Adjust this to fit the 'High' range for the cottage
+
+        # Return the total price including room and cottage prices and entrance fees
+        return room_price + cottage_price + self.entrance_kids + self.entrance_adults
+    
+    @property
     def room_rate_display(self):
-        """Return the actual price based on the room price range."""
+        """Return the price range based on room price range."""
         if self.room_price_range == 'Low':
             return "Low: 999 or below"
         elif self.room_price_range == 'Average':
@@ -138,13 +157,14 @@ class Resort(models.Model):
 
     @property
     def cottage_rate_display(self):
-        """Return the actual price based on the cottage price range."""
+        """Return the price range based on cottage price range."""
         if self.cottage_price_range == 'Low':
             return "Low: 999 or below"
         elif self.cottage_price_range == 'Average':
             return "Average: 1000 - 2999"
         elif self.cottage_price_range == 'High':
             return "High: 3000 or more"
+
 
 class Rating(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
