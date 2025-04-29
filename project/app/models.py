@@ -16,10 +16,11 @@ class SubAdminApplication(models.Model):
     resort_image = models.ImageField(upload_to='resorts/images/', blank=True, null=True)  # Resort Image
     verification_permit = models.ImageField(upload_to='resorts/subadmin_permits/', blank=True, null=True)
     is_reviewed = models.BooleanField(default=False)
+    is_approved = models.BooleanField(default=False)  # Added to track approval status
     submitted_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.resort_name} - {self.email}"
+        return self.resort_name
     
 class Notification(models.Model):
     recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')

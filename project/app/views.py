@@ -149,6 +149,37 @@ def applications(request):
         'applications': applications,
     }
     return render(request, 'app/applications.html', context)
+
+def update_status(request):
+    # Ensure this view is only handling AJAX requests
+    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        try:
+            # Parse the incoming data
+            data = json.loads(request.body)
+            status = data.get('status')
+            application_id = data.get('application_id')
+
+            # Find the SubAdminApplication object
+            application = SubAdminApplication.objects.get(id=application_id)
+
+            # Update the application status
+            if status == 'approve':
+                application.is_approved = True
+            elif status == 'decline':
+                application.is_approved = False
+
+            application.is_reviewed = True  # Mark as reviewed after action
+            application.save()  # Save the updated application
+
+            return JsonResponse({'success': True})  # Return success response
+
+        except SubAdminApplication.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'SubAdminApplication not found'})
+
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'error': 'Invalid JSON data'})
+
+    return JsonResponse({'success': False, 'error': 'Invalid request'})
 #end dashboard
 
 #login
