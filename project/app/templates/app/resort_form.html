@@ -10,56 +10,61 @@
 
       <form action="" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
-          <div class="form first">
-              <div class="details personal">
-                  <span class="title">Create Resort</span>
-                  <div class="fields">
-                      <div class="input-fields">
-                          <label for="host">Host</label>
-                          {{ form.host }}
-                      </div>
-
-                      <div class="input-fields">
-                          <label for="name">Name</label>
-                          {{ form.name }}
-                      </div>
-                      
-                      <div class="input-fields">
-                          <label for="location">Location</label>
-                          {{ form.location }}
-                      </div>
-
-                      <div class="input-fields">
-                          <label for="description">Description</label>
-                          {{ form.description }}
-                      </div>
-                      
-                      <div class="input-fields">
-                          <label for="amenities">Amenities</label>
-                          {{ form.amenities }}
-                      </div>
-
-                      <div class="input-fields">
+        <div class="form first">
+            <div class="details personal">
+                <span class="title">Create Resort</span>
+                <div class="fields">
+    
+                    <div class="input-fields">
+                        <label for="name">Name</label>
+                        {{ form.name }}
+                    </div>
+    
+                    <div class="input-fields">
+                        <label for="location">Location</label>
+                        {{ form.location }}
+                    </div>
+    
+                    <div class="input-fields">
+                        <label for="description">Description</label>
+                        {{ form.description }}
+                    </div>
+    
+                    <div class="input-fields">
+                        <label for="amenities">Amenities</label>
+                        {{ form.amenities }}
+                    </div>
+    
+                    <div class="input-fields">
                         <label for="image">Upload Image</label>
                         <input type="file" name="resort_image" id="id_image">
                     </div>
-
+    
+                    <!-- Password input field for sub-admin -->
+                    <div class="input-fields">
+                        <label for="password">Sub-Admin Password</label>
+                        <input type="password" name="password" id="id_password" required>
+                    </div>
+    
                     <div class="input-fields">
                         {% if request.user.groups.all.0.name == "Pinakaadmin" %}
-                      <button type="submit">Create</button>
-                      {% else %}
-                      <button type="submit">Update</button>
-                      {% endif %}
-                      {% if request.user.groups.all.0.name == "Pinakaadmin" %}
+                            <button type="submit">Create</button>
+                        {% else %}
+                            <button type="submit">Update</button>
+                        {% endif %}
+    
+                        {% if request.user.groups.all.0.name == "Pinakaadmin" %}
                             <a href="{% url 'admin-dashboard' %}" class="cancel">Cancel</a>
                         {% else %}
-                      <a href="{% url 'home' %}" class="cancel">Cancel</a>
-                      {% endif %}
+                            <a href="{% url 'home' %}" class="cancel">Cancel</a>
+                        {% endif %}
                     </div>
-                  </div>
-              </div>
-          </div>
-      </form>
+    
+                </div>
+            </div>
+        </div>
+    </form>
+    
   </div>
 </body>
 {% endblock content %}

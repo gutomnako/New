@@ -4,75 +4,498 @@
 
 {% if page == 'login' %}
 <link rel="stylesheet" href="{% static 'styles/login.css' %}">
+<style>
+/* Modal Background */
+.modal {
+    position: fixed;
+    z-index: 9999;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+}
+
+/* Modal Content Box */
+.modal-content {
+    background-color: #fff;
+    margin: auto;
+    padding: 30px 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 800px; /* Adjust the max width of the modal */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Close Button */
+.close {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+}
+
+/* Form Layout */
+.fields {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Two columns */
+    grid-gap: 15px;
+    padding: 10px;
+    width: 100%;
+}
+
+/* Control widths of inputs */
+.input-fields {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-fields label {
+    margin-bottom: 5px;
+}
+
+.input-fields input,
+.input-fields textarea {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    max-width: 100%; /* Allow the inputs to stretch across their container */
+    width: 95%; /* Limit input width */
+    margin-bottom: 10px; /* Add some space between inputs */
+}
+
+.input-fields button {
+    padding: 10px;
+    background-color: #0077cc;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.input-fields button:hover {
+    background-color: #005fa3;
+}
+
+/* Control widths of specific elements */
+.half-width {
+    grid-column: span 1; /* Make each input take half the width */
+}
+
+.full-width {
+    grid-column: span 2; /* Make the button span full width */
+}
+
+textarea {
+    resize: vertical;
+}
+
+/* Dropdown Styling */
+.dropdown {
+    margin-top: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+/* Button Styling */
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+
+.dropdown {
+    margin-top: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+/* Button Styling */
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* Style for the dropdown */
+#amenities-dropdown {
+    margin-top: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+/* Style for the list of amenities */
+#amenities-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Style for each amenity item */
+#amenities-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+    border-bottom: 1px solid #ccc;
+}
+
+/* Custom style for the "X" remove button (as a span) */
+.remove-amenity-x {
+    color: #f44336;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+/* Hover effect for the remove "X" */
+.remove-amenity-x:hover {
+    color: #d32f2f;
+}
+
+/* Close Button */
+.close {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+}
+
+/* Button Styling */
+.modal-content button {
+    width: 100%;
+    padding: 10px;
+    background-color: #0077cc;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.modal-content button:hover {
+    background-color: #005fa3;
+}
+/* Style for the dropdown */
+#amenities-dropdown {
+    margin-top: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+/* Style for the list of amenities */
+#amenities-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Style for each amenity item */
+#amenities-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+    border-bottom: 1px solid #ccc;
+}
+
+/* Custom style for the "X" remove button (as a span) */
+.remove-amenity-x {
+    color: #f44336;  /* Red color */
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+/* Hover effect for the remove "X" */
+.remove-amenity-x:hover {
+    color: #d32f2f;
+}
+
+/* Ensure the main buttons inside modal are styled correctly */
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+  </style>
+  
+
 <body>
-    <div>
-      {% if messages %}
-        {% for message in messages %}
-        <div class="alert alert-warning" role="alert">
-            {{message}}
-          </div>
-        {% endfor %} 
-      {% endif %}
-    
-      <div class="login-container">
-        <h1>STA MAGDALENA BEACH AND RESORT</h1>
-        <h4>RECOMMENDATION SYSTEM</h4>
-        <form method="POST" action="">
+
+  <div id="resortModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+
+        <form action="{% url 'apply_subadmin' %}" method="POST" enctype="multipart/form-data">
           {% csrf_token %}
-          <label>Username:</label>
-          <input type="text" name="username" placeholder="Enter Username">
-
-          <label>Password:</label>
-          <input type="password" name="password" placeholder="Enter Password">
-
-          <button 
-            type="submit" value="Login"> Login
-          </button>
-      </form>
-
-      <p>haven't sign up yet?</p>
-      <a href="{% url 'register' %}">Sign up</a>
-      </div>
-
-    {% else %}
-
-    <link rel="stylesheet" href="{% static 'styles/signup.css' %}">
-      <div class="signup-container1">
-        <h1>Sign Up for STA MAGDALENA BEACH AND RESORT</h1>
-        <h4>RECOMMENDATION SYSTEM</h4>
-        <form method="POST">
-          {% csrf_token %}
-          {{ form.as_p }}
-          
-          {% if form.errors %}
-              <div class="alert alert-danger">
-                  {% for field in form %}
-                      {% for error in field.errors %}
-                          <p>{{ error }}</p>
-                      {% endfor %}
-                  {% endfor %}
-              </div>
-          {% endif %}
-          
-          <button type="submit">Register</button>
-      </form>
+          <div class="form first">
+              <div class="details personal">
+                  <span class="title">Create Resort</span>
+                  <div class="fields">
       
-      {% if messages %}
-          <div class="alert alert-danger">
-              {% for message in messages %}
-                  <p>{{ message }}</p>
-              {% endfor %}
+                      <!-- Resort Name -->
+                      <div class="input-fields">
+                          <label for="resort_name">Resort Name</label>
+                          <input type="text" name="resort_name" required placeholder="Enter Resort Name">
+                      </div>
+      
+                      <!-- Resort Location -->
+                      <div class="input-fields">
+                          <label for="location">Location</label>
+                          <input type="text" name="location" required placeholder="Enter Resort Location">
+                      </div>
+      
+                      <!-- Resort Description -->
+                      <div class="input-fields">
+                          <label for="description">Description</label>
+                          <textarea name="description" required placeholder="Enter Resort Description"></textarea>
+                      </div>
+      
+                      <!-- Email -->
+                      <div class="input-fields">
+                          <label for="email">Email</label>
+                          <input type="email" name="email" required placeholder="Enter Resort Email">
+                      </div>
+      
+                      <!-- Phone Number -->
+                      <div class="input-fields">
+                          <label for="phone">Phone Number</label>
+                          <input type="tel" name="phone" required placeholder="Enter Resort Phone Number">
+                      </div>
+      
+                      <!-- Amenities Section -->
+                      <div class="input-fields">
+                          <label for="amenities">Amenities</label>
+                          <input type="text" id="amenity-input" class="amenity-input" placeholder="Enter an amenity" />
+                          <button type="button" onclick="addAmenity()">Add Amenity</button>
+                      </div>
+      
+                      <!-- Amenities Dropdown -->
+                      <div id="amenities-dropdown" class="dropdown" style="display:none;">
+                          <label>Added Amenities</label>
+                          <ul id="amenities-list">
+                              <!-- Dynamic options will be added here -->
+                          </ul>
+                      </div>
+      
+                      <!-- Hidden field to store selected amenities for submission -->
+                      <input type="hidden" name="amenities" id="hidden-amenities" value="[]">
+      
+                      <!-- Resort Image Upload -->
+                      <div class="input-fields">
+                          <label for="resort_image">Upload Resort Image</label>
+                          <input type="file" name="resort_image" id="id_resort_image">
+                      </div>
+
+                      <!-- Sub-Admin Password -->
+                      <div class="input-fields">
+                          <label for="password">Sub-Admin Password</label>
+                          <input type="password" name="password" id="id_password" required>
+                      </div>
+      
+                      <!-- Submit Button -->
+                      <div class="input-fields">
+                          <button type="submit">Create Resort</button>
+                          <a href="{% url 'home' %}" class="cancel">Cancel</a>
+                      </div>
+      
+                  </div>
+              </div>
           </div>
-      {% endif %}
+      </form>
+    </div>
+</div>
+<!-- 🟰 🟰 MODAL ends here 🟰 🟰 -->
 
-      <p>Already signed up?</p>
-      <a href="{% url 'login' %}">Login</a>
 
+<!-- 🟰 Login container starts here 🟰 -->
+<div>
+  {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-warning" role="alert">
+        {{ message }}
+    </div>
+    {% endfor %} 
+  {% endif %}
+  
+  <div class="login-container">
+    <h1>STA MAGDALENA BEACH AND RESORT</h1>
+    <h4>RECOMMENDATION SYSTEM</h4>
+    <form method="POST" action="{% url 'login' %}">
+      {% csrf_token %}
+      <label>Username:</label>
+      <input type="text" name="username" placeholder="Enter Username">
+
+      <label>Password:</label>
+      <input type="password" name="password" placeholder="Enter Password">
+
+      <button type="submit" value="Login">Login</button>
+    </form>
+
+    <p>haven't sign up yet?</p>
+    <a href="{% url 'register' %}">Sign up</a>
+
+    <div>
       <p>Want to manage a resort?</p>
-      <a href="{% url 'apply_subadmin' %}" class="subadmin-btn">Apply as Sub-Admin</a>
-      </div>
+      <a href="#" class="subadmin-btn" onclick="openModal()">Apply as Resort Owner?</a>
+    </div>
   </div>
-</body>
+</div>
+
+{% else %}
+<!-- 🟰 Signup page here if not login page 🟰 -->
+<link rel="stylesheet" href="{% static 'styles/signup.css' %}">
+<div class="signup-container1">
+    <h1>Sign Up for STA MAGDALENA BEACH AND RESORT</h1>
+    <h4>RECOMMENDATION SYSTEM</h4>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <button type="submit">Register</button>
+    </form>
+
+    {% if messages %}
+        <div class="alert alert-danger">
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <p>Already signed up?</p>
+    <a href="{% url 'login' %}">Login</a>
+</div>
+
 {% endif %}
-</html>
+
+<script>
+    // Open modal function
+    function openModal() {
+        document.getElementById('resortModal').style.display = 'block';
+    }
+
+    // Close modal function
+    function closeModal() {
+        document.getElementById('resortModal').style.display = 'none';
+    }
+
+    // Add new amenity to the list
+    function addAmenity() {
+    var amenityInput = document.getElementById('amenity-input');
+    var amenityValue = amenityInput.value.trim();
+
+    if (amenityValue !== '') {
+        // Add the new amenity to the list
+        var amenitiesList = document.getElementById('amenities-list');
+        var newAmenityItem = document.createElement('li');
+        
+        // Create the amenity text
+        var amenityText = document.createElement('span');
+        amenityText.textContent = amenityValue;
+
+        // Create the "X" remove button (as a span, not a button)
+        var removeButton = document.createElement('span');
+        removeButton.textContent = '×'; // The "X" symbol
+        removeButton.classList.add('remove-amenity-x');  // Custom class for the "X"
+        removeButton.onclick = function() {
+            newAmenityItem.remove();
+            updateHiddenAmenities();
+        };
+
+        // Append the text and remove button to the item
+        newAmenityItem.appendChild(amenityText);
+        newAmenityItem.appendChild(removeButton);
+
+        // Append the new amenity item to the list
+        amenitiesList.appendChild(newAmenityItem);
+
+        // Show the dropdown if it's hidden
+        document.getElementById('amenities-dropdown').style.display = 'block';
+
+        // Clear the input field for the next amenity
+        amenityInput.value = '';
+
+        // Update the hidden input with the list of amenities
+        updateHiddenAmenities();
+    }
+}
+    // Update the hidden input field with the list of selected amenities
+    function updateHiddenAmenities() {
+        var amenities = [];
+        var amenityItems = document.querySelectorAll('#amenities-list li span');
+
+        amenityItems.forEach(function(item) {
+            amenities.push(item.textContent);
+        });
+
+        // Update the hidden input with the selected amenities as a JSON string
+        document.getElementById('hidden-amenities').value = JSON.stringify(amenities);
+    }
+
+    // Close modal when clicking outside the modal content
+    window.onclick = function (event) {
+        var modal = document.getElementById('resortModal');
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
+</script>
+
+</body>
+
 {% endblock content %}

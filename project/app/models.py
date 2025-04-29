@@ -5,10 +5,16 @@ from django.conf import settings
 from django.utils.timezone import now
 from django.contrib.auth.models import User
 
+
 class SubAdminApplication(models.Model):
     resort_name = models.CharField(max_length=100)
+    location = models.CharField('Location', max_length=200, blank=True, null=True, help_text="Location of the resort")
+    description = models.TextField(help_text="Brief description of the resort", blank=True, null=True)
     email = models.EmailField(unique=True)
-    verification_permit = models.ImageField(upload_to='resorts/subadmin_permits/',  blank=True, null=True)
+    phone = models.CharField(max_length=15, default='0000000000')
+    amenities = models.JSONField(default=list)  # Added amenities as a JSON field to store a list
+    resort_image = models.ImageField(upload_to='resorts/images/', blank=True, null=True)  # Resort Image
+    verification_permit = models.ImageField(upload_to='resorts/subadmin_permits/', blank=True, null=True)
     is_reviewed = models.BooleanField(default=False)
     submitted_at = models.DateTimeField(auto_now_add=True)
 

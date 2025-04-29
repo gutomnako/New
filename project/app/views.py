@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 import logging
 from django.db.models import Q, Count, F, Sum, OuterRef, Subquery, Avg, Exists, Value, Case, When, IntegerField
 from django.contrib.auth.decorators import login_required
-from .models import Resort, Amenity, Location, Message, User, Favorite, Rating, RoomImage, ActivityImage, BeachImage
+from .models import Resort, Amenity, Location, Message, User, Favorite, Rating, RoomImage, ActivityImage, BeachImage,  SubAdminApplication
 from django.contrib.auth import authenticate, login, logout
 from .forms import ResortForm, MyUserCreationForm, SubAdminApplicationForm
 from django.contrib import messages
@@ -99,7 +99,7 @@ def adminDashboard(request):
     )
 
     # Fetch unread notifications for the logged-in user
-    notifications = Notification.objects.filter(recipient=request.user, is_read=False).order_by('-created_at')
+    notifications = Notification.objects.filter(recipient=request.user).order_by('-created_at')
 
     # Add all the data to the context
     context = {
@@ -142,6 +142,13 @@ def adminmonitors(request):
       login_activities = LoginActivity.objects.filter(user=request.user).order_by('-timestamp')
       return render(request, 'app/recent-logins.html', {'resorts': resorts, 'login_history': login_history,
             'login_activities': login_activities})
+
+def applications(request):
+    applications = SubAdminApplication.objects.all().order_by('-submitted_at')
+    context = {
+        'applications': applications,
+    }
+    return render(request, 'app/applications.html', context)
 #end dashboard
 
 #login
@@ -149,35 +156,69 @@ def apply_subadmin(request):
     if request.method == 'POST':
         form = SubAdminApplicationForm(request.POST, request.FILES)
         if form.is_valid():
+            # Ensure no None values are submitted for required fields
+            subadmin_application = form.save(commit=False)
+
+            # Optional: Ensure the 'resort_name' and other fields are not None
+            if not subadmin_application.resort_name:
+                subadmin_application.resort_name = 'Default Resort Name'  # Set default name if empty
+
+            if not subadmin_application.email:
+                subadmin_application.email = 'default@example.com'  # Set default email if empty
+
             # Save the form instance to the database
-            application = form.save()
+            subadmin_application.save()
 
-            # Access the resort_name and email from the saved SubAdminApplication instance
-            resort_name = application.resort_name
-            email = application.email
-
-            # If the user is authenticated, create a notification for the user
+            # Optionally, create a notification if the user is authenticated
             if request.user.is_authenticated:
                 Notification.objects.create(
                     recipient=request.user,
-                    message=f"Your sub-admin application for '{resort_name}' (Email: {email}) has been successfully submitted and is under review."
+                    message=f"Your sub-admin application for '{subadmin_application.resort_name}' has been successfully submitted."
                 )
 
-            # Notify the admins about the submission
+            # Notify the admins
             admin_users = User.objects.filter(is_superuser=True)  # Get all admin users (superusers)
             for admin in admin_users:
                 Notification.objects.create(
                     recipient=admin,
-                    message=f"A new sub-admin application has been submitted for '{resort_name}' (Email: {email})."
+                    message=f"A new sub-admin application has been submitted for '{subadmin_application.resort_name}'."
                 )
 
-            # Success message to the user
+            # Success message
             messages.success(request, "Application submitted successfully. Admin will review your resort's verification.")
             return redirect('home')  # Or the appropriate redirect after submission
     else:
         form = SubAdminApplicationForm()
 
     return render(request, 'app/login_register.html', {'form': form})
+
+def delete_notification(request, id):
+    # Check if the request is POST to confirm the delete action
+    if request.method == 'POST':
+        notification = get_object_or_404(Notification, id=id)
+        notification.delete()  # Delete the notification from the database
+    return redirect('admin-dashboard')
+
+def mark_as_read(request, notification_id):
+    if request.method == 'POST':
+        # Retrieve notification and mark it as read
+        notification = get_object_or_404(Notification, id=notification_id, recipient=request.user)
+        
+        if not notification.is_read:
+            notification.is_read = True
+            notification.save()
+
+        # Recalculate unread notifications for the logged-in user
+        unread_count = Notification.objects.filter(recipient=request.user, is_read=False).count()
+
+        # Return JSON with success and updated unread count
+        return JsonResponse({"success": True, "unread_count": unread_count})
+    
+    return JsonResponse({"success": False}, status=400)
+
+def unread_count(request):
+    unread_count = Notification.objects.filter(recipient=request.user, is_read=False).count()
+    return JsonResponse({'unread_count': unread_count})
 
 @unauthenticated_user 
 def loginPage(request):
@@ -834,15 +875,77 @@ def userProfile(request, pk):
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['Pinakaadmin'])
 def createResort(request):
-      form = ResortForm()
-      
-      if request.method == 'POST':
-            form = ResortForm(request.POST, request.FILES)
-            if form.is_valid():
-                form.save()
-                return redirect ('home')
-      context = {'form': form}
-      return render(request, 'app/resort_form.html', context)
+    form = ResortForm()
+
+    if request.method == 'POST':
+        form = ResortForm(request.POST, request.FILES)
+        
+        # Check if the form is valid
+        if form.is_valid():
+            resort_name = form.cleaned_data['name']
+
+            # Create a username for the subadmin
+            username = resort_name.lower().replace(' ', '_') + "_admin"
+
+            # Capture the password from the submitted form
+            password = request.POST.get('password')
+            
+            if not password:
+                form.add_error(None, "Password is required to create sub-admin.")
+                return render(request, 'app/resort_form.html', {'form': form})
+
+            # Create an email based on the username
+            email = f"{username}@yourdomain.com"
+
+            # 1. Create the SubAdmin User with the password from the form
+            subadmin_user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password,  # Password is set directly from the form input
+                is_staff=True  # Give them access to Django admin panel if needed
+            )
+
+            # 2. Add the user to the subadmin group
+            subadmin_group, created = Group.objects.get_or_create(name='subadmin')
+            subadmin_user.groups.add(subadmin_group)
+
+            # 3. Create the Resort and assign the subadmin user as host
+            resort = form.save(commit=False)
+            resort.host = subadmin_user
+            
+            # Debugging: Check if the resort object is being created properly
+            print(f"Creating Resort: {resort.name}, Host: {subadmin_user.username}")
+            
+            # Save the resort
+            resort.save()
+
+            # Save many-to-many fields if any (like amenities, locations)
+            form.save_m2m()
+
+            print(f"Subadmin created: username={username}, password={password}")
+
+            return redirect('home')  # Redirect after successful creation
+        else:
+            # Print form errors for debugging
+            print(form.errors)
+
+    context = {'form': form}
+    return render(request, 'app/resort_form.html', context)
+
+def create_resort(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        location = request.POST.get('location')
+        description = request.POST.get('description')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        password = request.POST.get('password')
+        amenities = request.POST.getlist('amenities')  # Collecting amenities as a list
+
+        # Now you can save these amenities, or process them as needed
+        # For example, store them in a list or a related model.
+
+        return redirect('login_register')  # Redirect after successful form submission
 
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['subadmin'])

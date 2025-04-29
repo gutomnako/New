@@ -35,19 +35,19 @@
 					<span class="text">Dashboard</span>
 				</a>
 			</li>
-			<li>
+			<li class="">
 				<a href="{% url 'admin-beach' %}">
 					<i class='bx bx-swim'></i>
 					<span class="text">Beaches and Resorts</span>
 				</a>
 			</li>
-			<li class="active">
+			<li>
 				<a href="{% url 'admin-monitor' %}">
 					<i class='bx bxs-doughnut-chart' ></i>
 					<span class="text">Recent User Logins</span>
 				</a>
 			</li>
-			<li class="">
+			<li class="active">
 				<a href="{% url 'applications' %}">
 					<i class='bx bx-folder bx-fw'></i>
 					<span class="text">Applications</span>
@@ -123,51 +123,74 @@
 		<main>
 			<div class="head-title">
 				<div class="left">
-					<h1>Recent Logins</h1>
+					<h1>Beaches and Resorts</h1>
 					<ul class="breadcrumb">
 						<li>
 							<a href="#">Dashboard</a>
 						</li>
 						<li><i class='bx bx-chevron-right' ></i></li>
 						<li>
-							<a class="active" href="">Recent Logins</a>
+							<a class="active" href="">Beaches and Resorts</a>
 						</li>
 					</ul>
 				</div>
 				<a href="#" class="btn-download">
 				</a>
 			</div>
+
 			<div class="table-data">
-				<div class="order">
-					<div class="head">
-						<h3>Recent Logins</h3>
-						<i class='bx bx-search' ></i>
-						<i class='bx bx-filter' ></i>
-					</div>
-						<table>
-							<thead>
-								<tr>
-									<th>User</th>
-									<th>Last Login</th>
-									<th>Last Logout</th>
-								</tr>
-							</thead>
-							<tbody>
-								{% for login in login_history %}
-								<tr>
-									<td>{{ login.user.username }}</td>
-									<td>{{ login.last_login|date:"Y-m-d H:i" }}</td>
-									<td>{{ login.last_logout|date:"Y-m-d H:i" }}</td>
-								</tr>
-								{% empty %}
-								<tr>
-									<td colspan="3">No login history available.</td>
-								</tr>
-								{% endfor %}
-							</tbody>
-						</table>			
-				</div>
-			</div>
+                <div class="todo">
+                    <div class="head">
+                        <h3>List of Sub-Admin Applications</h3>
+                        <i class='bx bx-filter'></i>
+                    </div>
+            
+                    <ul class="todo-list" style="list-style: none; padding: 0; margin: 0;">
+                        <!-- Header -->
+                        <li style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 2px solid #000; font-weight: bold; background: #f0f0f0;">
+                            <div style="flex: 2;">Resort Name</div>
+                            <div style="flex: 2;">Location</div>
+                            <div style="flex: 3;">Description</div>
+                            <div style="flex: 2;">Email</div>
+                            <div style="flex: 2;">Phone</div>
+                            <div style="flex: 2;">Amenities</div>
+                            <div style="flex: 2;">Image</div>
+                            <div style="flex: 1;">Status</div>
+                        </li>
+                    
+                        {% if applications %}
+                            {% for application in applications %}
+                                <li style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #ccc;">
+                                    <div style="flex: 2;">{{ application.resort_name }}</div>
+                                    <div style="flex: 2;">{{ application.location }}</div>
+                                    <div style="flex: 3;">{{ application.description|truncatewords:15 }}</div>
+                                    <div style="flex: 2;">{{ application.email }}</div>
+                                    <div style="flex: 2;">{{ application.phone }}</div>
+                                    <div style="flex: 2;">{{ application.amenities }}</div>
+                                    <div style="flex: 2;">
+                                        {% if application.resort_image %}
+                                            <img src="{{ application.resort_image.url }}" alt="Resort Image" style="width: 60px; height: 60px; object-fit: cover;">
+                                        {% else %}
+                                            No Image
+                                        {% endif %}
+                                    </div>
+                                    <div style="flex: 1;">
+                                        {% if not application.is_reviewed %}
+                                            <span style="color: orange; font-weight: bold;">Pending</span>
+                                        {% elif application.is_approved %}
+                                            <span style="color: green; font-weight: bold;">Approved</span>
+                                        {% else %}
+                                            <span style="color: red; font-weight: bold;">Declined</span>
+                                        {% endif %}
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        {% else %}
+                            <li style="padding: 20px; text-align: center;">No applications found.</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
 		</main>
 		<!-- MAIN -->
 	</section>

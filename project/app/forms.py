@@ -66,14 +66,27 @@ class ResortForm(ModelForm):
     class Meta:
         model = Resort
         fields = [
-            'host', 'name', 'location', 'description', 
+            'name', 'location', 'description', 
             'amenities', 'resort_image'
             ]
 
 class SubAdminApplicationForm(forms.ModelForm):
     class Meta:
         model = SubAdminApplication
-        fields = ['resort_name', 'email', 'verification_permit']        
+        fields = ['resort_name', 'location', 'description', 'email', 'phone', 'amenities', 'resort_image']
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        
+        # If email is empty, raise a validation error
+        if not email:
+            raise forms.ValidationError("Email is required.")
+        
+        # Optionally, you can apply .lower() here to ensure the email is case-insensitive before saving
+        email = email.lower()
+        
+        # Return the cleaned and standardized email
+        return email       
 
 class Userform(ModelForm):
     class Meta:

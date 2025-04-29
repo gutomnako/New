@@ -14,7 +14,13 @@
 
 	<title>AdminHub</title>
 </head>
-
+<style>
+.read {
+    background-color: #f5f5f5; /* Light gray background to indicate read status */
+    text-decoration: line-through; /* Optional: strike-through text */
+    color: #bbb; /* Optional: change text color to indicate read */
+}
+</style>
 <body>
 {% csrf_token %}
 
@@ -49,6 +55,12 @@
 					<span class="text">Recent User Logins</span>
 				</a>
 			</li>
+			<li class="">
+				<a href="{% url 'applications' %}">
+					<i class='bx bx-folder bx-fw'></i>
+					<span class="text">Applications</span>
+				</a>
+			</li>
 		</ul>
 		<ul class="side-menu">
 			<li>
@@ -78,18 +90,28 @@
 			<input type="checkbox" id="switch-mode" hidden>
 			<label for="switch-mode" class="switch-mode"></label>
 			<div class="notification dropdown" style="position: relative;">
-				<i class='bx bxs-bell'></i>
+				<i class='bx bxs-bell' style="font-size: 2rem;"></i>
 				{% if notifications %}
-					<span class="num">{{ notifications|length }}</span>
+					<span class="num" style="position: absolute; top: -5px; right: -5px; background-color: red; color: white; border-radius: 50%; padding: 3px 8px; font-size: 12px; font-weight: bold; display: inline-block; min-width: 18px; text-align: center;">
+						{{ notifications|length }}
+					</span>
+				{% else %}
+					<span class="num" style="display: none;"></span> <!-- Hide if no notifications -->
 				{% endif %}
 				<div class="dropdown-content" style="position: absolute; top: 100%; right: 0; display:none; background-color: white; border-radius: 8px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); width: 300px; max-height: 400px; overflow-y: auto; padding: 10px; margin-top: 5px;">
 					{% for note in notifications %}
-						<div class="notif-item" style="margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px;" onclick="openModal('{{ note.message|escapejs }}', '{{ note.created_at|timesince }} ago')">
+						<div class="notif-item" style="margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px;" data-id="{{ note.id }}">
 							<p style="font-size: 14px; color: #333;">{{ note.message }}</p>
 							<small style="font-size: 12px; color: #777;">{{ note.created_at|timesince }} ago</small>
-							<form action="{% url 'admin-dashboard' %}" method="post" style="margin-top: 5px;">
+							<form action="{% url 'mark_as_read' note.id %}" method="post" style="margin-top: 5px;">
 								{% csrf_token %}
-								<button type="submit" class="mark-read-btn" style="padding: 5px 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;">Mark as Read</button>
+								<button type="button" class="mark-read-btn" data-id="{{ note.id }}" style="padding: 6px 12px; background-color: #007bff; color: white; border: none; border-radius: 4px; font-size: 13px; cursor: pointer;">
+									Mark as Read
+								</button>
+							</form>
+							<form action="{% url 'delete_notification' note.id %}" method="post" style="margin-top: 5px;">
+								{% csrf_token %}
+								<button type="submit" class="delete-btn" style="padding: 5px 10px; background-color: #ff0000; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;">Delete</button>
 							</form>
 						</div>
 					{% empty %}
@@ -97,16 +119,6 @@
 							<p>No new notifications</p>
 						</div>
 					{% endfor %}
-				</div>
-			</div>
-			
-			<!-- Modal -->
-			<div id="notificationModal" class="modal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000;">
-				<div class="modal-content" style="background-color: white; margin: 50px auto; padding: 20px; width: 80%; max-width: 500px; border-radius: 8px;">
-					<span class="close" style="position: absolute; top: 10px; right: 10px; font-size: 20px; cursor: pointer;">&times;</span>
-					<h2>Notification</h2>
-					<p id="modalMessage" style="font-size: 16px;"></p>
-					<p id="modalTimestamp" style="font-size: 12px; color: #777;"></p>
 				</div>
 			</div>
 			
@@ -368,41 +380,146 @@ var mostRatedChart = new Chart(ctx, {
 	}
   }
 });
+// Toggle dropdown display when clicking on the notification icon
 document.querySelector('.notification').addEventListener('click', function() {
-        let dropdown = this.querySelector('.dropdown-content');
-        dropdown.style.display = (dropdown.style.display === 'none' || dropdown.style.display === '') ? 'block' : 'none';
+    let dropdown = this.querySelector('.dropdown-content');
+    dropdown.style.display = (dropdown.style.display === 'none' || dropdown.style.display === '') ? 'block' : 'none';
+});
+
+// Check on page load if any notifications are read and update the count
+document.addEventListener('DOMContentLoaded', function() {
+    const countElement = document.querySelector('.num');
+    console.log(countElement); // Check if the notification bubble element is found
+
+    // Check all notifications if they're marked as read already
+    document.querySelectorAll('.notif-item').forEach(item => {
+        if (item.classList.contains('read')) {
+            const button = item.querySelector('.mark-read-btn');
+            if (button) {
+                button.disabled = true; // Disable button if read
+                button.innerText = 'Read';
+            }
+        }
     });
 
-    // Function to open the modal and display notification message
-    function openModal(message, timestamp) {
-        // Display the modal
-        document.getElementById('notificationModal').style.display = 'block';
+    // Update count after page load
+    fetchUnreadCount();
+});
+
+// Fetch unread count and update notification bubble
+function fetchUnreadCount() {
+    fetch('/unread-count/')
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);  // Log the API response to check the unread count
+            const countElement = document.querySelector('.num');
+            const unreadCount = data.unread_count;
+
+            // If unread count is greater than 0, show the count bubble
+            if (unreadCount > 0) {
+                countElement.style.display = 'inline-block';
+                countElement.innerText = unreadCount;
+            } else {
+                countElement.style.display = 'none'; // Hide if no unread notifications
+            }
+        })
+        .catch(error => console.error('Error fetching unread count:', error));
+}
+
+// When clicking "Mark as Read" button
+document.querySelectorAll('.mark-read-btn').forEach(button => {
+    button.addEventListener('click', function(event) {
+        event.preventDefault();  // Prevent default behavior (e.g., form submission)
         
-        // Set the modal content
-        document.getElementById('modalMessage').innerText = message;
-        document.getElementById('modalTimestamp').innerText = timestamp;
-    }
+        const notificationId = this.getAttribute('data-id'); // Get notification ID
+        if (!notificationId) {
+            console.error("Notification ID is missing!");
+            return;
+        }
 
-    // Close the modal when the user clicks on the close button
-    document.querySelector('.close').onclick = function() {
-        document.getElementById('notificationModal').style.display = 'none';
-    }
+        const notificationItem = this.closest('.notif-item'); // Find the parent notification item
 
-    // Close the modal when the user clicks anywhere outside of the modal
-    window.onclick = function(event) {
-        if (event.target == document.getElementById('notificationModal')) {
-            document.getElementById('notificationModal').style.display = 'none';
+        // Send POST request to mark as read
+        fetch(`/mark-as-read/${notificationId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCSRFToken(), // CSRF token for safety
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Mark notification as read visually
+                notificationItem.classList.add('read');  // Add 'read' class to the notification
+                this.disabled = true;  // Disable the "Mark as Read" button
+                this.innerText = 'Read';  // Change button text to "Read"
+
+                // Update unread notification bubble count
+                updateUnreadCount(data.unread_count); // Pass updated unread count
+            }
+        })
+        .catch(error => console.error('Error marking as read:', error));
+    });
+});
+
+// Function to get CSRF token from cookies
+function getCSRFToken() {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, 10) === ('csrftoken=')) {
+                cookieValue = decodeURIComponent(cookie.substring(10));
+                break;
+            }
         }
     }
+    return cookieValue;
+}
 
-    // Ensure the notification click triggers modal opening
-    document.querySelectorAll('.notif-item').forEach(item => {
-        item.addEventListener('click', function() {
-            const message = this.querySelector('p').innerText;
-            const timestamp = this.querySelector('small').innerText;
-            openModal(message, timestamp); // Open the modal with the clicked notification's details
-        });
-    });
+// Update unread notification bubble count
+function updateUnreadCount(unreadCount) {
+    const countElement = document.querySelector('.num');
+    
+    if (unreadCount > 0) {
+        countElement.style.display = 'inline-block';
+        countElement.innerText = unreadCount;  // Set the new unread count
+    } else {
+        countElement.style.display = 'none';  // Hide bubble if no unread notifications
+    }
+}
+
+// Fetch unread count when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    fetchUnreadCount();  // Fetch unread notifications when the page is loaded
+});
+
+// Function to fetch unread count from the server
+function fetchUnreadCount() {
+    fetch('/unread-count/')
+        .then(response => response.json())
+        .then(data => {
+            updateUnreadCount(data.unread_count);  // Update the bubble count with the new value
+        })
+        .catch(error => console.error('Error fetching unread count:', error));
+}
+
+// Function to get CSRF token from cookies
+function getCSRFToken() {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, 10) === ('csrftoken=')) {
+                cookieValue = decodeURIComponent(cookie.substring(10));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
 	</script>	
 </body>
 </html>

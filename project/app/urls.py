@@ -31,6 +31,10 @@ urlpatterns = [
     path('admin-Dashboard/', views.adminDashboard, name='admin-dashboard'),
     path('adminbeachandresort/', views.adminresorts, name='admin-beach'),
     path('adminviews/', views.adminmonitors, name='admin-monitor'),
+    path('adminviews/applications/', views.applications, name='applications'),
+    path('delete-notification/<int:id>/', views.delete_notification, name='delete_notification'),
+    path('mark-as-read/<int:notification_id>/', views.mark_as_read, name='mark_as_read'),
+    path('unread-count/', views.unread_count, name='unread_count'),
     
     path('map/', views.map_view, name='map'),
 
