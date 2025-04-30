@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-tnu2lb8dmd0@x6715=eg-d+lakf8i!%8214kr^3y0i_un3g%b+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'Thesis.pythonanywhere.com']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -86,10 +86,10 @@ WSGI_APPLICATION = 'project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'Ronnie123$Thesis_project',
-        'USER': 'Ronnie123',
-        'PASSWORD': 'Hesoyam12#',
-        'HOST': 'Ronnie123.mysql.pythonanywhere-services.com',
+        'NAME': 'reset_django',
+        'USER': 'root',
+        'PASSWORD': 'akingtiti',
+        'HOST': '127.0.0.1',
         'PORT': '3306',
     }
 }

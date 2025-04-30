@@ -12,7 +12,7 @@ from django.contrib.auth.models import Group
 from django.utils.timezone import now, timedelta
 from .models import LoginActivity, LoginHistory, Visit, Notification
 import pandas as pd
-import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
 from django.http import JsonResponse
 import json
 from .recommendations import get_recommendations
@@ -27,16 +27,15 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 
+
+
 #dashboard
 #login
 #resorts
 #edit resort
 #comments
-def cosine_similarity(a):
-    a = np.array(a)
-    norm = np.linalg.norm(a, axis=1, keepdims=True)
-    normalized = a / norm
-    return np.dot(normalized, normalized.T)
+
+
 #dashboard
 @login_required
 def some_view(request):
