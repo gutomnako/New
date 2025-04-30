@@ -27,7 +27,6 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 
-
 #dashboard
 #login
 #resorts

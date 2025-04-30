@@ -4,37 +4,6 @@ body {
   margin: 0;
   padding: 0;
   background-color: #f3f3f3;
-  padding-top: 80px;  /* Adds space below the fixed navbar */
-}
-
-/* Search Bar */
-.search-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.5em;
-  padding-left: 20px; /* Ensures the search bar is not too close to the edge */
-}
-
-.search-bar input[type="text"] {
-  padding: 0.5em;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  width: 200px;
-  width: 250px; /* Increased width to make it more comfortable */
-}
-
-.search-bar button {
-  background-color: #ffccaa;
-  color: #004080;
-  border: none;
-  padding: 0.5em 1em;
-  cursor: pointer;
-  border-radius: 5px;
-  margin-left: 10px; /* Adds a little space between the input and the button */
-}
-
-.search-bar button:hover {
-  background-color: #ffa070;
 }
 
 /* Layout */
@@ -45,6 +14,7 @@ body {
   padding: 20px;
   background-color: #ddd;
   border-radius: 1%;
+  position: relative;
 }
 
 .sidebar {
@@ -84,7 +54,7 @@ body {
 }
 
 .filter-section button {
-  background-color: #004080;
+  background-color: #006f89; /* Updated color */
   color: #fff;
   border: none;
   padding: 0.5em 1em;
@@ -94,7 +64,7 @@ body {
 }
 
 .filter-section button:hover {
-  background-color: #002f4f;
+  background-color: #005a72; /* Slightly darker shade for hover */
 }
 
 /* Price Range Box */
@@ -134,7 +104,7 @@ body {
   display: block;
   width: 100%;
   padding: 0.5em;
-  background-color: #004080;
+  background-color: #006f89; /* Updated color */
   color: #fff;
   border: none;
   border-radius: 5px;
@@ -144,7 +114,7 @@ body {
 }
 
 .price-range-box button:hover {
-  background-color: #002f4f;
+  background-color: #005a72; /* Slightly darker shade for hover */
 }
 
 /* Card Grid */
@@ -196,12 +166,13 @@ body {
 
 .card-slider .card {
   flex: 0 0 auto;
-  width: 260px; /* Fix width of cards to prevent them from breaking out */
+  width: 260px; 
 }
 
 /* Section Titles */
 .recommended-section h2,
-.all-resorts-section h2 {
+.all-resorts-section h2,
+.most-rated-section h2{
   font-size: 26px;
   margin-bottom: 20px;
   text-align: left;
@@ -209,6 +180,7 @@ body {
   color: #333;
   margin-top: 30px;
   padding-left: 20px;
+  position: relative;
 }
 
 /* Favorite Button Styles */
@@ -248,7 +220,7 @@ body {
 
 /* Buttons */
 button {
-  background-color: #3498db;
+  background-color: #006f89; /* Updated color */
   color: white;
   padding: 12px 20px;
   border: none;
@@ -260,7 +232,7 @@ button {
 }
 
 button:hover {
-  background-color: #2980b9;
+  background-color: #005a72; /* Slightly darker shade for hover */
 }
 
 button a {
@@ -275,12 +247,12 @@ button a {
   overflow: hidden; /* Hide the overflowing content */
   display: flex;
   flex-wrap: wrap;
-  
 }
 
 .card-slider-container .all-resorts-card {
   flex-grow: 1
 }
+
 /* Arrow buttons fixed to the left and right */
 .arrow-btn {
   position: absolute;
@@ -336,4 +308,171 @@ button a {
     border-right: none;
     margin-bottom: 10px;
   }
+
+  /* Adjust the slider for mobile */
+  .card-slider {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .card-slider .card {
+    width: 100%; /* Cards will take full width */
+  }
+
+  /* Adjust the search form for smaller screens */
+  .search-form {
+    flex-direction: column;
+  }
+
+  .search-input,
+  .search-button {
+    width: 100%; /* Full-width inputs for mobile */
+  }
+
+  /* Adjust buttons for mobile */
+  button {
+    width: 100%;
+  }
+
+  .favorite-btn i {
+    font-size: 24px; /* Smaller size on mobile */
+  }
+
+  .card {
+    width: 100%; /* Cards will take full width on mobile */
+  }
+}
+
+.star-rating {
+  display: inline-flex;
+  align-items: center;
+  font-size: 20px; /* Adjust size */
+}
+
+.star-rating .fa {
+  margin-right: 2px;
+  transition: color 0.3s;
+}
+
+.star-rating .filled {
+  color: #FFD700; /* Gold for filled stars */
+}
+
+.star-rating .half {
+  color: #FFBF00; /* Slightly lighter gold for half stars */
+}
+
+.star-rating .empty {
+  color: #CCCCCC; /* Gray for empty stars */
+}
+
+/* Hide extra resorts (e.g., show only first 6 by default) */
+.resort-card {
+  display: none;
+}
+
+.resort-card:nth-child(-n+6) { /* Show only first 6 resorts */
+  display: block;
+}
+
+.all-resorts-cards {
+  display: flex;
+  flex-wrap: wrap; /* Allows wrapping into new rows */
+  justify-content: center; /* Centers the resorts */
+  gap: 20px; /* Space between resorts */
+}
+
+.resort-card {
+  width: 260px; /* Keep card width consistent */
+}
+
+.resort-card {
+  transition: opacity 0.3s ease-in-out;
+}
+
+/* Ensure the search bar stays on top, fixed within the container */
+.search-bar-wrapper {
+  position: fixed; /* Fixed position to stay at the top-right */
+  top: 60px; /* Adjust this value based on your navbar height */
+  right: 20px; /* Align it to the right side */
+  width: 80%; /* Make the search bar longer, adjust percentage as needed */
+  max-width: 800px; /* Set a maximum width to avoid it becoming too wide */
+  padding: 1rem 2rem;
+  background-color: transparent; /* Remove background color */
+  z-index: 10;  /* Ensures it's on top of other elements */
+  border-radius: 10px; /* Optional: Rounded corners */
+  box-sizing: border-box; /* Ensures padding is included in the width calculation */
+}
+
+/* Form styling */
+.search-form {
+  display: flex;
+  width: 100%;
+  background-color: transparent; /* Remove background color */
+}
+
+.search-input {
+  flex: 1;
+  padding: 0.75rem 1rem; /* Increase padding to make the text box bigger */
+  border: 1px solid #007BFF; /* Blue border to make it stand out */
+  border-bottom-left-radius: 20px; /* Keep rounded corners */
+  border-top-left-radius: 20px;
+  font-size: 1rem;
+  background-color: transparent; /* Remove background color */
+  transition: all 0.3s ease; /* Smooth transition for focus effect */
+}
+
+/* Add a glow effect on focus */
+.search-input:focus {
+  outline: none; /* Remove default focus outline */
+  border-color: #0056b3; /* Darker blue border on focus */
+  box-shadow: 0 0 8px rgba(0, 91, 255, 0.6); /* Subtle glow effect */
+}
+
+/* Button styling */
+.search-button {
+  padding: 0.75rem 1rem; /* Increase padding for the button */
+  border: 1px solid #ccc;
+  border-left: none;
+  background-color: #007BFF;
+  color: white;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
+/* Add space to the top of the container so the search bar doesn't overlap content */
+.container {
+  position: relative;
+  padding-top: 3.5rem; /* Adjust based on your search bar height */
+}
+
+/* Adjust layout for other content */
+.filter-container,
+.resorts-container {
+  margin-top: 1rem;  /* Optional: Adds space between content */
+}
+
+/* Suggestions box styling */
+.suggestions-box {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+.suggestions-box li {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.suggestions-box li:hover {
+  background-color: #f0f0f0;
 }
