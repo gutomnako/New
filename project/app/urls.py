@@ -21,7 +21,7 @@ urlpatterns = [
 
     path('create-resort/', views.createResort, name='create-resort'),
     path('update-resort/<str:pk>/', views.updateResort, name='update-resort'),
-    path('delete-resort/<str:pk>/', views.deleteResort, name='delete-resort'),
+    path('delete-resort/<int:id>/', views.deleteResort, name='delete-resort'),
     path('delete-message/<str:pk>/', views.deleteMessage, name='delete-message'),
     path('contact-number/', views.contact_number, name='contact-number'),
     path('autocomplete/', views.autocomplete, name='autocomplete'),
@@ -46,4 +46,6 @@ urlpatterns = [
     path('resort/<int:resort_id>/upload_room_image_ajax/', views.upload_room_image_ajax, name='upload_room_image_ajax'),
     path('resort/<int:resort_id>/upload_beach_image_ajax/', views.upload_beach_image_ajax, name='upload_beach_image_ajax'),
     path('resort/<int:resort_id>/upload_activity_image_ajax/', views.upload_activity_image_ajax, name='upload_activity_image_ajax'),
+    path('resort/restrict/<int:resort_id>/', views.restrict_resort, name='restrict-resort'),
+    path('resort/remove-restriction/<int:resort_id>/', views.remove_restriction, name='remove-restriction'),
 ]

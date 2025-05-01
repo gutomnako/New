@@ -15,6 +15,7 @@ body {
   background-color: #ddd;
   border-radius: 1%;
   position: relative;
+  margin-top: 80px;  /* Adds space at the top */
 }
 
 .sidebar {
@@ -420,6 +421,7 @@ button a {
   font-size: 1rem;
   background-color: transparent; /* Remove background color */
   transition: all 0.3s ease; /* Smooth transition for focus effect */
+  margin-top: 40px;
 }
 
 /* Add a glow effect on focus */
@@ -440,6 +442,7 @@ button a {
   cursor: pointer;
   border-top-right-radius: 20px;
   border-bottom-right-radius: 20px;
+  margin-top: 40px;
 }
 
 /* Add space to the top of the container so the search bar doesn't overlap content */
@@ -475,4 +478,34 @@ button a {
 
 .suggestions-box li:hover {
   background-color: #f0f0f0;
+}
+
+.tooltip {
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: max-content;
+  background-color: #333;
+  color: #fff;
+  text-align: left;
+  padding: 8px 12px;
+  border-radius: 6px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%; /* Above the text */
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
 }

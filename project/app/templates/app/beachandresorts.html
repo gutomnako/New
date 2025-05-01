@@ -1,7 +1,54 @@
 {% extends 'main.html' %}
 {% load static %}
 {% block content %}
+<style>
+.table-data,
+.todo {
+  overflow: visible !important; /* allow dropdowns to extend beyond bounds */
+}
 
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  z-index: 1;
+  position: relative;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #fff;
+  min-width: 140px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.25);
+  border-radius: 6px;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.dropdown-content a {
+  color: #333;
+  padding: 10px 12px;
+  text-decoration: none;
+  display: block;
+  transition: background 0.2s;
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+}
+</style>
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -147,26 +194,41 @@
 
 			<div class="table-data">
 				<div class="todo">
-					<div class="head">
-						<h3>List of Beaches and Resorts</h3>
-						{% if request.user.groups.all.0.name == "Pinakaadmin" %}
-						<a href="{% url 'create-resort' %}" class='bx bx-plus'></a>
-						{% endif %}
-						<i class='bx bx-filter' ></i>
-					</div>
-					<ul class="todo-list">
-						{% if resorts %}
-						<ul>
-							{% for resort in resorts %}
-								<li>{{ resort.name }}</li>
-							{% endfor %}
-						</ul>
-					{% else %}
-						<p>No resorts available.</p>
+				  <div class="head">
+					<h3>List of Beaches and Resorts</h3>
+					{% if request.user.groups.all.0.name == "Pinakaadmin" %}
+					<a href="{% url 'create-resort' %}" class="bx bx-plus add-btn" title="Add Resort"></a>
 					{% endif %}
-					</ul>
+					<i class="bx bx-filter filter-icon" title="Filter"></i>
+				  </div>
+				  <ul class="todo-list">
+					{% if resorts %}
+					  {% for resort in resorts %}
+					  <li class="todo-item">
+						<span class="resort-name">{{ resort.name }}</span>
+						{% if request.user.groups.all.0.name == "Pinakaadmin" %}
+						<div class="dropdown">
+						  <button class="dropdown-btn" onclick="toggleDropdown(event)">Actions &#9662;</button>
+						  <div class="dropdown-content">
+							<a href="{% url 'restrict-resort' resort.id %}">
+							  {% if resort.restricted %}Unrestrict{% else %}Restrict{% endif %}
+							</a>
+							<form id="delete-form-{{ resort.id }}" action="{% url 'delete-resort' resort.id %}" method="post" style="display: none;">
+								{% csrf_token %}
+							</form>
+							
+							<a href="#" onclick="if(confirm('Are you sure you want to remove this resort?')) { document.getElementById('delete-form-{{ resort.id }}').submit(); } return false;">Remove</a>
+						  </div>
+						</div>
+						{% endif %}
+					  </li>
+					  {% endfor %}
+					{% else %}
+					  <p>No resorts available.</p>
+					{% endif %}
+				  </ul>
 				</div>
-			</div>
+			  </div>
 		</main>
 		<!-- MAIN -->
 	</section>
@@ -316,6 +378,25 @@ function getCSRFToken() {
     }
     return cookieValue;
 }
+function toggleDropdown(event) {
+    event.stopPropagation();
+    const dropdown = event.currentTarget.nextElementSibling;
+
+    // Close all other dropdowns
+    document.querySelectorAll('.dropdown-content').forEach(el => {
+      if (el !== dropdown) el.style.display = 'none';
+    });
+
+    // Toggle current dropdown
+    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+  }
+
+  // Close on outside click
+  document.addEventListener('click', function () {
+    document.querySelectorAll('.dropdown-content').forEach(el => {
+      el.style.display = 'none';
+    });
+  });
 </script>
 </html>
 {% endblock content %}

@@ -105,7 +105,7 @@ class Resort(models.Model):
     room_description = models.TextField(help_text="Room description", blank=True, null=True)
     beach_description = models.TextField(help_text="Beach description", blank=True, null=True)
     activity_description = models.TextField(help_text="Activity description", blank=True, null=True)
-    
+    restricted = models.BooleanField(default=False)
     location_rating = models.FloatField(default=0.0, help_text="A score representing the resort's location")
     
     created_at = models.DateTimeField(auto_now_add=True, help_text="Date and time the resort was added")

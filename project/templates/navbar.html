@@ -1,32 +1,35 @@
 {% extends 'main.html' %}
 {% block content %}
-
+{% load static %}
 <header class="navbar">
-    <div class="logo">
-      <h1>BEACHES & RESORT</h1>
+  <div class="logo">
+    <a href="{% url 'home' %}">
+      <img src="{% static 'images/logoo-removebg-preview.png' %}" alt="Santa Magdalena Logo" class="logo-img">
+    </a>
+  </div>
+
+  <div class="right-side">
+    <nav class="nav">
+      <a href="{% url 'index-view' %}" class="{% if request.path == '/' %}active{% endif %}">Home</a>
+      <a href="{% url 'home' %}" class="{% if request.path == '/home/' %}active{% endif %}">Beaches & Resorts</a>
+      <a href="{% url 'map' %}" class="{% if request.path == '/map/' %}active{% endif %}">Map</a>
+    </nav>
+
+    <div class="dropdown">
+      {% if request.user.is_authenticated %}
+        <button class="hamburger-btn" id="hamburgerBtn">
+          <i class="bi bi-list"></i>
+        </button>
+        <ul class="dropdown-menu" id="dropdownMenu">
+          <li><a class="dropdown-item" href="{% url 'user-profile' request.user.pk %}">Settings</a></li>
+          <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+        </ul>
+      {% else %}
+        <a href="{% url 'login' %}" style="padding: 8px 16px; font-size: 21px; margin: 0;">Login</a>
+      {% endif %}
     </div>
-      <nav class="nav">
-          <a href="{% url 'index-view' %}">Home</a>
-          <a href="{% url 'home' %}">Beaches & Resorts</a>
-          <a href="{% url 'map' %}">Map</a>
-      </nav>
-      <div class="dropdown">
-        {% if request.user.is_authenticated %}
-          <!-- Hamburger Button -->
-          <button class="hamburger-btn" id="hamburgerBtn">
-            <i class="bi bi-list"></i> <!-- Bootstrap Icon (Can be replaced by custom icon) -->
-          </button>
-      
-          <!-- Dropdown Menu -->
-          <ul class="dropdown-menu" id="dropdownMenu">
-              <li><a class="dropdown-item" href="{% url 'user-profile' request.user.pk %}">Settings</a></li>
-              <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
-          </ul>
-        {% else %}
-            <a href="{% url 'login' %}" style="padding: 8px 16px; font-size: 16px; margin: 0;">Login</a>
-        {% endif %}
-      </div>
-  </header>
+  </div>
+</header>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       const hamburgerBtn = document.getElementById('hamburgerBtn');

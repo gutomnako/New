@@ -23,7 +23,41 @@
                         
 
                         <h4>{{ resort.name }}</h4>
-                        <p>Estimated Cost: <strong>₱{{ resort.total_price|floatformat:2 }}</strong></p>
+                        <p>
+                            Estimated Cost:
+                            <strong class="tooltip">
+                              <span class="price">
+                                ₱{{ resort.total_price|floatformat:2 }}
+                              </span>
+                              <span class="tooltiptext">
+                                Room Price Range: 
+                                <span class="price-range">
+                                  {% if resort.room_price_range == 'Low' %}
+                                    ₱0 - ₱999
+                                  {% elif resort.room_price_range == 'Average' %}
+                                    ₱1000 - ₱2999
+                                  {% elif resort.room_price_range == 'High' %}
+                                    ₱3000 and above
+                                  {% else %}
+                                    Not specified
+                                  {% endif %}
+                                </span>
+                                <br>
+                                Cottage Price Range:
+                                <span class="price-range">
+                                  {% if resort.cottage_price_range == 'Low' %}
+                                    ₱0 - ₱999
+                                  {% elif resort.cottage_price_range == 'Average' %}
+                                    ₱1000 - ₱2999
+                                  {% elif resort.cottage_price_range == 'High' %}
+                                    ₱3000 and above
+                                  {% else %}
+                                    Not specified
+                                  {% endif %}
+                                </span>
+                              </span>
+                            </strong>
+                          </p>
                         <button type="button">
                             <a href="{% url 'resort' resort.id %}">Details</a>
                         </button>
@@ -59,7 +93,41 @@
                         </a>
     
                         <h4>{{ resort.name }}</h4>
-                        <p>Estimated Cost: <strong>₱{{ resort.total_price|floatformat:2 }}</strong></p>
+                        <p>
+                            Estimated Cost:
+                            <strong class="tooltip">
+                              <span class="price">
+                                ₱{{ resort.total_price|floatformat:2 }}
+                              </span>
+                              <span class="tooltiptext">
+                                Room Price Range: 
+                                <span class="price-range">
+                                  {% if resort.room_price_range == 'Low' %}
+                                    ₱0 - ₱999
+                                  {% elif resort.room_price_range == 'Average' %}
+                                    ₱1000 - ₱2999
+                                  {% elif resort.room_price_range == 'High' %}
+                                    ₱3000 and above
+                                  {% else %}
+                                    Not specified
+                                  {% endif %}
+                                </span>
+                                <br>
+                                Cottage Price Range:
+                                <span class="price-range">
+                                  {% if resort.cottage_price_range == 'Low' %}
+                                    ₱0 - ₱999
+                                  {% elif resort.cottage_price_range == 'Average' %}
+                                    ₱1000 - ₱2999
+                                  {% elif resort.cottage_price_range == 'High' %}
+                                    ₱3000 and above
+                                  {% else %}
+                                    Not specified
+                                  {% endif %}
+                                </span>
+                              </span>
+                            </strong>
+                          </p>
                         <button type="button">
                             <a href="{% url 'resort' resort.id %}">Details</a>
                         </button>
@@ -97,7 +165,41 @@
                             Average Rating:
                             <span class="star-rating" data-rating="{{ resort.average_rating }}"></span>
                         </p>
-                        <p>Estimated Cost: <strong>₱{{ resort.total_price|floatformat:2 }}</strong></p>
+                        <p>
+                            Estimated Cost:
+                            <strong class="tooltip">
+                              <span class="price">
+                                ₱{{ resort.total_price|floatformat:2 }}
+                              </span>
+                              <span class="tooltiptext">
+                                Room Price Range: 
+                                <span class="price-range">
+                                  {% if resort.room_price_range == 'Low' %}
+                                    ₱0 - ₱999
+                                  {% elif resort.room_price_range == 'Average' %}
+                                    ₱1000 - ₱2999
+                                  {% elif resort.room_price_range == 'High' %}
+                                    ₱3000 and above
+                                  {% else %}
+                                    Not specified
+                                  {% endif %}
+                                </span>
+                                <br>
+                                Cottage Price Range:
+                                <span class="price-range">
+                                  {% if resort.cottage_price_range == 'Low' %}
+                                    ₱0 - ₱999
+                                  {% elif resort.cottage_price_range == 'Average' %}
+                                    ₱1000 - ₱2999
+                                  {% elif resort.cottage_price_range == 'High' %}
+                                    ₱3000 and above
+                                  {% else %}
+                                    Not specified
+                                  {% endif %}
+                                </span>
+                              </span>
+                            </strong>
+                          </p>                    
                         <button type="button">
                             <a href="{% url 'resort' resort.id %}">Details</a>
                         </button>

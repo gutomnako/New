@@ -462,6 +462,9 @@ def home(request):
     else:
         resorts = Resort.objects.all().order_by('-created_at')
 
+
+    resorts = resorts.filter(restricted=False)
+
     # Get filter parameters
     selected_amenities = request.GET.getlist('amenities')  
     selected_location = request.GET.getlist('location')   
@@ -486,24 +489,34 @@ def home(request):
     if min_price is not None or max_price is not None:
         # Annotating resorts with the total price including room and cottage prices
         resorts = resorts.annotate(
-            total_price=(
-                F('price_per_night') +
-                F('entrance_kids') +
-                F('entrance_adults') +
-                Case(
-                    When(room_price_range='Low', then=Value(999)),
-                    When(room_price_range='Average', then=Value(2000)),
-                    When(room_price_range='High', then=Value(3000)),
-                    default=Value(0),
-                    output_field=IntegerField()
-                ) +
-                Case(
-                    When(cottage_price_range='Low', then=Value(999)),
-                    When(cottage_price_range='Average', then=Value(2000)),
-                    When(cottage_price_range='High', then=Value(3000)),
-                    default=Value(0),
-                    output_field=IntegerField()
-                )
+            total_price=(...),
+            room_price_min=Case(
+                When(room_price_range='Low', then=Value(0)),
+                When(room_price_range='Average', then=Value(1000)),
+                When(room_price_range='High', then=Value(3000)),
+                default=Value(0),
+                output_field=IntegerField()
+            ),
+            room_price_max=Case(
+                When(room_price_range='Low', then=Value(999)),
+                When(room_price_range='Average', then=Value(2999)),
+                When(room_price_range='High', then=Value(9999)),
+                default=Value(0),
+                output_field=IntegerField()
+            ),
+            cottage_price_min=Case(
+                When(cottage_price_range='Low', then=Value(0)),
+                When(cottage_price_range='Average', then=Value(1000)),
+                When(cottage_price_range='High', then=Value(3000)),
+                default=Value(0),
+                output_field=IntegerField()
+            ),
+            cottage_price_max=Case(
+                When(cottage_price_range='Low', then=Value(999)),
+                When(cottage_price_range='Average', then=Value(2999)),
+                When(cottage_price_range='High', then=Value(9999)),
+                default=Value(0),
+                output_field=IntegerField()
             )
         )
 
@@ -619,6 +632,18 @@ def home(request):
     }
 
     return render(request, 'app/home.html', context)
+
+def restrict_resort(request, resort_id):
+    resort = get_object_or_404(Resort, id=resort_id)
+    resort.restricted = not resort.restricted
+    resort.save()
+    return redirect('admin-beach')  # Redirect back to the home page (or the resort list page)
+
+def remove_restriction(request, resort_id):
+    resort = get_object_or_404(Resort, id=resort_id)
+    resort.restricted = False
+    resort.save()
+    return redirect('admin-beach')
 
 @login_required
 def update_resort(request, resort_id):
@@ -1018,12 +1043,11 @@ def updateResort(request, pk):
 
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['Pinakaadmin'])
-def deleteResort(request, pk):
-      resort = Resort.objects.get(id=pk)
-      if request.method == 'POST':
-            resort.delete()
-            return redirect('home')
-      return render(request, 'app/delete.html', {'obj': resort})
+def deleteResort(request, id):
+    resort = get_object_or_404(Resort, id=id)
+    if request.method == "POST":
+        resort.delete()
+    return redirect('admin-beach') 
 
 @login_required
 @csrf_exempt
