@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 import logging
-from django.db.models import Q, Count, F, Sum, OuterRef, Subquery, Avg, Exists, Value, Case, When, IntegerField
+from django.db.models import Q, Count, F, Sum, OuterRef, Subquery, Avg, Exists, Value, Case, When, IntegerField, ExpressionWrapper, FloatField
 from django.contrib.auth.decorators import login_required
 from .models import Resort, Amenity, Location, Message, User, Favorite, Rating, RoomImage, ActivityImage, BeachImage,  SubAdminApplication
 from django.contrib.auth import authenticate, login, logout
@@ -489,18 +489,10 @@ def home(request):
     if min_price is not None or max_price is not None:
         # Annotating resorts with the total price including room and cottage prices
         resorts = resorts.annotate(
-            total_price=(...),
             room_price_min=Case(
                 When(room_price_range='Low', then=Value(0)),
                 When(room_price_range='Average', then=Value(1000)),
                 When(room_price_range='High', then=Value(3000)),
-                default=Value(0),
-                output_field=IntegerField()
-            ),
-            room_price_max=Case(
-                When(room_price_range='Low', then=Value(999)),
-                When(room_price_range='Average', then=Value(2999)),
-                When(room_price_range='High', then=Value(9999)),
                 default=Value(0),
                 output_field=IntegerField()
             ),
@@ -511,12 +503,9 @@ def home(request):
                 default=Value(0),
                 output_field=IntegerField()
             ),
-            cottage_price_max=Case(
-                When(cottage_price_range='Low', then=Value(999)),
-                When(cottage_price_range='Average', then=Value(2999)),
-                When(cottage_price_range='High', then=Value(9999)),
-                default=Value(0),
-                output_field=IntegerField()
+            total_price=ExpressionWrapper(
+                F('entrance_kids') + F('entrance_adults') + F('price_per_night') + F('room_price_min') + F('cottage_price_min'),
+                output_field=FloatField()
             )
         )
 
