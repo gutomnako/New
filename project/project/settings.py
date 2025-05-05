@@ -46,6 +46,7 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = 'app.User'
 
+SEMAPHORE_API_KEY ='04632bb9c15a2d7240e6cbcc2634da20'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

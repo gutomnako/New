@@ -3,8 +3,6 @@
 {% load static %}
 
 {% block content %}
-
-<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -15,15 +13,40 @@
   {% include 'navbar.html' %}
 <body>  
  {% csrf_token %}
- 
+ {% if request.user.is_authenticated %}
+ <!-- Modal container -->
+ <div id="loginModal" class="modal fade show d-block" tabindex="-1" aria-labelledby="loginModalLabel" style="background: rgba(0, 0, 0, 0.5); z-index: 1055;" aria-modal="true" role="dialog">
+   <div class="modal-dialog modal-dialog-centered">
+     <div class="modal-content border-success">
+       <div class="modal-header bg-success text-white">
+         <h5 class="modal-title" id="loginModalLabel">Welcome Back!</h5>
+         <button type="button" class="btn-close" aria-label="Close" onclick="closeLoginModal()"></button>
+       </div>
+       <div class="modal-body">
+         <p><strong>Hello {{ request.user }}!</strong></p>
+       </div>
+     </div>
+   </div>
+ </div>
+
+ <script>
+   // Auto-hide modal after 3 seconds
+   setTimeout(() => {
+     closeLoginModal();
+   }, 3000);
+
+   function closeLoginModal() {
+     const modal = document.getElementById('loginModal');
+     if (modal) {
+       modal.classList.remove('show');
+       modal.classList.add('fade');
+       modal.style.display = 'none';
+     }
+   }
+ </script>
+{% endif %}
   <div class="main">
     <div class="content">
-      {% if request.user.is_authenticated %}
-      <h2 class="hello-hello"><strong>Hello {{request.user}}!</strong></h2>
-      {% endif %}
-      <hr>
-      <br>
-      <br>
       <h1>Discover the Best<br><span>Beaches & Resorts</span><br>in Santa Magdalena, Sorsogon!</h1>
       <button class="cn"><a href="{% url 'home' %}">Explore Now!</a></button>
     </div>

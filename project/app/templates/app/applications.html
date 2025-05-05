@@ -380,33 +380,36 @@ function getCSRFToken() {
         modal.style.display = "none"; // Hide modal
     }
 	function updateStatus(status, applicationId) {
-        // Send AJAX request to update status
-        fetch('/update-status/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}',  // CSRF token for protection
-                'X-Requested-With': 'XMLHttpRequest'  // Ensure it's an AJAX request
-            },
-            body: JSON.stringify({
-                'status': status,
-                'application_id': applicationId
-            })
+    fetch('/update-status/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+            'status': status,
+            'application_id': applicationId
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Status updated successfully!');
-                location.reload();  // Optionally reload or update the status on the page
-            } else {
-                alert('Failed to update status: ' + data.error);
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            let message = 'Status updated successfully!';
+            if (!data.sms_sent) {
+                message += '\nNote: SMS may not have been sent.';
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while updating the status');
-        });
-    }
+            alert(message + '\nSent to: ' + data.sent_to);
+            location.reload();
+        } else {
+            alert('Failed to update: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while updating the status.');
+    });
+}
 </script>
 </html>
 {% endblock content %}

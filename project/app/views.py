@@ -25,7 +25,8 @@ import re
 from collections import Counter
 from django.utils import timezone
 from django.views.decorators.http import require_POST
-
+import requests
+from django.conf import settings
 
 
 
@@ -123,66 +124,139 @@ def adminDashboard(request):
 
 @admin_only
 def adminresorts(request):
-      resorts = Resort.objects.all().order_by('-created_at')
-     
-      return render(request, 'app/beachandresorts.html', {'resorts': resorts})
+    # Handle notification marking
+    if request.method == 'POST':
+        notification_id = request.POST.get('notification_id')
+        if notification_id:
+            notification = get_object_or_404(Notification, id=notification_id, recipient=request.user)
+            notification.is_read = True
+            notification.save()
+            return redirect('adminresorts')  # Redirect back to the same page
+
+    resorts = Resort.objects.all().order_by('-created_at')
+
+    # Fetch unread notifications for the logged-in user
+    notifications = Notification.objects.filter(recipient=request.user).order_by('-created_at')
+
+    return render(request, 'app/beachandresorts.html', {
+        'resorts': resorts,
+        'notifications': notifications
+    })
 
 @admin_only
 def adminmonitors(request):
-      resorts = Resort.objects.all()
-      login_history = LoginHistory.objects.all().order_by('-last_login')
+    # Handle notification marking
+    if request.method == 'POST':
+        notification_id = request.POST.get('notification_id')
+        if notification_id:
+            notification = get_object_or_404(Notification, id=notification_id, recipient=request.user)
+            notification.is_read = True
+            notification.save()
+            return redirect('adminmonitors')  # Redirect back to the same page
 
-      unique_users_count = login_history.values('user').distinct().count()
+    resorts = Resort.objects.all()
+    login_history = LoginHistory.objects.all().order_by('-last_login')
+    unique_users_count = login_history.values('user').distinct().count()
 
-      if not login_history:
-        return render(request, 'app/recent-logins.html',
-            {'error': 'No login history found.',
+    if not login_history:
+        return render(request, 'app/recent-logins.html', {
+            'error': 'No login history found.',
             'resorts': resorts,
             'login_history': login_history,
-            'unique_users_count': unique_users_count, })
+            'unique_users_count': unique_users_count,
+        })
 
-      login_activities = LoginActivity.objects.filter(user=request.user).order_by('-timestamp')
-      return render(request, 'app/recent-logins.html', {'resorts': resorts, 'login_history': login_history,
-            'login_activities': login_activities})
+    login_activities = LoginActivity.objects.filter(user=request.user).order_by('-timestamp')
 
+    # Fetch unread notifications for the logged-in user
+    notifications = Notification.objects.filter(recipient=request.user).order_by('-created_at')
+
+    return render(request, 'app/recent-logins.html', {
+        'resorts': resorts,
+        'login_history': login_history,
+        'login_activities': login_activities,
+        'notifications': notifications  # Pass notifications to the template
+    })
 def applications(request):
+    # Handle notification marking
+    if request.method == 'POST':
+        notification_id = request.POST.get('notification_id')
+        if notification_id:
+            notification = get_object_or_404(Notification, id=notification_id, recipient=request.user)
+            notification.is_read = True
+            notification.save()
+            return redirect('applications')  # Redirect back to the same page
+
     applications = SubAdminApplication.objects.all().order_by('-submitted_at')
+
+    # Fetch unread notifications for the logged-in user
+    notifications = Notification.objects.filter(recipient=request.user).order_by('-created_at')
+
     context = {
         'applications': applications,
+        'notifications': notifications,  # Pass notifications to the template
     }
     return render(request, 'app/applications.html', context)
-
+semaphore_api_key = settings.SEMAPHORE_API_KEY
 def update_status(request):
-    # Ensure this view is only handling AJAX requests
     if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         try:
-            # Parse the incoming data
             data = json.loads(request.body)
             status = data.get('status')
             application_id = data.get('application_id')
-
-            # Find the SubAdminApplication object
             application = SubAdminApplication.objects.get(id=application_id)
 
-            # Update the application status
+            # Update application status
             if status == 'approve':
                 application.is_approved = True
-            elif status == 'decline':
+                sms_message = "Your resort application has been approved!"
+            else:
                 application.is_approved = False
+                sms_message = "Your resort application has been declined."
 
-            application.is_reviewed = True  # Mark as reviewed after action
-            application.save()  # Save the updated application
+            application.is_reviewed = True
+            application.save()
 
-            return JsonResponse({'success': True})  # Return success response
+            # Format phone number to +63 format
+            raw_number = application.phone.strip()
+            if raw_number.startswith('0'):
+                formatted_number = '+63' + raw_number[1:]
+            elif raw_number.startswith('63'):
+                formatted_number = '+' + raw_number
+            else:
+                formatted_number = raw_number  # Assume already in correct format
+
+            # Send SMS via Semaphore
+            semaphore_api_key = '04632bb9c15a2d7240e6cbcc2634da20'  # Replace with your actual API key
+            payload = {
+                'apikey': semaphore_api_key,
+                'number': formatted_number,
+                'message': sms_message,
+                # 'sendername': 'ResortApp'  # Optional — remove if not approved
+            }
+
+            response = requests.post('https://api.semaphore.co/api/v4/messages', data=payload)
+
+            # Debugging logs
+            print("Sending SMS to:", formatted_number)
+            print("Semaphore status code:", response.status_code)
+            print("Semaphore response:", response.text)
+
+            sms_sent = response.status_code == 200
+
+            return JsonResponse({
+                'success': True,
+                'sms_sent': sms_sent,
+                'sent_to': formatted_number  # Optional: remove in production
+            })
 
         except SubAdminApplication.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'SubAdminApplication not found'})
-
+            return JsonResponse({'success': False, 'error': 'Application not found'})
         except json.JSONDecodeError:
-            return JsonResponse({'success': False, 'error': 'Invalid JSON data'})
+            return JsonResponse({'success': False, 'error': 'Invalid JSON'})
 
     return JsonResponse({'success': False, 'error': 'Invalid request'})
-#end dashboard
+#end dashboarings
 
 #login
 def apply_subadmin(request):
