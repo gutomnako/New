@@ -36,6 +36,7 @@ urlpatterns = [
     path('mark-as-read/<int:notification_id>/', views.mark_as_read, name='mark_as_read'),
     path('unread-count/', views.unread_count, name='unread_count'),
     path('update-status/', views.update_status, name='update_status'),
+    path('change-password/', views.change_password, name='change_password'),
     
     path('map/', views.map_view, name='map'),
 

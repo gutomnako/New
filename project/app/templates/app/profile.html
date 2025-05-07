@@ -12,6 +12,7 @@
 {% include 'navbar.html' %}
 <body>
         <div class="container">
+            {% if request.user == user %}
             <aside class="sidebar">
                 <h2>Favorite Resorts</h2>
                 <div class="beach-list-container">
@@ -21,21 +22,63 @@
                         {% endfor %}
                     </ul>
                 </div>
-        </aside>
+            </aside>
+            {% endif %}
         <main class="profile">
-            <div class="profile-img">
-                {% if request.user.is_authenticated %}
-                    <img src="{{ request.user.avatar.url }}" alt="User Avatar">
-                {% else %}
-                    <img src="/media/avatar-default.svg" alt="Default Avatar">
+            <form method="POST" enctype="multipart/form-data" action="{% url 'user-profile' pk=request.user.pk %}">
+                {% csrf_token %}
+                
+                <div class="profile-img">
+                    {% if user.avatar %}
+                        <img id="previewImage" src="{{ user.avatar.url }}" alt="{{ user.username }}'s Avatar">
+                    {% else %}
+                        <img src="/media/avatar-default.svg" alt="Default Avatar">
+                    {% endif %}
+                </div>
+
+                {% if request.user == user %}
+                <input type="file" id="uploadInput" name="image" accept="image/*" style="display: none;" onchange="uploadAvatar(event)">
+                <button type="button" class="upload-btn" onclick="document.getElementById('uploadInput').click();">Upload Image</button>
                 {% endif %}
-            </div>
-            <input type="file" id="uploadInput" accept="image/*" style="display: none;">
-            <button class="upload-btn" onclick="document.getElementById('uploadInput').click();">Upload Image</button>
+            </form>
+
             <h1>{{ user.username }}</h1>
             <h2>{{ user.username }}'s Profile</h2>
             <p>Email: {{ user.email}}</p>
+            {% if request.user == user %}
+            <button onclick="document.getElementById('passwordModal').style.display='block'" class="upload-btn">
+                View / Change Password
+            </button>
+            
+            <!-- 🔲 Modal -->
+            <div id="passwordModal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <span class="close" onclick="document.getElementById('passwordModal').style.display='none'">&times;</span>
+                    <h2 style="margin-bottom: 15px;">Change Password</h2>
+                    <p style="color: #666; margin-bottom: 20px;">Your password is encrypted and cannot be viewed. You may change it below:</p>
+                    
+                    <form method="POST" action="{% url 'change_password' %}">
+                        {% csrf_token %}
+                        
+                        <label class="input-label">Current Password</label>
+                        <input type="password" name="old_password" class="modal-input" required>
+
+                        <label class="input-label">New Password</label>
+                        <input type="password" name="new_password1" class="modal-input" required>
+
+                        <label class="input-label">Confirm New Password</label>
+                        <input type="password" name="new_password2" class="modal-input" required>
+
+                        <div class="modal-buttons">
+                            <button type="submit" class="modal-submit">Change</button>
+                            <button type="button" class="modal-cancel" onclick="document.getElementById('passwordModal').style.display='none'">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
         </main>
+        {% if request.user == user %}
         <aside class="comments">
             <h2>ACTIVITY LOG</h2>
                 {% for message in messages %}
@@ -61,20 +104,59 @@
                     </div>
                 {% endfor %}
         </aside>
+        {% endif %}
     </div>
     <script src="{% static 'scripts/profile.css' %}"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-  const hamburgerBtn = document.getElementById('hamburgerBtn');
-  const dropdownMenu = document.getElementById('dropdownMenu');
+function uploadAvatar(event) {
+    const file = event.target.files[0];
+    if (!file) {
+        console.error("No file selected.");
+        return;
+    }
 
-  if (hamburgerBtn && dropdownMenu) {
-    hamburgerBtn.addEventListener('click', function() {
-      // Toggle the 'open' class on the dropdown element
-      dropdownMenu.parentElement.classList.toggle('open');
+    const formData = new FormData();
+    formData.append('image', file);
+
+    // Fetch request to upload the image
+    fetch(window.location.href, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Response data:", data);  // Debugging line
+        if (data.status === 'success') {
+            // Update the image preview
+            document.getElementById('previewImage').src = data.image_url;
+            alert('Image uploaded successfully!');
+        } else {
+            alert(data.message || 'Upload failed.');
+        }
+    })
+    .catch(error => {
+        console.error('Upload error:', error);
     });
-  }
-});
+}
+
+// Helper function to get the CSRF token from the cookies
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+            if (cookie.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(cookie.slice(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
     </script>
 </body>
 </html>

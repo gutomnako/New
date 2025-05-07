@@ -27,7 +27,8 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 import requests
 from django.conf import settings
-
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 
 
 #dashboard
@@ -976,19 +977,48 @@ def contact_number(request):
       return render(request, 'app/contact_number.html', context)
 
 
+@login_required
 def userProfile(request, pk):
-    user = get_object_or_404(User, id=pk)  # Get user by ID or return 404
-    favorites = Favorite.objects.filter(user=user)  # Get user's favorite resorts
-    messages = Message.objects.filter(user=user)  # Get user's messages/comments
-    ratings = Rating.objects.filter(user=user)  # Get user's ratings
+    user = get_object_or_404(User, id=pk)
+    favorites = Favorite.objects.filter(user=user)
+    messages = Message.objects.filter(user=user)
+    ratings = Rating.objects.filter(user=user)
+
+    if request.method == 'POST' and request.FILES.get('image'):
+        # Only allow users to change their own avatar
+        if request.user.id != user.id:
+            return JsonResponse({'status': 'error', 'message': 'Permission denied'}, status=403)
+
+        # Handle avatar image update
+        user.avatar = request.FILES['image']
+        user.save()
+
+        # Return the URL of the uploaded image in the response
+        return JsonResponse({'status': 'success', 'image_url': user.avatar.url})
 
     context = {
         'user': user,
         'favorites': favorites,
         'messages': messages,
-        'ratings': ratings,  
+        'ratings': ratings,
     }
     return render(request, 'app/profile.html', context)
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Keep user logged in
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('user-profile', pk=request.user.pk)
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = PasswordChangeForm(user=request.user)
+
+    return redirect('user-profile', pk=request.user.pk)
 
 #end resorts
 
