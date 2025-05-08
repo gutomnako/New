@@ -101,7 +101,7 @@
             </div>
 
             <!-- Description Right -->
-            <div class="description-text" style="flex: 1; max-width: 50%;">
+            <div class="description-text" style="flex: 1; max-width: 50%; margin-left: 40px;">
                 <h2 style="color: white; font-size: 32px; font-weight: bold; margin-bottom: 16px;">Rooms</h2>
                 <p id="room-description" style="font-size: 17px; line-height: 1.6;">{{ resort.room_description }}</p>
                 <textarea name="room_description" id="edit-room-description-input" style="display: none; width: 100%; padding: 10px;">{{ resort.room_description }}</textarea>
@@ -118,12 +118,12 @@
 </div>
 
 <!-- Beach Section -->
-<div class="beach-container" style="background: #ffffff; padding: 60px 40px; color: #333;">
+<div class="beach-container" style="background: #f5f5f5; padding: 60px 40px; color: #333;">
     <section class="beach-description">
         <div class="description-container" style="display: flex; justify-content: space-between; align-items: center; gap: 40px; flex-wrap: wrap;">
             
             <!-- Text Left -->
-            <div class="description-text" style="flex: 1; max-width: 50%;">
+            <div class="description-text" style="flex: 1; max-width: 50%; margin-right: 40px;">
                 <h2 style="color: #333; font-size: 32px; font-weight: bold; margin-bottom: 16px;">Beach</h2>
                 <p id="beach-description" style="font-size: 17px; line-height: 1.6; color: #333;">{{ resort.beach_description }}</p>
                 <textarea name="beach_description" id="edit-beach-description-input" style="display: none; width: 100%; padding: 10px;">{{ resort.beach_description }}</textarea>
@@ -153,8 +153,9 @@
                     {% endfor %}
                     
                     <!-- Arrows -->
-                    <button class="prev" type="button" style="position: absolute; left: -30px; top: 50%; transform: translateY(-50%); font-size: 24px;">&#10094;</button>
-                    <button class="next" type="button" style="position: absolute; right: -30px; top: 50%; transform: translateY(-50%); font-size: 24px;">&#10095;</button>
+                    <button class="prev" type="button">&#10094;</button>
+                    <button class="next" type="button">&#10095;</button>
+
                 </div>
             
                 <!-- Upload form -->
@@ -216,7 +217,7 @@
             </div>
 
             <!-- Description Right -->
-            <div class="description-text" style="flex: 1; max-width: 50%;">
+            <div class="description-text" style="flex: 1; max-width: 50%; margin-left: 40px;">
                 <h2 style="color: white; font-size: 32px; font-weight: bold; margin-bottom: 16px;">Activities</h2>
                 <p id="activity-description" style="font-size: 17px; line-height: 1.6;">{{ resort.activity_description }}</p>
                 <textarea name="activity_description" id="edit-activity-description-input" style="display: none; width: 100%; padding: 10px;">{{ resort.activity_description }}</textarea>

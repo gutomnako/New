@@ -88,7 +88,7 @@ def adminDashboard(request):
     # Fetch Most Rated Resorts
     most_rated_resorts = Resort.objects.annotate(
         avg_rating=Avg('rating__rating')
-    ).order_by('-avg_rating').values('name', 'avg_rating')[:5]  # Top 5 most rated resorts
+    ).order_by('-avg_rating').values('name', 'avg_rating')
 
     # Convert to JSON-compatible format
     most_rated_resorts_data = json.dumps(list(most_rated_resorts), default=float)

@@ -13,6 +13,7 @@
       <a href="{% url 'index-view' %}" class="{% if request.path == '/' %}active{% endif %}">Home</a>
       <a href="{% url 'home' %}" class="{% if request.path == '/home/' %}active{% endif %}">Beaches & Resorts</a>
       <a href="{% url 'map' %}" class="{% if request.path == '/map/' %}active{% endif %}">Map</a>
+      <a href="{% url 'index-view' %}#about-section" class="{% if request.path == '/about-section/' %}active{% endif %}">About Us</a>
     </nav>
 
     <div class="dropdown">
@@ -40,6 +41,29 @@
           dropdownMenu.parentElement.classList.toggle('open');
         });
       }
+    });
+
+    document.querySelectorAll(".nav a").forEach(link => {
+        const href = link.getAttribute("href");
+        
+        // Only apply the smooth scroll for internal links with hashes
+        if (href && href.includes("#")) {
+            link.addEventListener("click", function (event) {
+                const [baseUrl, sectionId] = href.split("#");
+
+                // If on the same page, use smooth scroll
+                if (window.location.pathname === baseUrl || baseUrl === window.location.origin + '/') {
+                    event.preventDefault();
+                    const target = document.getElementById(sectionId);
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start"
+                        });
+                    }
+                }
+            });
+        }
     });
   </script>
 
