@@ -541,6 +541,10 @@ button a {
   color: #c0c0c0;
 }
 
+.text{
+  text-decoration: none;
+}
+
 .social-media .icons {
   display: flex;
   gap: 20px;

@@ -346,6 +346,13 @@ def loginPage(request):
                   if user.groups.filter(name='pinakaadmin').exists():
                    return redirect('admin-dashboard')
                   
+                  if user.groups.filter(name='subadmin').exists():
+                    resorts = Resort.objects.filter(host=user)
+                    if resorts.exists():
+                        return redirect('resort', pk=resorts.first().id)  # Redirect to the resort detail page
+                    else:
+                        messages.error(request, "You don't have any resorts assigned yet.")
+                        return redirect('index-view')
                   return redirect('index-view')
             else:
                   messages.error(request, 'User does not exist OR password is incorrect')
@@ -548,10 +555,14 @@ def home(request):
 
     # Apply filters
     if selected_amenities:
-        resorts = resorts.filter(amenities__id__in=selected_amenities).distinct()
+        for amenity in selected_amenities:
+            resorts = resorts.filter(amenities__id=amenity).distinct()
 
+    selected_location = request.GET.get('location')  # Get the single selected location
+
+    # Apply location filter
     if selected_location:
-        resorts = resorts.filter(location__id__in=selected_location).distinct()
+        resorts = resorts.filter(location__id=selected_location).distinct()
 
     # Ensure proper price filtering
     try:

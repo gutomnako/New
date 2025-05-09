@@ -16,7 +16,7 @@
   <div class="main">
     <div class="content">
       <h1>Discover the Best<br><span>Beaches & Resorts</span><br>in Santa Magdalena, Sorsogon!</h1>
-      <button class="cn"><a href="{% url 'home' %}">Explore Now!</a></button>
+      <a href="{% url 'home' %}"><button class="cn">Explore Now!</button></a>
     </div>
   </div>
  
@@ -68,9 +68,7 @@
             Average Rating:
             <span class="star-rating" data-rating="{{ resort.average_rating }}"></span>
           </p>
-          <button type="button">
-            <a href="{% url 'resort' resort.id %}">Details</a>
-          </button>
+            <a href="{% url 'resort' resort.id %}" class="text"><button type="button">Details</button></a>
         </div>
         {% endfor %}
       </div>
@@ -123,6 +121,9 @@
     <div class="section">
       <h2>Our Team</h2>
       <p>Led by passionate local caretakers and hospitality experts, our team at Sta. Magdalena Beach and Resort is dedicated to ensuring that every guest enjoys a memorable and relaxing stay. From our welcoming staff to our experienced chefs crafting local delicacies, every member of our team is here to make your stay truly exceptional.</p>
+      <br>
+      <hr>
+      <br>
       <h2>Join Us for Your Next Escape</h2>
       <p>Step into a world where the waves whisper, the palms sway, and your spirit feels renewed. Whether you’re here for a quick weekend retreat or a long holiday, Sta. Magdalena Beach and Resort promises a rejuvenating experience for all.</p>
     </div>

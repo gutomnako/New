@@ -31,8 +31,8 @@
             <h3>LOCATIONS</h3>
             {% for location in locations %}
             <label>
-                <input type="checkbox" name="location" value="{{ location.id }}"
-                    {% if location.id|stringformat:"s" in selected_location %}checked{% endif %}>
+                <input type="radio" name="location" value="{{ location.id }}"
+                    {% if location.id|stringformat:"s" == selected_location %}checked{% endif %}>
                 {{ location.name }}
             </label>
             {% endfor %}
@@ -75,7 +75,6 @@ document.addEventListener('DOMContentLoaded', function () {
     })
     .catch(error => console.error('Error fetching filtered resorts:', error));
 }
-
 
     // Apply filters when checkboxes change
     filterForm.addEventListener('change', applyFilters);
@@ -153,7 +152,29 @@ function getCsrfToken() {
 }
 
 });
+document.addEventListener("DOMContentLoaded", function() {
+        // Get the price fields
+        const minPriceField = document.getElementById('min_price');
+        const maxPriceField = document.getElementById('max_price');
 
+        // Prevent negative values in the min_price field
+        minPriceField.addEventListener('input', function() {
+            if (minPriceField.value < 0) {
+                minPriceField.setCustomValidity("Price cannot be negative");
+            } else {
+                minPriceField.setCustomValidity(""); // Clear the custom validity
+            }
+        });
+
+        // Prevent negative values in the max_price field
+        maxPriceField.addEventListener('input', function() {
+            if (maxPriceField.value < 0) {
+                maxPriceField.setCustomValidity("Price cannot be negative");
+            } else {
+                maxPriceField.setCustomValidity(""); // Clear the custom validity
+            }
+        });
+    });
     </script>
     
 

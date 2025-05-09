@@ -81,7 +81,7 @@ class Amenity(models.Model):
          return self.name
      
 class Resort(models.Model):
-    host = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    host = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='resorts')
     name = models.CharField(max_length=255, help_text="Name of the resort")
     map_url = models.URLField(blank=True, null=True)
     latitude = models.FloatField(null=True, blank=True)

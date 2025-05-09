@@ -58,11 +58,7 @@
                               </span>
                             </strong>
                           </p>
-                        <button type="button">
-                            <a href="{% url 'resort' resort.id %}">Details</a>
-                        </button>
-
-                        
+                          <a href="{% url 'resort' resort.id %}" class="text"><button type="button">Details</button></a>
                         <p class="favorite-count">Favorites: {{ resort.favorite_count }}</p>
                     </div>
                 {% endfor %}
@@ -128,9 +124,7 @@
                               </span>
                             </strong>
                           </p>
-                        <button type="button">
-                            <a href="{% url 'resort' resort.id %}">Details</a>
-                        </button>
+                          <a href="{% url 'resort' resort.id %}" class="text"><button type="button">Details</button></a>
                         <p class="favorite-count">Favorites: {{ resort.favorite_count }}</p>
                     </div>
                 {% endfor %}
@@ -202,10 +196,7 @@
                               </span>
                             </strong>
                           </p>                    
-                        <button type="button">
-                            <a href="{% url 'resort' resort.id %}">Details</a>
-                        </button>
-    
+                            <a href="{% url 'resort' resort.id %}" class="text"><button type="button">Details</button></a>
                         <p class="favorite-count">Favorites: {{ resort.favorite_count }}</p>
                     </div>
                 {% endfor %}

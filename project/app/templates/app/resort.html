@@ -102,7 +102,7 @@
 
             <!-- Description Right -->
             <div class="description-text" style="flex: 1; max-width: 50%; margin-left: 40px;">
-                <h2 style="color: white; font-size: 32px; font-weight: bold; margin-bottom: 16px;">Rooms</h2>
+                <h2 style="color: white; font-size: 32px; font-weight: bold; margin-bottom: 16px;">Rooms and Cottages</h2>
                 <p id="room-description" style="font-size: 17px; line-height: 1.6;">{{ resort.room_description }}</p>
                 <textarea name="room_description" id="edit-room-description-input" style="display: none; width: 100%; padding: 10px;">{{ resort.room_description }}</textarea>
                 <div style="margin-top: 10px;">
@@ -272,9 +272,9 @@
                     <div id="edit-mode" style="display: none;">
                         <label>Room Rates:</label>
                         <select name="room_price_range" id="room-rate-input">
-                            <option value="Low" {% if resort.room_price_range == "Low" %}selected{% endif %}>Low</option>
-                            <option value="Average" {% if resort.room_price_range == "Average" %}selected{% endif %}>Average</option>
-                            <option value="High" {% if resort.room_price_range == "High" %}selected{% endif %}>High</option>
+                            <option value="Low" {% if resort.room_price_range == "Low" %}selected{% endif %}>Below - 999</option>
+                            <option value="Average" {% if resort.room_price_range == "Average" %}selected{% endif %}>Average - 1000-2999</option>
+                            <option value="High" {% if resort.room_price_range == "High" %}selected{% endif %}>Above - 3000</option>
                         </select>
                     
                         <label>Kids Fee:</label>
@@ -285,9 +285,9 @@
                     
                         <label>Cottage Rates:</label>
                         <select name="cottage_price_range" id="cottage-rate-input">
-                            <option value="Low" {% if resort.cottage_price_range == "Low" %}selected{% endif %}>Low</option>
-                            <option value="Average" {% if resort.cottage_price_range == "Average" %}selected{% endif %}>Average</option>
-                            <option value="High" {% if resort.cottage_price_range == "High" %}selected{% endif %}>High</option>
+                            <option value="Low" {% if resort.cottage_price_range == "Low" %}selected{% endif %}>Below - 999</option>
+                            <option value="Average" {% if resort.cottage_price_range == "Average" %}selected{% endif %}>Average - 1000-2999</option>
+                            <option value="High" {% if resort.cottage_price_range == "High" %}selected{% endif %}>Above - 3000</option>
                         </select>
                     
                         <label>Overnight Fee:</label>
