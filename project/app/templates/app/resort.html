@@ -7,6 +7,7 @@
     <title>FMB Resort</title>
     <link rel="stylesheet" href="{% static 'styles/resort.css'%}">
     <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 {% include 'navbar.html' %}
 <body>
@@ -24,8 +25,12 @@
             <textarea name="mini_description" id="edit-hero-subtitle-input" class="editable-textarea" style="display: none;">{{ resort.mini_description }}</textarea>
             <div class="description-buttons">
                 {% if request.user == resort.host %}
-                <button type="button" id="edit-hero-btn" class="edit-btn">Edit Description</button>
-                <button type="submit" id="save-hero-btn" class="save-btn" style="display: none;">Save Description</button>
+               <button type="button" id="edit-hero-btn" class="btn btn-primary me-2">
+                Edit Description
+            </button>
+            <button type="submit" id="save-hero-btn" class="btn btn-success" style="display: none;">
+                Save Description
+            </button>
                 {% endif %}
             </div>
         </div>
@@ -33,7 +38,9 @@
         <!-- Upload Hero Image -->
         <label for="uploadHeroImageHero" class="custom-file-upload">Upload Image</label>
         <input type="file" name="hero_image" id="uploadHeroImageHero" accept="image/*" hidden>
-        <button type="submit" class="save-image-btn">Save Hero Image</button>
+        <button type="submit" class="btn btn-primary px-4 py-2 rounded-3">
+            Save Hero Image
+        </button>
         {% endif %}
     </div>
 </header>
@@ -46,8 +53,12 @@
                     <p id="resort-description" style="color: black;">{{ resort.description }}</p>
                     {% if request.user == resort.host %}
                     <textarea name="description" id="edit-description-input" style="display: none;">{{ resort.description }}</textarea>
-                    <button type="button" id="edit-description-btn">Edit Description</button>
-                    <button type="submit" id="save-description-btn" style="display: none;">Save Description</button>
+                    <button type="button" id="edit-description-btn" class="btn btn-warning me-2">
+                        Edit Description
+                    </button>
+                    <button type="submit" id="save-description-btn" class="btn btn-success" style="display: none;">
+                        Save Description
+                    </button>
                     {% endif %}
                 </div>
     
@@ -57,7 +68,9 @@
                     {% if request.user == resort.host %}
                     <label for="uploadResortImage" class="custom-file-upload">Upload Image</label>
                     <input type="file" name="resort_image" id="uploadResortImage" accept="image/*">
-                    <button type="submit" id="save-resort-image-btn" class="save-image-btn">Save Resort Image</button>
+                    <button type="submit" id="save-resort-image-btn" class="btn btn-primary px-4 py-2 rounded-3 shadow-sm">
+                        Save Resort Image
+                    </button>
                     {% endif %}
                 </div>
             </div>
@@ -95,7 +108,9 @@
                     {% if request.user == resort.host %}
                         <label for="uploadRoomImage" class="custom-file-upload">Upload Image</label>
                         <input type="file" name="room_image" id="uploadRoomImage" accept="image/*">
-                        <button type="button" id="save-room-image-btn" class="save-image-btn">Save Room Image</button>
+                        <button type="button" id="save-room-image-btn" class="btn btn-success px-4 py-2 rounded-3 shadow-sm">
+                            Save Room Image
+                        </button>
                     {% endif %}
                 </div>
             </div>
@@ -107,8 +122,12 @@
                 <textarea name="room_description" id="edit-room-description-input" style="display: none; width: 100%; padding: 10px;">{{ resort.room_description }}</textarea>
                 <div style="margin-top: 10px;">
                     {% if request.user == resort.host %}
-                    <button type="button" id="edit-room-description-btn">Edit Room Description</button>
-                    <button type="submit" id="save-room-description-btn" style="display: none;">Save Room Description</button>
+                    <button type="button" id="edit-room-description-btn" class="btn btn-warning me-2">
+                        Edit Room Description
+                    </button>
+                    <button type="submit" id="save-room-description-btn" class="btn btn-success" style="display: none;">
+                        Save Room Description
+                    </button>
                     {% endif %}
                 </div>
             </div>
@@ -129,8 +148,12 @@
                 <textarea name="beach_description" id="edit-beach-description-input" style="display: none; width: 100%; padding: 10px;">{{ resort.beach_description }}</textarea>
                 <div style="margin-top: 10px;">
                     {% if request.user == resort.host %}
-                    <button type="button" id="edit-beach-description-btn">Edit Beach Description</button>
-                    <button type="submit" id="save-beach-description-btn" style="display: none;">Save Beach Description</button>
+                    <button type="button" id="edit-beach-description-btn" class="btn btn-warning me-2">
+                        Edit Beach Description
+                    </button>
+                    <button type="submit" id="save-beach-description-btn" class="btn btn-success" style="display: none;">
+                        Save Beach Description
+                    </button>
                     {% endif %}
                 </div>
             </div>
@@ -163,7 +186,9 @@
                     {% if request.user == resort.host %}
                         <label for="uploadBeachImage" class="custom-file-upload">Upload Image</label>
                         <input type="file" name="beach_image" id="uploadBeachImage" accept="image/*">
-                        <button type="button" id="save-beach-image-btn" class="save-image-btn">Save Beach Image</button>
+                        <button type="button" id="save-beach-image-btn" class="btn btn-primary px-4 py-2 rounded-3 shadow-sm">
+                            Save Beach Image
+                        </button>
                     {% endif %}
                 </div>
             </div>            
@@ -211,7 +236,9 @@
                     {% if request.user == resort.host %}
                         <label for="uploadActivityImage" class="custom-file-upload">Upload Image</label>
                         <input type="file" name="activity_image" id="uploadActivityImage" accept="image/*">
-                        <button type="button" id="save-activity-image-btn" class="save-image-btn">Save Activity Image</button>
+                        <button type="button" id="save-activity-image-btn" class="btn btn-primary px-4 py-2 rounded-3 shadow-sm">
+                            Save Activity Image
+                        </button>
                     {% endif %}
                 </div>
             </div>
@@ -223,8 +250,12 @@
                 <textarea name="activity_description" id="edit-activity-description-input" style="display: none; width: 100%; padding: 10px;">{{ resort.activity_description }}</textarea>
                 <div style="margin-top: 10px;">
                     {% if request.user == resort.host %}
-                    <button type="button" id="edit-activity-description-btn">Edit Activity Description</button>
-                    <button type="submit" id="save-activity-description-btn" style="display: none;">Save Activity Description</button>
+                    <button type="button" id="edit-activity-description-btn" class="btn btn-warning me-2">
+                        Edit Activity Description
+                    </button>
+                    <button type="submit" id="save-activity-description-btn" class="btn btn-success" style="display: none;">
+                        Save Activity Description
+                    </button>
                     {% endif %}
                 </div>
             </div>
@@ -238,34 +269,53 @@
             <div class="info-container">
                 <!-- Amenities Section -->
                 <div class="info-box">
-                    <h3>Our Amenities</h3>
-                    
-                    <ul id="amenities-list">
-                        {% for amenity in resort.amenities.all %}
-                            <li>{{ amenity.name }}</li> 
-                        {% endfor %}
-                    </ul>
-                    {% if request.user == resort.host %}
-                    <input type="text" id="new-amenity-input" placeholder="Enter a new amenity">
-                    <button type="button" id="add-amenity-btn">Add Amenity</button>
-            
-                    <input type="hidden" name="new_amenity" id="new-amenity-hidden" value="{{ new_amenity }}">
-                    
-                    <button type="submit" style="display: none;"></button> 
-                    {% endif %}
-                </div>
+                <h3>Our Amenities</h3>
+                
+                <ul id="amenities-list">
+                    {% for amenity in resort.amenities.all %}
+                        <li>{{ amenity.name }}</li> 
+                    {% endfor %}
+                </ul>
+
+                {% if request.user == resort.host %}
+                
+                <!-- Dropdown for selecting existing amenities -->
+                <select id="amenities-dropdown" class="form-select mb-2">
+                    <option value="" disabled selected>Select Amenity</option>
+                    {% for amenity in amenities %}
+                        <option value="{{ amenity.id }}">{{ amenity.name }}</option>
+                    {% endfor %}
+                </select>
+                
+                <!-- Input for entering a new amenity -->
+                <input type="text" id="new-amenity-input" placeholder="Enter a new amenity" class="form-control mb-2">
+                
+                <!-- Add Amenity Button -->
+                <button type="button" id="add-amenity-btn" class="btn btn-primary px-4 py-2 rounded-3 shadow-sm">
+                    Add Amenity
+                </button>
+
+                <!-- Hidden field for sending the selected amenity or new amenity to the backend -->
+                <input type="hidden" name="new_amenity" id="new-amenity-hidden">
+                
+                <!-- Invisible submit button, you can trigger this if needed -->
+                <button type="submit" style="display: none;"></button>
+                {% endif %}
+            </div>
     
                 <div class="info-box">
                     <h3>Room Rates & Fees</h3>
     
                     <div id="display-mode">
                         <p><strong>Room Price:</strong> <span id="room-rate-text">{{resort.room_rate_display}}</span></p>
-                        <p><strong>Kids:</strong> <span id="kids-fee-text">{{ resort.entrance_kids }}</span></p>
-                        <p><strong>Adults:</strong> <span id="adults-fee-text">{{ resort.entrance_adults }}</span></p>
+                        <p><strong>Kids Entrance Fee:</strong> <span id="kids-fee-text">{{ resort.entrance_kids }}</span></p>
+                        <p><strong>Adults Entrance Fee:</strong> <span id="adults-fee-text">{{ resort.entrance_adults }}</span></p>
                         <p><strong>Cottage Price:</strong> <span id="cottage-rate-text">{{resort.cottage_rate_display}}</span></p>
                         <p><strong>Overnight Fee:</strong> <span id="overnight-fee-text">{{ resort.price }}</span></p>
                         {% if request.user == resort.host %}
-                        <button type="button" id="edit-btn">Edit Rates</button>
+                        <button type="button" id="edit-btn" class="btn btn-primary px-4 py-2 rounded-3 shadow-sm">
+                            Edit Rates
+                        </button>
                         {% endif %}
                     </div>
     
@@ -277,10 +327,10 @@
                             <option value="High" {% if resort.room_price_range == "High" %}selected{% endif %}>Above - 3000</option>
                         </select>
                     
-                        <label>Kids Fee:</label>
+                        <label>Kids Entrance Fee:</label>
                         <input type="text" name="entrance_kids" id="kids-fee-input" value="{{ resort.entrance_kids }}">
                     
-                        <label>Adults Fee:</label>
+                        <label>Adults Entrance Fee:</label>
                         <input type="text" name="entrance_adults" id="adults-fee-input" value="{{ resort.entrance_adults }}">
                     
                         <label>Cottage Rates:</label>
@@ -357,9 +407,25 @@
   document.addEventListener("DOMContentLoaded", function () {
     let editBtn = document.getElementById("edit-btn");
     let saveBtn = document.getElementById("save-btn");
- 
     let displayMode = document.getElementById("display-mode");
     let editMode = document.getElementById("edit-mode");
+
+    // Prevent negative values for fee inputs
+    const feeInputs = [
+        "room-rate-input",
+        "kids-fee-input",
+        "adults-fee-input",
+        "cottage-rate-input",
+        "overnight-fee-input"
+    ];
+
+    feeInputs.forEach(id => {
+        const input = document.getElementById(id);
+        input.addEventListener("input", function () {
+            // Prevent negative numbers and non-digit characters
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+    });
 
     // Edit and Save Room Rates
     editBtn.addEventListener("click", function () {
@@ -492,12 +558,20 @@ editAndSaveDescription("edit-activity-description-btn", "save-activity-descripti
     document.getElementById('add-amenity-btn').addEventListener('click', function() {
     var newAmenityInput = document.getElementById('new-amenity-input');
     var newAmenity = newAmenityInput.value.trim();
-    
-    if (newAmenity) {
-        // Set the hidden input value to the new amenity
+    var amenitiesDropdown = document.getElementById('amenities-dropdown');
+    var selectedAmenityId = amenitiesDropdown.value;
+
+    if (selectedAmenityId) {
+        // Get the name of the selected amenity
+        var selectedAmenityName = amenitiesDropdown.options[amenitiesDropdown.selectedIndex].text;
+
+        // Set the hidden input value to the selected amenity name
+        document.getElementById('new-amenity-hidden').value = selectedAmenityName;
+    } else if (newAmenity) {
+        // If there's a new amenity entered, set it as the value to be sent
         document.getElementById('new-amenity-hidden').value = newAmenity;
         
-        // Optionally, you can also dynamically update the amenities list on the page
+        // Optionally, you can dynamically update the amenities list on the page
         var amenitiesList = document.getElementById('amenities-list');
         var newAmenityLi = document.createElement('li');
         newAmenityLi.textContent = newAmenity;
@@ -505,10 +579,10 @@ editAndSaveDescription("edit-activity-description-btn", "save-activity-descripti
         
         // Clear the input
         newAmenityInput.value = '';
-        
-        // Trigger the form submit
-        document.querySelector('form button[type="submit"]').click();
     }
+
+    // Trigger the form submit
+    document.querySelector('form button[type="submit"]').click();
 });
 });
 let selectedRating = null;

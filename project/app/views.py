@@ -544,27 +544,22 @@ def home(request):
     else:
         resorts = Resort.objects.all().order_by('-created_at')
 
-
     resorts = resorts.filter(restricted=False)
 
-    # Get filter parameters
-    selected_amenities = request.GET.getlist('amenities')  
-    selected_location = request.GET.getlist('location')   
-    min_price = request.GET.get('min_price') 
-    max_price = request.GET.get('max_price')  
-
-    # Apply filters
+    # Apply amenities filter
+    selected_amenities = request.GET.getlist('amenities')
     if selected_amenities:
         for amenity in selected_amenities:
             resorts = resorts.filter(amenities__id=amenity).distinct()
 
-    selected_location = request.GET.get('location')  # Get the single selected location
-
     # Apply location filter
+    selected_location = request.GET.get('location')
     if selected_location:
         resorts = resorts.filter(location__id=selected_location).distinct()
 
-    # Ensure proper price filtering
+    # Apply price filtering
+    min_price = request.GET.get('min_price')
+    max_price = request.GET.get('max_price')
     try:
         min_price = float(min_price) if min_price else None
         max_price = float(max_price) if max_price else None
@@ -573,7 +568,6 @@ def home(request):
         max_price = None
 
     if min_price is not None or max_price is not None:
-        # Annotating resorts with the total price including room and cottage prices
         resorts = resorts.annotate(
             room_price_min=Case(
                 When(room_price_range='Low', then=Value(0)),
@@ -595,88 +589,82 @@ def home(request):
             )
         )
 
-        # Apply the min_price and max_price filters after computing the total price
         if min_price is not None:
             resorts = resorts.filter(total_price__gte=min_price)
-
         if max_price is not None:
             resorts = resorts.filter(total_price__lte=max_price)
 
-    # Annotate resorts with favorite count
+    # Annotate favorites
+    user = request.user
     resorts = resorts.annotate(
         favorite_count=Count('favorite_resorts', distinct=True),
         is_favorite=Exists(
-            Favorite.objects.filter(user=request.user, resort=OuterRef('pk'))
-        ) if request.user.is_authenticated else Value(False)
+            Favorite.objects.filter(user=user, resort=OuterRef('pk'))
+        ) if user.is_authenticated else Value(False)
     )
-    resorts = get_ranked_resorts(resorts)
+
+    # Fetch the weights from the form submission
+    weights = {
+        'price': float(request.GET.get('price_weight', 40)) / 100,
+        'rank': float(request.GET.get('rank_weight', 35)) / 100,
+        'location': float(request.GET.get('location_weight', 15)) / 100,
+        'amenities': float(request.GET.get('amenities_weight', 10)) / 100
+    }
 
     # Apply ranking for rated resorts (by average rating)
     rated_resorts = Resort.objects.annotate(
         average_rating=Avg('rating__rating'),
-        favorite_count=Count('favorite_resorts', distinct=True)  # Add favorite count
-    ).order_by('-average_rating')  
-
-
-    user = request.user
-    recommendations = []
+        favorite_count=Count('favorite_resorts', distinct=True)
+    ).order_by('-average_rating')
 
     # Fetch recommendations for authenticated users
+    recommendations = []
     if user.is_authenticated:
         recommendations = get_recommendations(user.id, n_recommendations=5)
-
-        # Get recommended resort IDs
         recommendation_ids = [resort.id for resort in recommendations]
-
-        # Fetch resorts with favorite count and order by most favorited
         annotated_recommendations = (
             Resort.objects.filter(id__in=recommendation_ids)
             .annotate(favorite_count=Count('favorite_resorts', distinct=True))
-            .order_by('-favorite_count')  # Order by highest favorite count
+            .order_by('-favorite_count')
         )
-
-        # Map favorite count and is_favorite back to recommendations
         for resort in annotated_recommendations:
             resort.is_favorite = Favorite.objects.filter(user=user, resort=resort).exists()
-
-        # Assign sorted recommendations back
         recommendations = list(annotated_recommendations)
 
+    # Rank resorts using the selected weights
+    ranked_resorts = get_ranked_resorts(resorts, weights)
+
     # Add `is_favorite` to all rated resorts
-    for resort in rated_resorts:  
+    for resort in rated_resorts:
         resort.is_favorite = user.is_authenticated and Favorite.objects.filter(user=user, resort=resort).exists()
 
+    # Handle AJAX requests
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        resorts_data = list(resorts.values(
-            'id', 'name', 'description', 'entrance_kids', 'entrance_adults', 'price_per_night', 'resort_image', 'room_price_range', 'cottage_price_range', 'score'
+        resorts_data = list(ranked_resorts.values(
+            'id', 'name', 'description', 'entrance_kids', 'entrance_adults', 'price_per_night', 'resort_image', 'room_price_range', 'cottage_price_range'
         ))
 
         for resort in resorts_data:
-            # Compute the base total price
             total_price = float(resort['price_per_night']) + float(resort['entrance_kids']) + float(resort['entrance_adults'])
 
-            # Add the room and cottage price ranges to the total price
             if resort.get('room_price_range') == 'Low':
-                total_price += 999  # or another value fitting the 'Low' range
+                total_price += 999
             elif resort.get('room_price_range') == 'Average':
-                total_price += 2000  # or another value fitting the 'Average' range
+                total_price += 2000
             elif resort.get('room_price_range') == 'High':
-                total_price += 3000  # or another value fitting the 'High' range
+                total_price += 3000
 
             if resort.get('cottage_price_range') == 'Low':
-                total_price += 999  # Adjust this to fit the 'Low' range for the cottage
+                total_price += 999
             elif resort.get('cottage_price_range') == 'Average':
-                total_price += 2000  # Adjust this to fit the 'Average' range for the cottage
+                total_price += 2000
             elif resort.get('cottage_price_range') == 'High':
-                total_price += 3000  # Adjust this to fit the 'High' range for the cottage
+                total_price += 3000
 
-            # Set the computed total price
             resort['total_price'] = total_price
-            # Ensure image URLs are correct
             if resort['resort_image']:
                 resort['resort_image'] = f"/media/{resort['resort_image']}"
-
-            resort['is_favorite'] = Favorite.objects.filter(user=user, resort_id=resort['id']).exists() if user.is_authenticated else False  
+            resort['is_favorite'] = Favorite.objects.filter(user=user, resort_id=resort['id']).exists() if user.is_authenticated else False
             resort['favorite_count'] = Favorite.objects.filter(resort_id=resort['id']).count()
 
         return JsonResponse({
@@ -689,11 +677,11 @@ def home(request):
 
     amenities = Amenity.objects.all()
     locations = Location.objects.all()
-    resort_count = rated_resorts.count()  # Get the count of rated resorts  
+    resort_count = ranked_resorts.count()
 
     context = {
-        'resorts': resorts,  # Resorts ordered by creation date
-        'recommendations': recommendations,  # Ordered by favorite count
+        'resorts': ranked_resorts,
+        'recommendations': recommendations,
         'amenities': amenities,
         'resort_count': resort_count,
         'locations': locations,
@@ -701,7 +689,7 @@ def home(request):
         'selected_location': selected_location,
         'min_price': min_price,
         'max_price': max_price,
-        "rated_resorts": rated_resorts,  # Resorts ordered by average rating
+        "rated_resorts": rated_resorts,
         "show_scores": True,
         'q': q
     }

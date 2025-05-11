@@ -1,3 +1,35 @@
+<style>
+.hover-tooltip {
+    cursor: help;
+}
+
+
+.hover-tooltip:hover {
+    text-decoration: underline;
+    color: #007bff;  /* Use a color that fits your design */
+}
+
+
+@keyframes tooltip-pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.hover-tooltip {
+    display: inline-block;
+    animation: tooltip-pulse 1.5s infinite;
+}
+
+.filter-section h3{
+    color: #007bff;
+}
+</style>
+
+
 <aside class="sidebar">
     <form id="filter-form" action="{% url 'home' %}" method="GET">
         
@@ -13,6 +45,41 @@
 
             <button type="button" id="apply-filters">Apply</button>
         </div>
+
+        <div class="filter-section">
+            <h3>Ranking Criteria Based On Users Preference</h3>
+            
+            <label for="price_weight">
+                Price <span class="hover-tooltip" title="The higher score the lower the price">ℹ️</span>
+            </label>
+            <input type="range" id="price_weight" min="0" max="100" value="40">
+            <input type="number" id="price_weight_value" value="40" min="0" max="100">
+            <input type="hidden" name="price_weight" id="price_weight_hidden" value="40">
+            <br>
+        
+            <label for="rank_weight">
+                Rank <span class="hover-tooltip" title="Higher scores indicate more popular and better-reviewed resorts">ℹ️</span>
+            </label>
+            <input type="range" id="rank_weight" min="0" max="100" value="35">
+            <input type="number" id="rank_weight_value" value="35" min="0" max="100">
+            <input type="hidden" name="rank_weight" id="rank_weight_hidden" value="35">
+            <br>
+        
+            <label for="location_weight">
+                Location <span class="hover-tooltip" title="Higher scores indicates nearest on the Municipality">ℹ️</span>
+            </label>
+            <input type="range" id="location_weight" min="0" max="100" value="15">
+            <input type="number" id="location_weight_value" value="15" min="0" max="100">
+            <input type="hidden" name="location_weight" id="location_weight_hidden" value="15">
+            <br>
+        
+            <label for="amenities_weight">
+                Amenities <span class="hover-tooltip" title="Higher scores indicate resorts with more and better amenities">ℹ️</span>
+            </label>
+            <input type="range" id="amenities_weight" min="0" max="100" value="10">
+            <input type="number" id="amenities_weight_value" value="10" min="0" max="100">
+            <input type="hidden" name="amenities_weight" id="amenities_weight_hidden" value="10">
+            <br>
 
         <div class="filter-section">
             <h3>AMENITIES</h3>
@@ -49,32 +116,56 @@ document.addEventListener('DOMContentLoaded', function () {
     const maxPriceInput = document.getElementById('max-price');
     const applyButton = document.getElementById('apply-filters');
     
-    function applyFilters() {
-    event.preventDefault(); // Prevent the form from submitting normally
+    // Prevent negative values
+    [minPriceInput, maxPriceInput].forEach(input => {
+        input.addEventListener('input', function () {
+            // Remove non-numeric characters
+            this.value = this.value.replace(/[^0-9]/g, '');
 
-    // Collect form data
-    const formData = new FormData(filterForm);
-    const params = new URLSearchParams(formData);
+            // Check for negative values
+            if (parseInt(this.value) < 0) {
+                this.setCustomValidity("Price cannot be negative");
+            } else {
+                this.setCustomValidity(""); // Clear the custom validity
+            }
 
-    // Manually append price inputs if they are filled
-    if (minPriceInput.value) {
-        params.append("min_price", minPriceInput.value);
+            // Check for valid price range
+            if (minPriceInput.value && maxPriceInput.value && parseInt(minPriceInput.value) > parseInt(maxPriceInput.value)) {
+                maxPriceInput.setCustomValidity("Maximum price cannot be less than minimum price");
+                minPriceInput.setCustomValidity("Minimum price cannot be greater than maximum price");
+            } else {
+                maxPriceInput.setCustomValidity("");
+                minPriceInput.setCustomValidity("");
+            }
+        });
+    });
+
+    function applyFilters(event) {
+        event.preventDefault(); // Prevent the form from submitting normally
+
+        // Collect form data
+        const formData = new FormData(filterForm);
+        const params = new URLSearchParams(formData);
+
+        // Manually append price inputs if they are filled
+        if (minPriceInput.value) {
+            params.set("min_price", minPriceInput.value);
+        }
+        if (maxPriceInput.value) {
+            params.set("max_price", maxPriceInput.value);
+        }
+
+        fetch(`${filterForm.action}?${params.toString()}`, {
+            method: 'GET',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            updateResortList(data.resorts); // Update the resort list after filtering
+            attachFavoriteListeners(); // Re-attach favorite button listeners
+        })
+        .catch(error => console.error('Error fetching filtered resorts:', error));
     }
-    if (maxPriceInput.value) {
-        params.append("max_price", maxPriceInput.value);
-    }
-
-    fetch(`${filterForm.action}?${params.toString()}`, {
-        method: 'GET',
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-    })
-    .then(response => response.json())
-    .then(data => {
-        updateResortList(data.resorts); // Update the resort list after filtering
-        attachFavoriteListeners(); // Re-attach favorite button listeners
-    })
-    .catch(error => console.error('Error fetching filtered resorts:', error));
-}
 
     // Apply filters when checkboxes change
     filterForm.addEventListener('change', applyFilters);
@@ -83,98 +174,170 @@ document.addEventListener('DOMContentLoaded', function () {
     applyButton.addEventListener('click', applyFilters);
 
     function updateResortList(resorts) {
-    const resortsContainer = document.querySelector('.all-resorts-cards');
-    resortsContainer.innerHTML = ''; // Clear existing resorts
+        const resortsContainer = document.querySelector('.all-resorts-cards');
+        resortsContainer.innerHTML = ''; // Clear existing resorts
 
-    resorts.forEach(resort => {
-    const card = document.createElement('div');
-    card.classList.add('card');
+        resorts.forEach(resort => {
+            const card = document.createElement('div');
+            card.classList.add('card');
 
-    card.innerHTML = `
-        ${resort.resort_image ? `<img src="${resort.resort_image}" alt="">` : ''}
+            card.innerHTML = `
+                ${resort.resort_image ? `<img src="${resort.resort_image}" alt="">` : ''}
 
-        <a class="favorite-btn" data-resort-id="${resort.id}">
-            <i class="fa fa-heart ${resort.is_favorite ? 'active' : ''}" aria-hidden="true"></i>
-        </a>
+                <a class="favorite-btn" data-resort-id="${resort.id}">
+                    <i class="fa fa-heart ${resort.is_favorite ? 'active' : ''}" aria-hidden="true"></i>
+                </a>
 
-        <h4>${resort.name}</h4>
-        <p>Estimated Cost: <strong>₱${resort.total_price.toFixed(2)}</strong></p>
-        <button type="button">
-            <a href="/resort/${resort.id}/">Details</a>
-        </button>
-        <p class="favorite-count">Favorites: ${resort.favorite_count}</p>
+                <h4>${resort.name}</h4>
+                <p>Estimated Cost: <strong>₱${resort.total_price.toFixed(2)}</strong></p>
+                <button type="button">
+                    <a href="/resort/${resort.id}/">Details</a>
+                </button>
+                <p class="favorite-count">Favorites: ${resort.favorite_count}</p>
 
-        ${resort.score ? `<p>Score: ${resort.score.toFixed(2)}</p>` : ''} 
-    `;
+                ${resort.score ? `<p>Score: ${resort.score.toFixed(2)}</p>` : ''} 
+            `;
 
-    resortsContainer.appendChild(card);
-});
+            resortsContainer.appendChild(card);
+        });
 
-attachFavoriteListeners(); // Re-attach event listeners for heart icons
+        attachFavoriteListeners(); // Re-attach event listeners for heart icons
+    }
 
-}
+    function attachFavoriteListeners() {
+        const resortsContainer = document.querySelector('.all-resorts-cards');
 
-function attachFavoriteListeners() {
-    const resortsContainer = document.querySelector('.all-resorts-cards');
+        // Event delegation for heart icon click
+        resortsContainer.addEventListener('click', function (event) {
+            if (event.target.closest('.favorite-btn')) {
+                const button = event.target.closest('.favorite-btn');
+                const resortId = button.dataset.resortId;
+                const isFavorite = button.querySelector('.fa-heart').classList.contains('active');
 
-    // Event delegation for heart icon click
-    resortsContainer.addEventListener('click', function (event) {
-        if (event.target.closest('.favorite-btn')) {
-            const button = event.target.closest('.favorite-btn');
-            const resortId = button.dataset.resortId;
-            const isFavorite = button.querySelector('.fa-heart').classList.contains('active');
-
-            fetch('/toggle_favorite/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCsrfToken()
-                },
-                body: JSON.stringify({
-                    resort_id: resortId,
-                    is_favorite: !isFavorite
+                fetch('/toggle_favorite/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCsrfToken()
+                    },
+                    body: JSON.stringify({
+                        resort_id: resortId,
+                        is_favorite: !isFavorite
+                    })
                 })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    button.querySelector('.fa-heart').classList.toggle('active', !isFavorite);
-                    button.closest('.card').querySelector('.favorite-count').textContent = `Favorites: ${data.favorite_count}`;
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        }
-    });
-}
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        button.querySelector('.fa-heart').classList.toggle('active', !isFavorite);
+                        button.closest('.card').querySelector('.favorite-count').textContent = `Favorites: ${data.favorite_count}`;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        });
+    }
 
-function getCsrfToken() {
-    return document.querySelector('input[name="csrfmiddlewaretoken"]').value;
-}
+    function getCsrfToken() {
+        return document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+    }
 
 });
-document.addEventListener("DOMContentLoaded", function() {
-        // Get the price fields
-        const minPriceField = document.getElementById('min_price');
-        const maxPriceField = document.getElementById('max_price');
+   document.addEventListener('DOMContentLoaded', function () {
+    const weights = [
+        { slider: 'price_weight', input: 'price_weight_value', hidden: 'price_weight_hidden' },
+        { slider: 'rank_weight', input: 'rank_weight_value', hidden: 'rank_weight_hidden' },
+        { slider: 'location_weight', input: 'location_weight_value', hidden: 'location_weight_hidden' },
+        { slider: 'amenities_weight', input: 'amenities_weight_value', hidden: 'amenities_weight_hidden' }
+    ];
 
-        // Prevent negative values in the min_price field
-        minPriceField.addEventListener('input', function() {
-            if (minPriceField.value < 0) {
-                minPriceField.setCustomValidity("Price cannot be negative");
-            } else {
-                minPriceField.setCustomValidity(""); // Clear the custom validity
+    // Function to adjust weights to ensure the total is exactly 100
+    function adjustWeightsToTotal() {
+        const total = 100;
+        const currentValues = weights.map(weight => parseInt(document.getElementById(weight.input).value, 10) || 0);
+        const currentSum = currentValues.reduce((sum, value) => sum + value, 0);
+
+        if (currentSum > total) {
+            let excess = currentSum - total;
+
+            // Proportionally reduce values to fit within 100
+            for (let i = 0; i < weights.length; i++) {
+                if (currentValues[i] > 0) {
+                    const proportion = currentValues[i] / currentSum;
+                    const adjustment = Math.round(excess * proportion);
+
+                    // Adjust the value, ensuring it doesn't go below zero
+                    let newValue = currentValues[i] - adjustment;
+                    newValue = Math.max(newValue, 0);
+
+                    // Update DOM elements
+                    document.getElementById(weights[i].input).value = newValue;
+                    document.getElementById(weights[i].slider).value = newValue;
+                    document.getElementById(weights[i].hidden).value = newValue;
+                }
             }
+        }
+    }
+
+    // Sync sliders with inputs and enforce 0-100 range
+    weights.forEach(weight => {
+        const slider = document.getElementById(weight.slider);
+        const input = document.getElementById(weight.input);
+        const hidden = document.getElementById(weight.hidden);
+
+        // Sync slider and input values
+        const syncValues = (source, target1, target2) => {
+            let value = parseInt(source.value, 10) || 0;
+
+            // Enforce 0-100 range
+            value = Math.max(0, Math.min(100, value));
+
+            // Update values
+            target1.value = value;
+            target2.value = value;
+        };
+
+        // Slider change
+        slider.addEventListener('input', function () {
+            syncValues(this, input, hidden);
+            adjustWeightsToTotal();
         });
 
-        // Prevent negative values in the max_price field
-        maxPriceField.addEventListener('input', function() {
-            if (maxPriceField.value < 0) {
-                maxPriceField.setCustomValidity("Price cannot be negative");
-            } else {
-                maxPriceField.setCustomValidity(""); // Clear the custom validity
-            }
+        // Number input change
+        input.addEventListener('input', function () {
+            // Prevent non-numeric input
+            this.value = this.value.replace(/[^0-9]/g, '');
+            syncValues(this, slider, hidden);
+            adjustWeightsToTotal();
         });
     });
+
+    // Apply filters button
+    const applyButton = document.getElementById('apply-filters');
+    applyButton.addEventListener('click', function () {
+        const totalWeight = weights.reduce((sum, weight) => {
+            return sum + parseInt(document.getElementById(weight.hidden).value, 10);
+        }, 0);
+
+        // Ensure the total is exactly 100%
+        if (totalWeight !== 100) {
+            alert('The total weight must sum to 100%');
+            return;
+        }
+
+        // Add weights to the form before submission
+        const filterForm = document.getElementById('filter-form');
+        weights.forEach(weight => {
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = weight.slider.replace('_weight', '');
+            hiddenInput.value = document.getElementById(weight.hidden).value;
+            filterForm.appendChild(hiddenInput);
+        });
+
+        // Submit the form
+        filterForm.submit();
+    });
+});
     </script>
     
 
