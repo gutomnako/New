@@ -1074,7 +1074,7 @@ def createResort(request):
 
             print(f"Subadmin created: username={username}, password={password}")
 
-            return redirect('home')  # Redirect after successful creation
+            return redirect('admin-beach')  # Redirect after successful creation
         else:
             # Print form errors for debugging
             print(form.errors)

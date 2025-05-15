@@ -58,7 +58,9 @@
                               </span>
                             </strong>
                           </p>
-                          <a href="{% url 'resort' resort.id %}" class="text"><button type="button">Details</button></a>
+                          <a href="{% if user.is_authenticated %}{% url 'resort' resort.id %}{% else %}{% url 'login' %}{% endif %}">
+                              <button type="button" class="text">Details</button>
+                          </a>
                         <p class="favorite-count">Favorites: {{ resort.favorite_count }}</p>
                     </div>
                 {% endfor %}
@@ -124,7 +126,9 @@
                               </span>
                             </strong>
                           </p>
-                          <a href="{% url 'resort' resort.id %}" class="text"><button type="button">Details</button></a>
+                          <a href="{% if user.is_authenticated %}{% url 'resort' resort.id %}{% else %}{% url 'login' %}{% endif %}">
+                              <button type="button" class="text">Details</button>
+                          </a>
                         <p class="favorite-count">Favorites: {{ resort.favorite_count }}</p>
                     </div>
                 {% endfor %}
@@ -196,7 +200,9 @@
                               </span>
                             </strong>
                           </p>                    
-                            <a href="{% url 'resort' resort.id %}" class="text"><button type="button">Details</button></a>
+                            <a href="{% if user.is_authenticated %}{% url 'resort' resort.id %}{% else %}{% url 'login' %}{% endif %}">
+                              <button type="button" class="text">Details</button>
+                            </a>
                         <p class="favorite-count">Favorites: {{ resort.favorite_count }}</p>
                     </div>
                 {% endfor %}

@@ -68,7 +68,9 @@
             Average Rating:
             <span class="star-rating" data-rating="{{ resort.average_rating }}"></span>
           </p>
-            <a href="{% url 'resort' resort.id %}" class="text"><button type="button">Details</button></a>
+            <a href="{% if user.is_authenticated %}{% url 'resort' resort.id %}{% else %}{% url 'login' %}{% endif %}">
+              <button type="button" class="text">Details</button>
+            </a>
         </div>
         {% endfor %}
       </div>

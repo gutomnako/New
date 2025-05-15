@@ -15,7 +15,7 @@
         {% csrf_token %}
     
        <!-- Hero Section -->
-<header class="hero" id="hero" style="background-image: url('{% if resort.hero_image %}{{ resort.hero_image.url }}{% else %}/static/images/fmb.jpg{% endif %}');">
+<header class="hero" id="hero" style="background-image: url('{% if resort.hero_image %}{{ resort.hero_image.url }}{% else %}/static/images/paradise.jpg{% endif %}');">
     <div class="hero-content">
         <h1>Welcome to {{ resort.name }}</h1>
 
@@ -95,7 +95,7 @@
                         {% endif %}
                         </div>
                     {% empty %}
-                        <img src="/static/images/fmb.jpg" alt="Default Room Image" class="room-slide active" data-image-id="default-room-1">
+                        <img src="/static/images/paradise.jpg" alt="Default Room Image" class="room-slide active" data-image-id="default-room-1">
                     {% endfor %}
                     
                     <!-- Arrows -->
@@ -172,7 +172,7 @@
                             {% endif %}
                         </div>
                     {% empty %}
-                        <img src="/static/images/fmb.jpg" alt="Default Beach Image 1" class="beach-slide active" data-image-id="default-beach-1">
+                        <img src="/static/images/paradise.jpg" alt="Default Beach Image 1" class="beach-slide active" data-image-id="default-beach-1">
                     {% endfor %}
                     
                     <!-- Arrows -->
@@ -223,7 +223,7 @@
                             {% endif %}
                         </div>
                     {% empty %}
-                        <img src="/static/images/fmb.jpg" alt="Default Beach Image 1" class="beach-slide active" data-image-id="default-beach-1">
+                        <img src="/static/images/paradise.jpg" alt="Default Beach Image 1" class="beach-slide active" data-image-id="default-beach-1">
                     {% endfor %}
             
                     <!-- Arrows -->
